@@ -1,9 +1,9 @@
 %%% Testing 3D data processing with new MATLAB graphics
 
-run = 356798;
-cd(sprintf('%d',run))
+run = 448706;
+cd(sprintf('/Users/Taryn/Documents/MATLAB/MFIX_temp/%d',run))
 
-% EP_G = importdata(sprintf('EP_G_%d',run));
+EP_G = importdata(sprintf('EP_G_%d',run));
 
 IMAX = 104;
 JMAX = 104;
@@ -21,13 +21,13 @@ box on
 
 
 %%% testing all in one time loop
-% vidObj = VideoWriter('EPGtest.avi');
-% vidObj.Quality = 100;
-% vidObj.FrameRate = 10;
-% open(vidObj);
-% set(gcf,'Visible','off');
+vidObj = VideoWriter('EPGtest.avi');
+vidObj.Quality = 100;
+vidObj.FrameRate = 10;
+open(vidObj);
+set(gcf,'Visible','off');
 
-for t = 100%1:timesteps
+for t = 50;%1:timesteps
     
     EPG = reshape(EP_G((t-1)*IMAX*JMAX*KMAX+1:t*IMAX*JMAX*KMAX),[JMAX IMAX KMAX]);
     EPG = EPG(3:end-2,3:end-2,3:end-2);
@@ -47,17 +47,17 @@ for t = 100%1:timesteps
     legend([surf1,surf2,surf3,surf4],'EPG=0.99999','EPG=0.99995','EPG=0.9999','EPG=0.9995')
     title(sprintf('Gas volume fraction, timestep=%d',t));
     
-%     vidfig = 'current.jpg';
-%     saveas(fig,vidfig);
+    vidfig = 'current.jpg';
+    saveas(fig,vidfig);
 %     newfig = sprintf('EPG_%dt',t);
 %     savefig(fig,newfig,'compact');
-% 
-%     img = imread(vidfig);
-%     writeVideo(vidObj,img);
+
+    img = imread(vidfig);
+    writeVideo(vidObj,img);
     
 end
 
-% close(vidObj);
+close(vidObj);
     
     
     
