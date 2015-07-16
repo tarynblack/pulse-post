@@ -1,5 +1,5 @@
 function [EP_G,RO_G,ROP_S1,ROP_S2,V_G,U_G,V_S1,V_S2,T_G,P_G] = mfixData(run)
-% mfixData loads output data from an MFIX simulation specified by <run>
+% mfixData2D loads output data from an MFIX simulation specified by <run>
 %   EP_G: gas volume fraction
 %   RO_G: effective gas density
 %   ROP_S1: effective solid(1) density

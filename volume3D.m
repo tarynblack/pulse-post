@@ -1,0 +1,78 @@
+function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
+    ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,isoEPG,...
+    colEPG,trnEPG,time,PULSE,FREQ )
+%volume3D makes frames of the time evolution of gas volume fraction in a
+%volcanic plume during a simulated volcanic eruption.
+%   volume3D processes gas volume fraction (EP_G) data from an MFiX run
+%   <run> to create video frames of the evolution of gas volume fraction
+%   during an eruption, which are passed as output to a file
+%   vidEPG_<run>.avi. The frames display specified isosurfaces <isoEPG> of
+%   gas volume fraction, at specified colors <colEPG> and transparencies
+%   <trnEPG>.
+%   
+%   Special functions called: timeslice3D; pulsetitle
+%   Last edit: Taryn Black, 16 July 2015
+
+    cd(dir)
+    
+    varname = 'Gas volume fraction';
+    
+%%% Initialize figure frames
+    fig = figure('Name','Gas Volume Fraction','visible',vis);
+    hold on
+    view(3)
+    axis equal
+    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
+        JMAX-(ghostcells/2),ghostcells-1,KMAX-(ghostcells/2)]);
+    set(gca,'XTick',xkilolabels(2:end)*1000,'XTickLabel',xkilolabels(2:end),'FontSize',12)
+        xlabel('\bf Distance (km)','FontSize',12)
+    set(gca,'YTick',zkilolabels(2:end)*1000,'YTickLabel',zkilolabels(2:end),'FontSize',12)
+        ylabel('\bf Distance(km)','FontSize',12)
+    set(gca,'ZTick',ykilolabels(2:end)*1000,'ZTickLabel',ykilolabels(2:end),'FontSize',12)
+        zlabel('\bf Altitude (km)','FontSize',12)
+    grid on
+    box on
+    %%% Initialize legend entries based on number of isosurfaces
+        names = cell(1,length(isoEPG));
+        initEPG = timeslice3D(EP_G,1,IMAX,JMAX,KMAX,ghostcells);
+        for i = 1:length(isoEPG)
+            names{i} = sprintf('EPG = %0.5f',isoEPG(i));
+            surf = patch(isosurface(initEPG,isoEPG(i)));
+            set(surf,'FaceColor',colEPG(i,:),'EdgeColor','none','FaceAlpha',1.0);
+            hold on
+        end
+        legend(names)
+    
+%%% Initialize video
+    vidEPG = VideoWriter(sprintf('vidEPG_%d.avi',run));
+    vidEPG.Quality = 100;
+    vidEPG.FrameRate = 10;
+    open(vidEPG);
+    set(gcf,'Visible',vis);
+    
+%%% Plot gas volume fraction isosurfaces at each timestep and save video.
+    for t = 1:timesteps
+        
+        EPG = timeslice3D(EP_G,t,IMAX,JMAX,KMAX,ghostcells);
+        
+        cla;
+        for j = 1:length(isoEPG)
+            surf(j) = patch(isosurface(EPG,isoEPG(j)));
+            set(surf(j),'FaceColor',colEPG(j,:),'EdgeColor','none','FaceAlpha',trnEPG(j));
+            hold on
+        end
+        
+        tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
+        title(tL,'FontSize',12,'FontWeight','bold');
+        
+        vidfig = 'EPGcurrent.jpg';
+        saveas(fig,vidfig);
+        img = imread(vidfig);
+        writeVideo(vidEPG,img);
+        
+    end
+    
+    close(vidEPG);
+
+end
+
