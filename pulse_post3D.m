@@ -21,8 +21,13 @@ clear all
   allruns = [448706];
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
-  path = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
-
+%   path = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
+  runpath = '~/data2/rundata/';
+  
+% Set path for location of post-processing files (cannot change path file
+% on Atlas cluster).
+  postpath = '~/data2/pulse-post';
+  
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nojvm mode.
   vis = 'off';
@@ -75,8 +80,7 @@ for i = 1:length(allruns)
     run = allruns(i);
     sprintf('Now processing run #%d',run)
 
-    dir = sprintf('%s%d',path,run);
-    cd(dir)
+    dir = sprintf('%s%d',runpath,run);
    
     % Import data generated in MFiX
       [  EP_G,...
@@ -87,11 +91,13 @@ for i = 1:length(allruns)
           W_G,W_S1,W_S2,...
           RO_G,ROP_S1,ROP_S2,...
           X_G2  ] = mfixData3D(run,dir,onE,onP,onT,onV,onR,onX);
+      cd(postpath)
         
     % Load and set constant simulation parameters
       ghostcells = 4;     % MFiX adds these to each domain dimension
       [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,PULSE,FREQ,DT] ...
           = setCnsts3D(run,dir);
+      cd(postpath)
       timesteps = length(EP_G)/(IMAX*JMAX*KMAX);
       % Cell edges? [meters]
       % TODO: check to see if X/Y/Z need ghostcells or not in calcs, where
@@ -118,6 +124,7 @@ for i = 1:length(allruns)
               ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,...
               isoEPG,colEPG,trnEPG,time,PULSE,FREQ);
       end
+      cd(postpath)
 
         
     clearvars -except i allruns
