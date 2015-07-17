@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 16 July 2015
+% Last edit: Taryn Black, 17 July 2015
 
 clear all
 
@@ -29,7 +29,7 @@ clear all
   postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
-% Note: vis must be 'off' when running remotely in -nojvm mode.
+% Note: vis must be 'off' when running remotely in -nojvm clear allmode.
   vis = 'off';
   
 % Choose whether to load and process a variable (1) or skip it (0).
@@ -122,7 +122,7 @@ for i = 1:length(allruns)
       if onE == 1
           vidEPG = volume3D(run,dir,vis,ghostcells,xkilolabels,...
               ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,...
-              isoEPG,colEPG,trnEPG,time,PULSE,FREQ);
+              isoEPG,colEPG,trnEPG,time,PULSE,FREQ,postpath);
       end
       cd(postpath)
 

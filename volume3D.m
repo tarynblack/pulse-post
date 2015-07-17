@@ -1,6 +1,6 @@
 function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,isoEPG,...
-    colEPG,trnEPG,time,PULSE,FREQ )
+    colEPG,trnEPG,time,PULSE,FREQ,postpath )
 %volume3D makes frames of the time evolution of gas volume fraction in a
 %volcanic plume during a simulated volcanic eruption.
 %   volume3D processes gas volume fraction (EP_G) data from an MFiX run
@@ -11,13 +11,13 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
 %   <trnEPG>.
 %   
 %   Special functions called: timeslice3D; pulsetitle
-%   Last edit: Taryn Black, 16 July 2015
+%   Last edit: Taryn Black, 17 July 2015
 
-    cd(dir)
     
     varname = 'Gas volume fraction';
     
 %%% Initialize figure frames
+    cd(dir)
     fig = figure('Name','Gas Volume Fraction','visible',vis);
     hold on
     view(3)
@@ -34,7 +34,9 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     box on
     %%% Initialize legend entries based on number of isosurfaces
         names = cell(1,length(isoEPG));
+        cd(postpath)
         initEPG = timeslice3D(EP_G,1,IMAX,JMAX,KMAX,ghostcells);
+        cd(dir)
         for i = 1:length(isoEPG)
             names{i} = sprintf('EPG = %0.5f',isoEPG(i));
             surf = patch(isosurface(initEPG,isoEPG(i)));
@@ -49,6 +51,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     vidEPG.FrameRate = 10;
     open(vidEPG);
     set(gcf,'Visible',vis);
+    cd(postpath)
     
 %%% Plot gas volume fraction isosurfaces at each timestep and save video.
     for t = 1:timesteps
@@ -72,7 +75,9 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
         
     end
     
+    cd(dir)
     close(vidEPG);
+    cd(postpath)
 
 end
 
