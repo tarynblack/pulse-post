@@ -18,7 +18,7 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = [448706];
+  allruns = [477394];% 476277 477391 477392]; %477399 477396 477397 477398 477404 477401 477402 477403];
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
 %   path = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
@@ -29,7 +29,7 @@ clear all
   postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
-% Note: vis must be 'off' when running remotely in -nojvm clear allmode.
+% Note: vis must be 'off' when running remotely in -nojvm mode.
   vis = 'off';
   
 % Choose whether to load and process a variable (1) or skip it (0).
