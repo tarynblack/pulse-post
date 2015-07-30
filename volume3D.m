@@ -1,5 +1,5 @@
 function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
-    ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,isoEPG,...
+    ykilolabels,zkilolabels,timesteps,IMAX,JMAX,KMAX,isoEPG,...
     colEPG,trnEPG,time,PULSE,FREQ,postpath )
 %volume3D makes frames of the time evolution of gas volume fraction in a
 %volcanic plume during a simulated volcanic eruption.
@@ -33,17 +33,17 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     grid on
     box on
     %%% Initialize legend entries based on number of isosurfaces
-        names = cell(1,length(isoEPG));
-        cd(postpath)
-        initEPG = timeslice3D(EP_G,1,IMAX,JMAX,KMAX,ghostcells);
-        cd(dir)
-        for i = 1:length(isoEPG)
-            names{i} = sprintf('EPG = %0.5f',isoEPG(i));
-            surf = patch(isosurface(initEPG,isoEPG(i)));
-            set(surf,'FaceColor',colEPG(i,:),'EdgeColor','none','FaceAlpha',1.0);
-            hold on
-        end
-        legend(names)
+%         names = cell(1,length(isoEPG));
+%         cd(postpath)
+%         initEPG = timeslice3D(EP_G,1,IMAX,JMAX,KMAX,ghostcells);
+%         cd(dir)
+%         for i = 1:length(isoEPG)
+%             names{i} = sprintf('EPG = %0.5f',isoEPG(i));
+%             surf = patch(isosurface(initEPG,isoEPG(i)));
+%             set(surf,'FaceColor',colEPG(i,:),'EdgeColor','none','FaceAlpha',1.0);
+%             hold on
+%         end
+%         legend(names)
     
 %%% Initialize video
     vidEPG = VideoWriter(sprintf('vidEPG_%d.avi',run));
@@ -54,10 +54,21 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     cd(postpath)
     
 %%% Plot gas volume fraction isosurfaces at each timestep and save video.
-    for t = 1:timesteps
+    cd(dir)
+    fileID = fopen(sprintf('EP_G_%d',run));
+    t = 0;
+    while ~feof(fileID)
         
-        EPG = timeslice3D(EP_G,t,IMAX,JMAX,KMAX,ghostcells);
+        t = t+1;
         
+        cd(postpath)
+        EPG = varchunk3D(fileID,IMAX,JMAX,KMAX,ghostcells);
+        cd(dir)
+
+%     for t = 1:timesteps
+%         
+%         EPG = timeslice3D(EP_G,t,IMAX,JMAX,KMAX,ghostcells);
+%         
         cla;
         for j = 1:length(isoEPG)
             surf(j) = patch(isosurface(EPG,isoEPG(j)));
@@ -75,9 +86,12 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
         
     end
     
+    close(fileID)
     cd(dir)
     close(vidEPG);
     cd(postpath)
+    
+    sprintf('EPG processing complete.\nvidEPG_%d has been saved to %s',run,dir)
 
 end
 

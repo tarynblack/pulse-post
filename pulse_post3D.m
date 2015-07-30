@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 17 July 2015
+% Last edit: Taryn Black, 29 July 2015
 
 clear all
 
@@ -18,15 +18,16 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = [477394];% 476277 477391 477392]; %477399 477396 477397 477398 477404 477401 477402 477403];
+  allruns = [477394];% 476277 477391 477392 477399 477396 477397 477398 477404 477401 477402 477403];
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
-%   path = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
-  runpath = '~/data2/rundata/';
+  runpath = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
+%   runpath = '~/data2/rundata/';
   
 % Set path for location of post-processing files (cannot change path file
 % on Atlas cluster).
-  postpath = '~/data2/pulse-post';
+  postpath = '/Users/Taryn/Documents/GitHub/pulse-post';
+%   postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nojvm mode.
@@ -83,14 +84,14 @@ for i = 1:length(allruns)
     dir = sprintf('%s%d',runpath,run);
    
     % Import data generated in MFiX
-      [  EP_G,...
-          P_G,...
-          T_G,T_S1,T_S2,...
-          U_G,U_S1,U_S2,...
-          V_G,V_S1,V_S2,...
-          W_G,W_S1,W_S2,...
-          RO_G,ROP_S1,ROP_S2,...
-          X_G2  ] = mfixData3D(run,dir,onE,onP,onT,onV,onR,onX);
+%       [  EP_G,...
+%           P_G,...
+%           T_G,T_S1,T_S2,...
+%           U_G,U_S1,U_S2,...
+%           V_G,V_S1,V_S2,...
+%           W_G,W_S1,W_S2,...
+%           RO_G,ROP_S1,ROP_S2,...
+%           X_G2  ] = mfixData3D(run,dir,onE,onP,onT,onV,onR,onX);
       cd(postpath)
         
     % Load and set constant simulation parameters
@@ -98,7 +99,9 @@ for i = 1:length(allruns)
       [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,PULSE,FREQ,DT] ...
           = setCnsts3D(run,dir);
       cd(postpath)
-      timesteps = length(EP_G)/(IMAX*JMAX*KMAX);
+%       timesteps = length(EP_G)/(IMAX*JMAX*KMAX);
+    % TODO: add TSTOP to mfixconst
+    timesteps = (600/DT)+1;
       % Cell edges? [meters]
       % TODO: check to see if X/Y/Z need ghostcells or not in calcs, where
       % are these even used?
@@ -119,11 +122,14 @@ for i = 1:length(allruns)
       time = (0:timesteps-1)*DT;
         
     % Manipulate data to time evolution over domain and save output
-      if onE == 1
-          vidEPG = volume3D(run,dir,vis,ghostcells,xkilolabels,...
-              ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,...
+%       if onE == 1
+%           vidEPG = volume3D(run,dir,vis,ghostcells,xkilolabels,...
+%               ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,...
+%               isoEPG,colEPG,trnEPG,time,PULSE,FREQ,postpath);
+%       end
+    vidEPG = volume3D(run,dir,vis,ghostcells,xkilolabels,...
+              ykilolabels,zkilolabels,timesteps,IMAX,JMAX,KMAX,...
               isoEPG,colEPG,trnEPG,time,PULSE,FREQ,postpath);
-      end
       cd(postpath)
 
         
