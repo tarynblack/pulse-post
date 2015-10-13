@@ -51,10 +51,10 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     vidEPG.FrameRate = 10;
     open(vidEPG);
     set(gcf,'Visible',vis);
-    cd(postpath)
+%     cd(postpath)
     
 %%% Plot gas volume fraction isosurfaces at each timestep and save video.
-    cd(dir)
+%     cd(dir)
     fileID = fopen(sprintf('EP_G_%d',run));
     t = 0;
     while ~feof(fileID)
@@ -62,8 +62,13 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
         t = t+1;
         
         cd(postpath)
-        EPG = varchunk3D(fileID,IMAX,JMAX,KMAX,ghostcells);
-        cd(dir)
+        try
+            EPG = varchunk3D(fileID,IMAX,JMAX,KMAX,ghostcells);
+        catch ME
+            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
+            break
+        end
+%         cd(dir)
 
 %     for t = 1:timesteps
 %         
@@ -78,7 +83,8 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
         
         tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
-        
+  
+	cd(dir)      
         vidfig = 'EPGcurrent.jpg';
         saveas(fig,vidfig);
         img = imread(vidfig);
@@ -86,7 +92,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
         
     end
     
-    close(fileID)
+%     close(fileID)
     cd(dir)
     close(vidEPG);
     cd(postpath)
