@@ -23,7 +23,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     view(3)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-        JMAX-(ghostcells/2),ghostcells-1,KMAX-(ghostcells/2)]);
+        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
     set(gca,'XTick',xkilolabels(2:end)*1000,'XTickLabel',xkilolabels(2:end),'FontSize',12)
         xlabel('\bf Distance (km)','FontSize',12)
     set(gca,'YTick',zkilolabels(2:end)*1000,'YTickLabel',zkilolabels(2:end),'FontSize',12)

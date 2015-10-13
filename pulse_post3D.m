@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 29 July 2015
+% Last edit: Taryn Black, 12 October 2015
 
 clear all
 
@@ -107,7 +107,7 @@ for i = 1:length(allruns)
       % are these even used?
         X = LENGTH/IMAX:LENGTH/IMAX:LENGTH;
         Y = HEIGHT/JMAX:HEIGHT/JMAX:HEIGHT;
-        Z = WIDTH/JMAX:WIDTH/JMAX:WIDTH;
+        Z = WIDTH/KMAX:WIDTH/KMAX:WIDTH;
       % Dimension resolution [meters/cell], excluding ghost cells
         XRES = LENGTH/(IMAX - ghostcells);
         YRES = HEIGHT/(JMAX - ghostcells);
