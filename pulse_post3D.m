@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 12 October 2015
+% Last edit: Taryn Black, 10 November 2015
 
 clear all
 
@@ -18,26 +18,27 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = [734662 734663 734664];
+  allruns = [888187];
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
 %   runpath = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
-  runpath = '~/data2/rundata/';
+%   runpath = '~/data2/rundata/';
+    runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
   
-% Set path for location of post-processing files (cannot change path file
+% Set path for location of post-processing scripts (cannot change path file
 % on Atlas cluster).
-%   postpath = '/Users/Taryn/Documents/GitHub/pulse-post';
-  postpath = '~/data2/pulse-post';
+  postpath = '/Users/taryn/Documents/GitHub/pulse-post';
+%   postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nojvm mode.
-  vis = 'off';
+  vis = 'on';
   
 % Choose whether to load and process a variable (1) or skip it (0).
   onE = 1;      % EP_G
   onP = 0;      % P_G
   onT = 0;      % T_G, T_S1, T_S2
-  onV = 0;      % U_G, U_S1, U_S2, V_G, V_S1, V_S2, W_G, W_S2, W_S2
+  onV = 1;      % U_G, U_S1, U_S2, V_G, V_S1, V_S2, W_G, W_S2, W_S2
   onR = 0;      % RO_G, ROP_S1, ROP_S2
   onX = 0;      % X_G2
 
@@ -45,24 +46,31 @@ clear all
 % <isoEPG>. Set an RGB triple color (row in <colEPG>) and transparency
 % <trnEPG> value for each isosurface. Note: the number of rows in <colEPG>
 % and values in <trnEPG> must equal the number of isosurfaces.
-  isoEPG = [0.99999,0.99995,0.9999,0.9995];
-  colEPG = [1 0 0;
-            1 1 0;
-            0 1 1;
-            0 0 0];       
-  trnEPG = [0.1,0.2,0.3,0.5];
+  plumeedge = 1 - 1E-6;  % gas vol fraction at edge of plume (#~ARBITRARY~#)
+  isoEPG = [plumeedge];%,0.99995,0.9999,0.9995];
+  colEPG = [0.5 0.5 0.5];   % gray
+%           [1 0 0;
+%             1 1 0;
+%             0 1 1;
+%             0 0 0];       
+  trnEPG = [0.3];%[0.1,0.2,0.3,0.5];
 
 % Number of labels to display on figures for each dimension
   xpoints = 5;      % horizontal axis 1
   ypoints = 9;      % vertical axis
   zpoints = 5;      % horizontal axis 2
+  
+% Scaling factor (meters*_fact) and unit for axes labels
+  xfact = 1000;
+  labelxunit = 'km';
+  yfact = 1000;
+  labelyunit = 'km';
+  zfact = 1000;
+  labelzunit = 'km';
 
-% TODO: check that these are necessary and automate in mfixconst
-ventwidth = 400;    % meters
-T_range = [300 1100];
-P_range = [5E4 5E5];
-BD_range = [0 7];
-V_range = [0 400];
+% ##TODO: add to mfixconst
+  vel_inlet = 178;    % inlet velocity, m/s
+  
 
 %%% =================================================================== %%%
 %%% =================================================================== %%%
@@ -92,7 +100,7 @@ for i = 1:length(allruns)
 %           W_G,W_S1,W_S2,...
 %           RO_G,ROP_S1,ROP_S2,...
 %           X_G2  ] = mfixData3D(run,dir,onE,onP,onT,onV,onR,onX);
-      cd(postpath)
+%       cd(postpath)
         
     % Load and set constant simulation parameters
       ghostcells = 4;     % MFiX adds these to each domain dimension
@@ -114,24 +122,35 @@ for i = 1:length(allruns)
         ZRES = WIDTH/(KMAX - ghostcells);
         
     % Set figure properties. Note: MFiX horizontal dimensions are LENGTH
-    % (x; MATLAB x) and WIDTH (z; MATLAB y), vertical dimension is HEIGHT
-    % (y; MATLAB z).
-      xkilolabels = linspace(0,LENGTH/1000,xpoints);
-      ykilolabels = linspace(0,HEIGHT/1000,ypoints);
-      zkilolabels = linspace(0,WIDTH/1000,zpoints);
+    % (x; MATLAB X) and WIDTH (z; MATLAB Y), vertical dimension is HEIGHT
+    % (y; MATLAB Z). tick* values are in meters.
+      tickx = linspace(0,LENGTH,xpoints);
+      labelx = tickx(2:end)/xfact;
+      ticky = linspace(0,HEIGHT,ypoints);
+      labely = ticky(2:end)/yfact;
+      tickz = linspace(0,WIDTH,zpoints);
+      labelz = tickz(2:end)/zfact;
+      
       time = (0:timesteps-1)*DT;
         
     % Manipulate data to time evolution over domain and save output
 %       if onE == 1
-%           vidEPG = volume3D(run,dir,vis,ghostcells,xkilolabels,...
-%               ykilolabels,zkilolabels,timesteps,EP_G,IMAX,JMAX,KMAX,...
-%               isoEPG,colEPG,trnEPG,time,PULSE,FREQ,postpath);
+%           vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,...
+%           labelxunit,ticky,labely,labelyunit,tickz,labelz,labelzunit,...
+%           timesteps,EP_G,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
+%           PULSE,FREQ,postpath);
 %       end
-    vidEPG = volume3D(run,dir,vis,ghostcells,xkilolabels,...
-              ykilolabels,zkilolabels,timesteps,IMAX,JMAX,KMAX,...
-              isoEPG,colEPG,trnEPG,time,PULSE,FREQ,postpath);
-      cd(postpath)
 
+%     vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
+%               ticky,labely,labelyunit,tickz,labelz,labelzunit,...
+%               timesteps,EP_G,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
+%               PULSE,FREQ,postpath);
+%       cd(postpath)
+
+    vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
+        tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
+        labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
+        vel_inlet);
         
 %     clearvars -except i allruns
 

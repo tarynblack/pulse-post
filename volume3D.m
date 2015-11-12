@@ -10,8 +10,8 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
 %   gas volume fraction, at specified colors <colEPG> and transparencies
 %   <trnEPG>.
 %   
-%   Special functions called: timeslice3D; pulsetitle
-%   Last edit: Taryn Black, 17 July 2015
+%   Special functions called: varchunk3D; pulsetitle
+%   Last edit: Taryn Black, 1 November 2015
 
     
     varname = 'Gas volume fraction';
@@ -24,11 +24,11 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',xkilolabels(2:end)*1000,'XTickLabel',xkilolabels(2:end),'FontSize',12)
+    set(gca,'XTick',xkilolabels(2:end)*1000/XRES,'XTickLabel',xkilolabels(2:end),'FontSize',12)
         xlabel('\bf Distance (km)','FontSize',12)
-    set(gca,'YTick',zkilolabels(2:end)*1000,'YTickLabel',zkilolabels(2:end),'FontSize',12)
+    set(gca,'YTick',zkilolabels(2:end)*1000/ZRES,'YTickLabel',zkilolabels(2:end),'FontSize',12)
         ylabel('\bf Distance(km)','FontSize',12)
-    set(gca,'ZTick',ykilolabels(2:end)*1000,'ZTickLabel',ykilolabels(2:end),'FontSize',12)
+    set(gca,'ZTick',ykilolabels(2:end)*1000/YRES,'ZTickLabel',ykilolabels(2:end),'FontSize',12)
         zlabel('\bf Altitude (km)','FontSize',12)
     grid on
     box on
