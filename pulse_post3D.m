@@ -75,6 +75,13 @@ clear all
 % Viewing azimuth and elevation (in degrees) for 3D animations
   viewaz = -37.5;
   viewel = 20;
+  
+% Save animation timesteps as individual figures of specified filetype.
+% Returned filename convention is Entr_tsteps_<run#>.tif for imtype='tif'
+% or 'tiff', Entr_<t>s_<run#>.<imtype> for all other filetypes. Only choose
+% tif if your photo viewer can handle multipage tif (e.g. Windows
+% Photo Viewer), otherwise use jpg/bmp/etc.
+  imtype = 'tif';
 
 % ##TODO: add to mfixconst
   vel_inlet = 178;    % inlet velocity, m/s
@@ -158,7 +165,7 @@ for i = 1:length(allruns)
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-        vel_inlet,cmin,cmax,viewaz,viewel);
+        vel_inlet,cmin,cmax,viewaz,viewel,imtype);
         
 %     clearvars -except i allruns
 

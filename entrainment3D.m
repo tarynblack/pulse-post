@@ -1,7 +1,7 @@
 % function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
 %     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
 %     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-%     time,vel_inlet,cmin,cmax,viewaz,viewel )
+%     time,vel_inlet,cmin,cmax,viewaz,viewel,imtype )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -159,10 +159,17 @@
         title(tL,'FontSize',12,'FontWeight','bold');
         
         cd(dir)
-            vidfig = 'ENTRcurrent.jpg';
+            vidfig = 'EntrCurrent.jpg';
             saveas(fig,vidfig);
             img = imread(vidfig);
             writeVideo(vidEntr,img);
+            
+          % Save each timestep as an individual figure in either a
+          % multipage tif file or other image filetype (user-specified).
+            if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+                imwrite(img,sprintf('Entr_tsteps_%d.tif',run),'WriteMode','append')
+            else saveas(fig,sprintf('Entr_%03ds_%d.%s',time(t),run,imtype));
+            end
             
     end
     
