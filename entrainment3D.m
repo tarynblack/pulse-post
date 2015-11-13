@@ -1,12 +1,12 @@
 % function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
 %     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
 %     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-%     time,vel_inlet,cmin,cmax )
+%     time,vel_inlet,cmin,cmax,viewaz,viewel )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 12 November 2015
+%   Last edit: Taryn Black, 13 November 2015
 
     varname = 'Entrainment';
     
@@ -14,7 +14,7 @@
     cd(dir)
     fig = figure('Name','Entrainment','visible',vis);
     hold on
-    view(3)
+    view(viewaz,viewel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
@@ -116,10 +116,8 @@
 
     nmap = 256;
 %      colormap(jet(nmap));
-    colormap([winter(nmap/2);flipud(autumn(nmap/2))]);
-    % colormap([cool(nmap/3);spring(nmap/3);autumn(nmap/3)]);
-%     colormap([winter(2*nmap/5);spring(nmap/5);flipud(autumn(2*nmap/5))]);
-%    colormap([copper(nmap/2);flipud(jet(nmap/2))]);
+%     colormap([winter(nmap*-cmin/(cmax-cmin));flipud(autumn(nmap*cmax/(cmax-cmin)))]);
+%     colormap([winter(round(nmap*abs(cmin)));flipud(autumn(nmap-round(nmap*abs(cmin))))]);
     caxis([cmin cmax])
     cmap = colormap;
     emap = linspace(cmin,cmax,nmap);

@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 12 November 2015
+% Last edit: Taryn Black, 13 November 2015
 
 clear all
 
@@ -32,7 +32,7 @@ clear all
   
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nojvm mode.
-  vis = 'off';
+  vis = 'on';
   
 % Choose whether to load and process a variable (1) or skip it (0).
   onE = 1;      % EP_G
@@ -69,8 +69,12 @@ clear all
   labelzunit = 'km';
   
 % Entrainment animation colorbar limits (between -1 and 1)
-  cmin = -0.5;
+  cmin = -0.3;
   cmax = 0.5;
+  
+% Viewing azimuth and elevation (in degrees) for 3D animations
+  viewaz = -37.5;
+  viewel = 20;
 
 % ##TODO: add to mfixconst
   vel_inlet = 178;    % inlet velocity, m/s
@@ -154,7 +158,7 @@ for i = 1:length(allruns)
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-        vel_inlet,cmin,cmax);
+        vel_inlet,cmin,cmax,viewaz,viewel);
         
 %     clearvars -except i allruns
 
