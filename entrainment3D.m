@@ -116,8 +116,7 @@
 
     nmap = 256;
 %      colormap(jet(nmap));
-%     colormap([winter(nmap*-cmin/(cmax-cmin));flipud(autumn(nmap*cmax/(cmax-cmin)))]);
-%     colormap([winter(round(nmap*abs(cmin)));flipud(autumn(nmap-round(nmap*abs(cmin))))]);
+    colormap([winter(round(nmap*-cmin/(cmax-cmin)));flipud(autumn(nmap-round(nmap*-cmin/(cmax-cmin))))]);
     caxis([cmin cmax])
     cmap = colormap;
     emap = linspace(cmin,cmax,nmap);
