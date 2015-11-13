@@ -39,7 +39,7 @@
     fID_UG  = fopen(sprintf('U_G_%d',run));
     fID_VG  = fopen(sprintf('V_G_%d',run));
     fID_WG  = fopen(sprintf('W_G_%d',run));
-    
+        
     t = 0;
     while ~feof(fID_EPG)
             
@@ -111,6 +111,11 @@
         avg_expn(t) = mean(expn);
         std_expn(t) = std(expn);
         
+        dlmwrite(fullfile(sprintf('%s',dir),'coeff_avg-std.txt'),[avg_coeff(t) std_coeff(t)],'-append','delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),'entr_avg-std.txt'),[avg_entr(t) std_entr(t)],'-append','delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),'expn_avg-std.txt'),[avg_expn(t) std_expn(t)],'-append','delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),'plot_time.txt'),time(t)','-append','delimiter','\t','precision','%0.6f');
+        
       % Plot plume surface color-coded by entrainment coefficient
         e_color = zeros(length(e_coeff),3);
 
@@ -153,16 +158,15 @@
         e_Morton = PUNV_mag./plumeV';
         
         
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
         
         cd(dir)
-            vidfig = 'EntrCurrent.jpg';
-            saveas(fig,vidfig);
-            img = imread(vidfig);
-            writeVideo(vidEntr,img);
+          vidfig = 'EntrCurrent.jpg';
+          saveas(fig,vidfig);
+          img = imread(vidfig);
+          writeVideo(vidEntr,img);
             
           % Save each timestep as an individual figure in either a
           % multipage tif file or other image filetype (user-specified).
@@ -175,6 +179,7 @@
     
     cd(dir)
     close(vidEntr);
+
     
     % Plot total plume volume and change in plume volume over time
       if strcmp(PULSE,'T') == 1
