@@ -124,12 +124,12 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
 %             end
 %         end
     nmap = 256;
-    % colormap(jet(nmap));
+     colormap(jet(nmap));
     % colormap([winter(nmap/2);autumn(nmap/2)]);
     % colormap([cool(nmap/3);spring(nmap/3);autumn(nmap/3)]);
 %     colormap([winter(2*nmap/5);spring(nmap/5);flipud(autumn(2*nmap/5))]);
-    colormap([copper(nmap/2);flipud(jet(nmap/2))]);
-    caxis([-0.5 0.5])
+%    colormap([copper(nmap/2);flipud(jet(nmap/2))]);
+    caxis([-0.3 0.3])
     cmap = colormap;
     emap = linspace(-1,1,nmap);
 

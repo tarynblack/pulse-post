@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 10 November 2015
+% Last edit: Taryn Black, 12 November 2015
 
 clear all
 
@@ -18,21 +18,21 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = [888187];
+  allruns = [1111];
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
 %   runpath = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
-%   runpath = '~/data2/rundata/';
-    runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
+    runpath = '~/data2/rundata/';
+%   runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
   
 % Set path for location of post-processing scripts (cannot change path file
 % on Atlas cluster).
-  postpath = '/Users/taryn/Documents/GitHub/pulse-post';
-%   postpath = '~/data2/pulse-post';
+%  postpath = '/Users/taryn/Documents/GitHub/pulse-post';
+   postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nojvm mode.
-  vis = 'on';
+  vis = 'off';
   
 % Choose whether to load and process a variable (1) or skip it (0).
   onE = 1;      % EP_G
@@ -141,11 +141,11 @@ for i = 1:length(allruns)
 %           PULSE,FREQ,postpath);
 %       end
 
-%     vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
-%               ticky,labely,labelyunit,tickz,labelz,labelzunit,...
-%               timesteps,EP_G,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
-%               PULSE,FREQ,postpath);
-%       cd(postpath)
+      vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
+                ticky,labely,labelyunit,tickz,labelz,labelzunit,...
+               plumeedge,XRES,YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
+                PULSE,FREQ,postpath);
+        cd(postpath)
 
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...

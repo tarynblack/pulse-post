@@ -1,6 +1,7 @@
-function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
-    ykilolabels,zkilolabels,timesteps,IMAX,JMAX,KMAX,isoEPG,...
-    colEPG,trnEPG,time,PULSE,FREQ,postpath )
+function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
+                ticky,labely,labelyunit,tickz,labelz,labelzunit,...
+                plumeedge,XRES,YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
+                PULSE,FREQ,postpath )
 %volume3D makes frames of the time evolution of gas volume fraction in a
 %volcanic plume during a simulated volcanic eruption.
 %   volume3D processes gas volume fraction (EP_G) data from an MFiX run
@@ -11,7 +12,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
 %   <trnEPG>.
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 1 November 2015
+%   Last edit: Taryn Black, 12 November 2015
 
     
     varname = 'Gas volume fraction';
@@ -24,12 +25,12 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,xkilolabels,...
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',xkilolabels(2:end)*1000/XRES,'XTickLabel',xkilolabels(2:end),'FontSize',12)
-        xlabel('\bf Distance (km)','FontSize',12)
-    set(gca,'YTick',zkilolabels(2:end)*1000/ZRES,'YTickLabel',zkilolabels(2:end),'FontSize',12)
-        ylabel('\bf Distance(km)','FontSize',12)
-    set(gca,'ZTick',ykilolabels(2:end)*1000/YRES,'ZTickLabel',ykilolabels(2:end),'FontSize',12)
-        zlabel('\bf Altitude (km)','FontSize',12)
+    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
+        xlabel(sprintf('\\bf Distance (%s)',labelxunit),'FontSize',12)
+    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
+        ylabel(sprintf('\\bf Distance (%s)',labelzunit),'FontSize',12)
+    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
     grid on
     box on
     %%% Initialize legend entries based on number of isosurfaces
