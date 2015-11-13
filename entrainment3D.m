@@ -1,7 +1,7 @@
-function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
-    JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-    labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-    time,vel_inlet )
+% function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
+%     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+%     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
+%     time,vel_inlet,cmin,cmax )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -113,27 +113,26 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         
       % Plot plume surface color-coded by entrainment coefficient
         e_color = zeros(length(e_coeff),3);
-%         for j = 1:length(e_coeff)
-%             if e_coeff(j) > 0 && e_coeff(j) < 1
-%                 ecolor(j,:) = [1-e_coeff(j) e_coeff(j) 0];
-%             elseif e_coeff(j) < 0 && e_coeff(j) > -1
-%                 ecolor(j,:) = [0 -e_coeff(j) 1+e_coeff(j)];
-%             elseif e_coeff(j) == 0
-%                 ecolor(j,:) = [0 1 0];
-%             else ecolor(j,:) = [0 0 0];
-%             end
-%         end
+
     nmap = 256;
-     colormap(jet(nmap));
-    % colormap([winter(nmap/2);autumn(nmap/2)]);
+%      colormap(jet(nmap));
+    colormap([winter(nmap/2);flipud(autumn(nmap/2))]);
     % colormap([cool(nmap/3);spring(nmap/3);autumn(nmap/3)]);
 %     colormap([winter(2*nmap/5);spring(nmap/5);flipud(autumn(2*nmap/5))]);
 %    colormap([copper(nmap/2);flipud(jet(nmap/2))]);
-    caxis([-0.3 0.3])
+    caxis([cmin cmax])
     cmap = colormap;
-    emap = linspace(-1,1,nmap);
+    emap = linspace(cmin,cmax,nmap);
+    e_color = zeros(length(e_coeff),3);   
+    
+    for k = 1:length(e_coeff)
+        if e_coeff(k) > cmax
+            e_coeff(k) = cmax;
+        elseif e_coeff(k) < cmin
+            e_coeff(k) = cmin;
+        end
+    end
 
-    e_color = zeros(length(e_coeff),3);
     e_round = interp1(emap,emap,e_coeff,'nearest');
     emap = [emap; 1:nmap];
     for j = 1:length(e_coeff)
@@ -200,7 +199,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         errorbar(time,avg_expn,std_expn,'r')
         title(sprintf('%s: Plume-averaged coefficients',str),'FontWeight','bold','FontSize',10)
         xlabel('Time (s)','FontWeight','bold','FontSize',10)
-%         ylim([-1 1])
+        ylim([-1 1])
         legend({'Total coefficient','Entrainment','Expansion'},'Box','on','Location','EastOutside','FontWeight','bold','FontSize',10)
       saveas(fig_coeff,sprintf('Coefficients_%d.jpg',run));
             
@@ -208,5 +207,5 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     
     sprintf('Entrainment processing complete. \nvidEntr_%d has been saved to %s',run,dir)
 
-end
+% end
 

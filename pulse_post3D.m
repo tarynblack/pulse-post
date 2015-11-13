@@ -67,6 +67,10 @@ clear all
   labelyunit = 'km';
   zfact = 1000;
   labelzunit = 'km';
+  
+% Entrainment animation colorbar limits (between -1 and 1)
+  cmin = -0.5;
+  cmax = 0.5;
 
 % ##TODO: add to mfixconst
   vel_inlet = 178;    % inlet velocity, m/s
@@ -150,7 +154,7 @@ for i = 1:length(allruns)
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-        vel_inlet);
+        vel_inlet,cmin,cmax);
         
 %     clearvars -except i allruns
 
