@@ -143,9 +143,9 @@ for i = 1:length(allruns)
       % Cell edges? [meters]
 %%% #TODO#: check to see if X/Y/Z need ghostcells or not in calcs, where
 %%% are these even used?
-        X = LENGTH/IMAX:LENGTH/IMAX:LENGTH;
-        Y = HEIGHT/JMAX:HEIGHT/JMAX:HEIGHT;
-        Z = WIDTH/KMAX:WIDTH/KMAX:WIDTH;
+        X = LENGTH/(IMAX-ghostcells):LENGTH/(IMAX-ghostcells):LENGTH;
+        Y = HEIGHT/(JMAX-ghostcells):HEIGHT/(JMAX-ghostcells):HEIGHT;
+        Z = WIDTH/(KMAX-ghostcells):WIDTH/(KMAX-ghostcells):WIDTH;
       % Dimension resolution [meters/cell], excluding ghost cells
         XRES = LENGTH/(IMAX - ghostcells);
         YRES = HEIGHT/(JMAX - ghostcells);

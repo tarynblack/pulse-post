@@ -6,7 +6,7 @@
 %   entrainment3D ---does things---
 %
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 13 November 2015
+%   Last edit: Taryn Black, 14 November 2015
 
     varname = 'Entrainment';
     
