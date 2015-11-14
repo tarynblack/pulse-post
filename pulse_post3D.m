@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 13 November 2015
+% Last edit: Taryn Black, 14 November 2015
 
 clear all
 
@@ -18,42 +18,43 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = [1111];
+  allruns = [888187];
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
-%   runpath = '/Users/Taryn/Documents/MATLAB/MFIX_temp/'; 
-    runpath = '~/data2/rundata/';
-%   runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
+  runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
+%     runpath = '~/data2/rundata/';
   
 % Set path for location of post-processing scripts (cannot change path file
 % on Atlas cluster).
-%  postpath = '/Users/taryn/Documents/GitHub/pulse-post';
-   postpath = '~/data2/pulse-post';
+ postpath = '/Users/taryn/Documents/GitHub/pulse-post';
+%    postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
-% Note: vis must be 'off' when running remotely in -nojvm mode.
+% Note: vis must be 'off' when running remotely in -nodisplay mode.
   vis = 'on';
-  
-% Choose whether to load and process a variable (1) or skip it (0).
-  onE = 1;      % EP_G
-  onP = 0;      % P_G
-  onT = 0;      % T_G, T_S1, T_S2
-  onV = 1;      % U_G, U_S1, U_S2, V_G, V_S1, V_S2, W_G, W_S2, W_S2
-  onR = 0;      % RO_G, ROP_S1, ROP_S2
-  onX = 0;      % X_G2
+
+%%% #TODO#: DELETE THIS SECTION?
+% % Choose whether to load and process a variable (1) or skip it (0).
+%   onE = 1;      % EP_G
+%   onP = 0;      % P_G
+%   onT = 0;      % T_G, T_S1, T_S2
+%   onV = 1;      % U_G, U_S1, U_S2, V_G, V_S1, V_S2, W_G, W_S2, W_S2
+%   onR = 0;      % RO_G, ROP_S1, ROP_S2
+%   onX = 0;      % X_G2
 
 % Define isosurfaces for which gas volume fraction should be plotted
-% <isoEPG>. Set an RGB triple color (row in <colEPG>) and transparency
+% <isoEPG>. Plumeedge is the gas volume fraction that defines the boundary
+% of the plume. Set an RGB triple color (row in <colEPG>) and transparency
 % <trnEPG> value for each isosurface. Note: the number of rows in <colEPG>
 % and values in <trnEPG> must equal the number of isosurfaces.
-  plumeedge = 1 - 1E-6;  % gas vol fraction at edge of plume (#~ARBITRARY~#)
-  isoEPG = [plumeedge];%,0.99995,0.9999,0.9995];
+  plumeedge = 1 - 1E-6;
+  isoEPG = [plumeedge]; %,0.99995,0.9999,0.9995];
   colEPG = [0.5 0.5 0.5];   % gray
 %           [1 0 0;
 %             1 1 0;
 %             0 1 1;
 %             0 0 0];       
-  trnEPG = [0.3];%[0.1,0.2,0.3,0.5];
+  trnEPG = [0.5];%[0.1,0.2,0.3,0.5];
 
 % Number of labels to display on figures for each dimension
   xpoints = 5;      % horizontal axis 1
@@ -69,7 +70,7 @@ clear all
   labelzunit = 'km';
   
 % Entrainment animation colorbar limits (between -1 and 1)
-  cmin = -0.3;
+  cmin = -0.5;
   cmax = 0.5;
   
 % Viewing azimuth and elevation (in degrees) for 3D animations
@@ -77,14 +78,25 @@ clear all
   viewel = 20;
   
 % Save animation timesteps as individual figures of specified filetype.
-% Returned filename convention is Entr_tsteps_<run#>.tif for imtype='tif'
-% or 'tiff', Entr_<t>s_<run#>.<imtype> for all other filetypes. Only choose
-% tif if your photo viewer can handle multipage tif (e.g. Windows
-% Photo Viewer), otherwise use jpg/bmp/etc.
+% Options: tif (*only if your photo viewer can read multipage
+% tif, e.g. Windows Photo Viewer), jpeg, png, bmp, other image formats...
   imtype = 'tif';
 
-% ##TODO: add to mfixconst
-  vel_inlet = 178;    % inlet velocity, m/s
+% Vent parameters
+  vel_inlet = 178;      % inlet velocity [m/s]
+  BC_EPG_st = 1;        % initial gas volume fraction (steady case)      
+  BC_PG     = 1.2E5;    % inlet gas pressure [N/m2]
+  BC_TG     = 1100;     % inlet gas temperature [K]
+  BC_TS1    = 1100;     % inlet solid1 temperature [K]
+  BC_TS2    = 1100;     % inlet solid2 temperature [K]
+  BC_TS3    = 1100;     % inlet solid3 temperature [K]
+  
+% Other constants...
+  Rgas = 461.5;    % gas constant
+  
+  % use in calc_inletFlow - calculate characteristic velocity, etc at which
+  % value for unsteady gas volume fraction?
+  charEPG = 'mingas'; % 'maxgas' 'avggas'
   
 
 %%% =================================================================== %%%
@@ -98,6 +110,7 @@ clear all
   elseif length(trnEPG) ~= length(isoEPG)
       error('Error. \nLength of trnEPG must match length of isoEPG.')
   end
+  
 
 for i = 1:length(allruns)
     
@@ -106,6 +119,7 @@ for i = 1:length(allruns)
 
     dir = sprintf('%s%d',runpath,run);
    
+%%% #TODO#: delete this section?
     % Import data generated in MFiX
 %       [  EP_G,...
 %           P_G,...
@@ -119,15 +133,16 @@ for i = 1:length(allruns)
         
     % Load and set constant simulation parameters
       ghostcells = 4;     % MFiX adds these to each domain dimension
-      [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,PULSE,FREQ,DT] ...
-          = setCnsts3D(run,dir);
+      [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
+          NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP]...
+          = setCnsts3D(run,dir,ghostcells);
       cd(postpath)
 %       timesteps = length(EP_G)/(IMAX*JMAX*KMAX);
-    % TODO: add TSTOP to mfixconst
+%%% #TODO#: replace with TSTOP/END_TIME
     timesteps = (600/DT)+1;
       % Cell edges? [meters]
-      % TODO: check to see if X/Y/Z need ghostcells or not in calcs, where
-      % are these even used?
+%%% #TODO#: check to see if X/Y/Z need ghostcells or not in calcs, where
+%%% are these even used?
         X = LENGTH/IMAX:LENGTH/IMAX:LENGTH;
         Y = HEIGHT/JMAX:HEIGHT/JMAX:HEIGHT;
         Z = WIDTH/KMAX:WIDTH/KMAX:WIDTH;
@@ -147,7 +162,13 @@ for i = 1:length(allruns)
       labelz = tickz(2:end)/zfact;
       
       time = (0:timesteps-1)*DT;
+      pwd
+    % Calculate characteristic inlet velocity for use in entrainment script.
+      [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,...
+          BC_EPG_st,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,...
+          NFR_S3,BC_TS1,BC_TS2,BC_TS3,VENT_R);
         
+%%% #TODO#: delete this section?
     % Manipulate data to time evolution over domain and save output
 %       if onE == 1
 %           vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,...
@@ -165,7 +186,7 @@ for i = 1:length(allruns)
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-        vel_inlet,cmin,cmax,viewaz,viewel,imtype);
+        vel_char,cmin,cmax,viewaz,viewel,imtype);
         
 %     clearvars -except i allruns
 

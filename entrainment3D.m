@@ -1,7 +1,7 @@
 % function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
 %     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
 %     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-%     time,vel_inlet,cmin,cmax,viewaz,viewel,imtype )
+%     time,vel_char,cmin,cmax,viewaz,viewel,imtype )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -98,7 +98,7 @@
         PUNV_Z = PUNV_mag.*unitnorm(3,:); 
         
       % Calculate entrainment(-)/expansion(+) coefficient from plume velocities
-        e_coeff = PUNV_mag/vel_inlet;
+        e_coeff = PUNV_mag/vel_char;
         entr = e_coeff(e_coeff<0);
         expn = e_coeff(e_coeff>0);
         

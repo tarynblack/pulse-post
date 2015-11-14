@@ -1,9 +1,10 @@
-function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,PULSE,FREQ,...
-    DT ] = setCnsts3D( run,dir )
-%setCnsts3D loads the file mfixconst_<run> and sets constant parameters for
-%post-processing from an MFiX simulation specified by <run>. The contents
-%of mfixconst are specified in allocate_arrays.f in the simulation run
-%directory.
+function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
+    NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP ] ...
+    = setCnsts3D( run,dir,ghostcells )
+% setCnsts3D loads the file mfixconst_<run> and sets constant parameters for
+% post-processing from an MFiX simulation specified by <run>. The contents
+% of mfixconst are specified in allocate_arrays.f in the simulation run
+% directory.
 %   IMAX:   number of cells in x direction
 %   JMAX:   number of cells in y direction
 %   KMAX:   number of cells in z direction
@@ -12,10 +13,17 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,PULSE,FREQ,...
 %   HEIGHT: size of domain in y direction (meters)
 %   WIDTH:  size of domain in z direction (meters)
 %   RO_S#:  solid density of phase# particles (kg/m3)
+%   NFR_S#: number fraction of phase# particles (sum of NFR_S# == 1)
 %   PULSE:  describes whether flow is pulsing (T) or steady (F)
 %   FREQ:   frequency of pulsing, for PULSE=T
 %       *** NOTE: FREQ returns a value for PULSE=F that is not used.
+%   MING:   minimum gas volume fraction (unsteady flow)
+%   MAXG:   maximum gas volume fraction (unsteady flow)
+%   VENT_R: radius of vent [m]
 %   DT:     time interval between each data write in the simulation
+%   TSTOP:  end time of simulation [s]
+%
+% Last edit: Taryn Black, 14 November 2015
     
     cd(dir)
     
@@ -27,7 +35,6 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,PULSE,FREQ,...
     
     % Convert to data structure to save each cell as desired type
     Cnsts = cell2struct(data,{'data'},1);
-    ghostcells = 4;
     
     IMAX   = str2double(Cnsts.data(1)) + ghostcells;
     JMAX   = str2double(Cnsts.data(2)) + ghostcells;
@@ -37,9 +44,17 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,PULSE,FREQ,...
     WIDTH  = str2double(Cnsts.data(6));
     RO_S1  = str2double(Cnsts.data(7));
     RO_S2  = str2double(Cnsts.data(8));
-    PULSE  = char(Cnsts.data(9));
-    FREQ   = str2double(Cnsts.data(10));
-    DT     = str2double(Cnsts.data(11));
+    RO_S3  = str2double(Cnsts.data(9));
+    NFR_S1 = str2double(Cnsts.data(10));
+    NFR_S2 = str2double(Cnsts.data(11));
+    NFR_S3 = str2double(Cnsts.data(12));
+    PULSE  = char(Cnsts.data(13));
+    FREQ   = str2double(Cnsts.data(14));
+    MING   = str2double(Cnsts.data(15));
+    MAXG   = str2double(Cnsts.data(16));
+    VENT_R = str2double(Cnsts.data(17));
+    DT     = str2double(Cnsts.data(18));
+    TSTOP  = str2double(Cnsts.data(19));
 
     
 end
