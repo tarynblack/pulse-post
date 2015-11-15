@@ -1,7 +1,7 @@
-% function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
-%     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-%     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-%     time,vel_char,cmin,cmax,viewaz,viewel,imtype )
+function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
+    JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+    labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
+    time,vel_char,cmin,cmax,viewaz,viewel,imtype )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -80,6 +80,7 @@
         end
         
       % Find velocities for entire domain at current timestep
+ %%% #TODO# move this to before the continue statement?
         U_G = varchunk3D(fID_UG,IMAX,JMAX,KMAX,ghostcells);
         V_G = varchunk3D(fID_VG,IMAX,JMAX,KMAX,ghostcells);
         W_G = varchunk3D(fID_WG,IMAX,JMAX,KMAX,ghostcells);
@@ -216,5 +217,5 @@
     
     sprintf('Entrainment processing complete. \nvidEntr_%d has been saved to %s',run,dir)
 
-% end
+end
 
