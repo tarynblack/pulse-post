@@ -94,6 +94,12 @@ clear all
 % Other constants...
   Rgas = 461.5;    % gas constant
   
+% Parameters for particle concentration slices figure. sdist* is the
+% fraction along the *axis at which to cut the slice (between [] and 1).
+  sdistX = 0.5; % scales to IMAX
+  sdistY = [];  % scales to KMAX
+  sdistZ = [];  % scales to JMAX (remember MFIX 'y' is MATLAB 'up'!)
+  
   % use in calc_inletFlow - calculate characteristic velocity, etc at which
   % value for unsteady gas volume fraction?
   charEPG = 'mingas'; % 'maxgas' 'avggas'
