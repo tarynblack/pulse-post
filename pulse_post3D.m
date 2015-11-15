@@ -143,12 +143,10 @@ for i = 1:length(allruns)
           NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP]...
           = setCnsts3D(run,dir,ghostcells);
       cd(postpath)
-%       timesteps = length(EP_G)/(IMAX*JMAX*KMAX);
-%%% #TODO#: replace with TSTOP/END_TIME
-    timesteps = (600/DT)+1;
-      % Cell edges? [meters]
-%%% #TODO#: check to see if X/Y/Z need ghostcells or not in calcs, where
-%%% are these even used?
+
+      timesteps = (TSTOP/DT)+1;
+      % Define grid
+%%% #TODO#: check to see if X/Y/Z are these even used
         X = LENGTH/(IMAX-ghostcells):LENGTH/(IMAX-ghostcells):LENGTH;
         Y = HEIGHT/(JMAX-ghostcells):HEIGHT/(JMAX-ghostcells):HEIGHT;
         Z = WIDTH/(KMAX-ghostcells):WIDTH/(KMAX-ghostcells):WIDTH;
