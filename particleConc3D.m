@@ -1,6 +1,6 @@
-% function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
-%     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-%     labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ )
+function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
+    ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+    labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
@@ -92,11 +92,10 @@
     
 %%% Plot particle volume fraction concentrations at each timestep and save
 %%% video.
-%%% #TODO# change from gas to particles when on cluster!
-    fID_EPG = fopen(sprintf('EP_G_%d',run));
-%     fID_S1 = fopen(sprintf('ROP_S1_%d',run));
-%     fID_S2 = fopen(sprintf('ROP_S2_%d',run));
-%     fID_S3 = fopen(sprintf('ROP_S3_%d',run));
+    fID_S1 = fopen(sprintf('ROP_S1_%d',run));
+    fID_S2 = fopen(sprintf('ROP_S2_%d',run));
+    fID_S3 = fopen(sprintf('ROP_S3_%d',run));
+
     t = 0;
     while ~feof(fID_EPG)
         
@@ -104,11 +103,13 @@
         
         cd(postpath)
         try
-            EPG = varchunk3D(fID_EPG,IMAX,JMAX,KMAX,ghostcells);
+            ROPS1 = varchunk3D(fID_S1,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
             break
         end
+        ROPS2 = varchunk3D(fID_S2,IMAX,JMAX,KMAX,ghostcells);
+        ROPS3 = varchunk3D(fID_S3,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep - no isosurface at step one
         if t==1;
@@ -117,25 +118,27 @@
         
         cla;
         
-        logEPG = log10(1-EPG+1E-10);
+        logS1 = log10(ROPS1 + 1E-10);
+        logS2 = log10(ROPS2 + 1E-10);
+        logS3 = log10(ROPS3 + 1E-10);
         
         subplot(1,3,1)
             view(saz,sel)
-            hS1 = slice(logEPG,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
+            hS1 = slice(logS1,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS1.FaceColor = 'interp';
             hS1.EdgeColor = 'none';
             tLS1 = pulsetitle(varS1,PULSE,time,t,run,FREQ);
             title(tLS1,'FontSize',12,'FontWeight','bold'); 
         subplot(1,3,2)
             view(saz,sel)
-            hS2 = slice(logEPG,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
+            hS2 = slice(logS2,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS2.FaceColor = 'interp';
             hS2.EdgeColor = 'none';
             tLS2 = pulsetitle(varS2,PULSE,time,t,run,FREQ);
             title(tLS2,'FontSize',12,'FontWeight','bold');
         subplot(1,3,3)
             view(saz,sel)
-            hS3 = slice(logEPG,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
+            hS3 = slice(logS3,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS3.FaceColor = 'interp';
             hS3.EdgeColor = 'none';
             tLS3 = pulsetitle(varS3,PULSE,time,t,run,FREQ);
@@ -166,4 +169,4 @@
     
     sprintf('Particle concentration processing complete. \nvidPartConc_%d has been saved to %s',run,dir)
 
-% end
+end
