@@ -162,7 +162,7 @@ for i = 1:length(allruns)
       labelz = tickz(2:end)/zfact;
       
       time = (0:timesteps-1)*DT;
-      pwd
+      
     % Calculate characteristic inlet velocity for use in entrainment script.
       [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,...
           BC_EPG_st,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,...
