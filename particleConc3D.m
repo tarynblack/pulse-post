@@ -52,8 +52,6 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
                 ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
             set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
                 zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
-            grid on
-            box on
         subfigS2 = subplot(1,3,2);
             hold on
             view(saz,sel)
@@ -66,8 +64,6 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
                 ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
             set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
                 zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
-            grid on
-            box on
          subfigS3 = subplot(1,3,3);
             hold on
             view(saz,sel)
@@ -80,8 +76,6 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
                 ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
             set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
                 zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
-            grid on
-            box on
             
 %%% Initialize video
     vidPartConc = VideoWriter(sprintf('vidPartConc_%d.avi',run));
