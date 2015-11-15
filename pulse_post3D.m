@@ -92,7 +92,8 @@ clear all
   BC_TS3    = 1100;     % inlet solid3 temperature [K]
   
 % Other constants...
-  Rgas = 461.5;    % gas constant
+  Rgas = 461.5;     % gas constant
+  tropo = 11E3;     % tropopause height [m]
   
 % Parameters for particle concentration slices figure. sdist* is the
 % fraction along the *axis at which to cut the slice (between [] and 1).
@@ -200,7 +201,7 @@ for i = 1:length(allruns)
     
     vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath);
+        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,tropo,Y);
     cd(postpath)
         
 %     clearvars -except i allruns

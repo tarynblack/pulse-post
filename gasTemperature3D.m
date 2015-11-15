@@ -1,6 +1,6 @@
-% function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
-%     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-%     labelz,labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath )
+function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
+    JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+    labelz,labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,tropo,Y )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
 %over time.
 %   Detailed explanation goes here
@@ -78,6 +78,16 @@
         end
         cla;
         
+      % Apply atmospheric correction ~ equation of state for gas,
+      % above/below tropopause.
+        for i = 1:(JMAX-ghostcells)
+            if Y(i) <= tropo
+                TG(:,:,i) = TG(:,:,i) - 0.0098*Y(i);
+            elseif Y(i) > tropo
+                TG(:,:,i) = TG(:,:,i) - 0.0098*tropo + 0.001*Y(i);
+            end
+        end
+        
         hTG = slice(TG,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hTG.FaceColor = 'interp';
             hTG.EdgeColor = 'none';
@@ -99,5 +109,5 @@
     cd(postpath)
     sprintf('Gas temperature processing complete. \nvidGasTemp_%d has been saved to %s',run,dir) 
 
-% end
+end
 
