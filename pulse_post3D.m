@@ -206,6 +206,12 @@ for i = 1:length(allruns)
         atmos,Y);
     cd(postpath)
         
+    vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
+        postpath,Rgas,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,...
+        labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
+        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ);
+    cd(postpath)
+
 %     clearvars -except i allruns
 
 end
