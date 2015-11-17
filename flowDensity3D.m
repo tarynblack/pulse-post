@@ -1,7 +1,8 @@
 function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
     tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-    labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ )
+    labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
+    flowDensity_cmax )
 %flowDensity3D calculates the net density of the flow from gas and particle
 %densities and volume fractions.
 %   Detailed explanation goes here
@@ -119,17 +120,13 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
           reldens_3D = permute(reldens_3D,[3 2 1]);
           flowbuoyancy = reldens_3D.*inplume;
           
-%%% #TODO# change cmin/cmax/(numcolors?) to realistic once testing on
-%%% cluster. Or put in pulse_post so they aren't hard coded.
         % Define buoyancy colormap: red = rise, blue = collapse.
           numcolors = 256;
           zeropoint = abs(min(reldensity))/(abs(max(reldensity))+abs(min(reldensity)));
           cmaplims = [1 0 0;    % red
                       1 1 1;    % white
                       0 0 1];   % blue
-          cmin = -9;
-          cmax = 1;
-          fixcpts = [numcolors-1 numcolors*(1-(abs(cmax)/(abs(cmin)+abs(cmax)))) 0];
+          fixcpts = [numcolors-1 numcolors*(1-(abs(flowDensity_cmax)/(abs(flowDensity_cmin)+abs(flowDensity_cmax)))) 0];
           cmap = interp1(fixcpts/numcolors,cmaplims,linspace(0,1,numcolors));
           colormap(cmap)
           
@@ -138,7 +135,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
           hFB.FaceColor = 'interp';
           hFB.EdgeColor = 'none';
           colorbar
-          caxis([cmin cmax]);
+          caxis([flowDensity_cmin flowDensity_cmax]);
           tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
           title(tL,'FontSize',12,'FontWeight','bold');
           

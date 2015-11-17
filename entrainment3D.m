@@ -1,12 +1,12 @@
 function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-    time,vel_char,cmin,cmax,viewaz,viewel,imtype )
+    time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 14 November 2015
+%   Last edit: Taryn Black, 17 November 2015
 
     varname = 'Entrainment';
     
@@ -122,17 +122,17 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
 
     nmap = 256;
 %      colormap(jet(nmap));
-    colormap([winter(round(nmap*-cmin/(cmax-cmin)));flipud(autumn(nmap-round(nmap*-cmin/(cmax-cmin))))]);
-    caxis([cmin cmax])
+    colormap([winter(round(nmap*-entrainment_cmin/(entrainment_cmax-entrainment_cmin)));flipud(autumn(nmap-round(nmap*-entrainment_cmin/(entrainment_cmax-entrainment_cmin))))]);
+    caxis([entrainment_cmin entrainment_cmax])
     cmap = colormap;
-    emap = linspace(cmin,cmax,nmap);
+    emap = linspace(entrainment_cmin,entrainment_cmax,nmap);
     e_color = zeros(length(e_coeff),3);   
     
     for k = 1:length(e_coeff)
-        if e_coeff(k) > cmax
-            e_coeff(k) = cmax;
-        elseif e_coeff(k) < cmin
-            e_coeff(k) = cmin;
+        if e_coeff(k) > entrainment_cmax
+            e_coeff(k) = entrainment_cmax;
+        elseif e_coeff(k) < entrainment_cmin
+            e_coeff(k) = entrainment_cmin;
         end
     end
 

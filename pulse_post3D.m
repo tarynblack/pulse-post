@@ -61,9 +61,11 @@ clear all
   zfact = 1000;
   labelzunit = 'km';
   
-% Entrainment animation colorbar limits (between -1 and 1)
-  cmin = -0.5;
-  cmax = 0.5;
+% Animation colorbar limits
+  entrainment_cmin = -0.5;  % between -1 and 1
+  entrainment_cmax = 0.5;   % between -1 and 1
+  flowDensity_cmin = -9;
+  flowDensity_cmax = 1;
   
 % Other colorbar limits...
   lowTemp = 300;    % lowest temperature on colorbar [K]
@@ -157,7 +159,7 @@ for i = 1:length(allruns)
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-        vel_char,cmin,cmax,viewaz,viewel,imtype);
+        vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype);
     cd(postpath)
 
     vidPartConc = particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
@@ -175,7 +177,8 @@ for i = 1:length(allruns)
     vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
         postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,...
         labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ);
+        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
+        flowDensity_cmax);
     cd(postpath)
 
 %     clearvars -except i allruns
