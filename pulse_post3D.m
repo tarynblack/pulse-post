@@ -64,11 +64,11 @@ clear all
 % Animation colorbar limits
   entrainment_cmin = -0.5;  % between -1 and 1
   entrainment_cmax = 0.5;   % between -1 and 1
-  flowDensity_cmin = -9;
-  flowDensity_cmax = 1;
-  
-% Other colorbar limits...
-  lowTemp = 300;    % lowest temperature on colorbar [K]
+  particleConc_cmin = -10;  % #TODO# check this number
+  particleConc_cmax = 10;   % #TODO# check this number
+  flowDensity_cmin = -9;    % #TODO# check this number
+  flowDensity_cmax = 1;     % #TODO# check this number
+  gasTemperature_cmin = 300;    
   
 % Viewing azimuth and elevation (in degrees) for 3D animations
   viewaz = -37.5;
@@ -165,13 +165,13 @@ for i = 1:length(allruns)
     vidPartConc = particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,RO_S1,...
-        RO_S2,RO_S3 );
+        RO_S2,RO_S3,particleConc_cmin,particleConc_cmax );
     cd(postpath)
     
     vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
-        TROPO,Y,BC_TG,lowTemp,PULSE,FREQ,time);
+        TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time);
     cd(postpath)
         
     vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...

@@ -1,7 +1,7 @@
 function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
-    RO_S1,RO_S2,RO_S3 )
+    RO_S1,RO_S2,RO_S3,particleConc_cmin,particleConc_cmax )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
@@ -141,6 +141,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             tLS3 = pulsetitle(varS3,PULSE,time,t,run,FREQ);
             title(tLS3,'FontSize',12,'FontWeight','bold');
             hc = colorbar('location','eastoutside');
+                caxis([particleConc_cmin particleConc_cmax]);
                 ylabel(hc,'\bf log_1_0(Particle volume fraction)','FontSize',12)
             
         PosS1 = get(subfigS1,'position');
