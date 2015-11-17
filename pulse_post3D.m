@@ -33,15 +33,6 @@ clear all
 % Note: vis must be 'off' when running remotely in -nodisplay mode.
   vis = 'on';
 
-%%% #TODO#: DELETE THIS SECTION?
-% % Choose whether to load and process a variable (1) or skip it (0).
-%   onE = 1;      % EP_G
-%   onP = 0;      % P_G
-%   onT = 0;      % T_G, T_S1, T_S2
-%   onV = 1;      % U_G, U_S1, U_S2, V_G, V_S1, V_S2, W_G, W_S2, W_S2
-%   onR = 0;      % RO_G, ROP_S1, ROP_S2
-%   onX = 0;      % X_G2
-
 % Define isosurfaces for which gas volume fraction should be plotted
 % <isoEPG>. Plumeedge is the gas volume fraction that defines the boundary
 % of the plume. Set an RGB triple color (row in <colEPG>) and transparency
@@ -100,8 +91,8 @@ clear all
   sdistY = [];  % scales to KMAX
   sdistZ = [];  % scales to JMAX (remember MFIX 'y' is MATLAB 'up'!)
   
-  % use in calc_inletFlow - calculate characteristic velocity, etc at which
-  % value for unsteady gas volume fraction?
+% use in calc_inletFlow - calculate characteristic velocity, etc at which
+% value for unsteady gas volume fraction?
   charEPG = 'mingas'; % 'maxgas' 'avggas'
   
 
@@ -124,64 +115,44 @@ for i = 1:length(allruns)
     sprintf('Now processing run #%d',run)
 
     dir = sprintf('%s%d',runpath,run);
-   
-%%% #TODO#: delete this section?
-    % Import data generated in MFiX
-%       [  EP_G,...
-%           P_G,...
-%           T_G,T_S1,T_S2,...
-%           U_G,U_S1,U_S2,...
-%           V_G,V_S1,V_S2,...
-%           W_G,W_S1,W_S2,...
-%           RO_G,ROP_S1,ROP_S2,...
-%           X_G2  ] = mfixData3D(run,dir,onE,onP,onT,onV,onR,onX);
-%       cd(postpath)
         
-    % Load and set constant simulation parameters
-      ghostcells = 4;     % MFiX adds these to each domain dimension
-      [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
-          NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,...
-          TROPO,BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3]...
-          = setCnsts3D(run,dir,ghostcells);
-      cd(postpath)
+  % Load and set constant simulation parameters
+    ghostcells = 4;     % MFiX adds these to each domain dimension
+    [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,...
+        NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,BC_EPG,...
+        BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3] = setCnsts3D(run,dir,ghostcells);
+    cd(postpath)
 
-      timesteps = (TSTOP/DT)+1;
-      % Define grid
+    timesteps = (TSTOP/DT)+1;
+    
+  % Define grid
 %%% #TODO#: check to see if X/Y/Z are these even used
-        X = LENGTH/(IMAX-ghostcells):LENGTH/(IMAX-ghostcells):LENGTH;
-        Y = HEIGHT/(JMAX-ghostcells):HEIGHT/(JMAX-ghostcells):HEIGHT;
-        Z = WIDTH/(KMAX-ghostcells):WIDTH/(KMAX-ghostcells):WIDTH;
-      % Dimension resolution [meters/cell], excluding ghost cells
-        XRES = LENGTH/(IMAX - ghostcells);
-        YRES = HEIGHT/(JMAX - ghostcells);
-        ZRES = WIDTH/(KMAX - ghostcells);
+    X = LENGTH/(IMAX-ghostcells):LENGTH/(IMAX-ghostcells):LENGTH;
+    Y = HEIGHT/(JMAX-ghostcells):HEIGHT/(JMAX-ghostcells):HEIGHT;
+    Z = WIDTH/(KMAX-ghostcells):WIDTH/(KMAX-ghostcells):WIDTH;
+  % Dimension resolution [meters/cell], excluding ghost cells
+    XRES = LENGTH/(IMAX - ghostcells);
+    YRES = HEIGHT/(JMAX - ghostcells);
+    ZRES = WIDTH/(KMAX - ghostcells);
         
-    % Set figure properties. Note: MFiX horizontal dimensions are LENGTH
-    % (x; MATLAB X) and WIDTH (z; MATLAB Y), vertical dimension is HEIGHT
-    % (y; MATLAB Z). tick* values are in meters.
-      tickx = linspace(0,LENGTH,xpoints);
-      labelx = tickx(2:end)/xfact;
-      ticky = linspace(0,HEIGHT,ypoints);
-      labely = ticky(2:end)/yfact;
-      tickz = linspace(0,WIDTH,zpoints);
-      labelz = tickz(2:end)/zfact;
-      
-      time = (0:timesteps-1)*DT;
-      
-    % Calculate characteristic inlet velocity for use in entrainment script.
-      [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,...
-          BC_EPG_st,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,...
-          NFR_S3,BC_TS1,BC_TS2,BC_TS3,VENT_R);
-        
-%%% #TODO#: delete this section?
-    % Manipulate data to time evolution over domain and save output
-%       if onE == 1
-%           vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,...
-%           labelxunit,ticky,labely,labelyunit,tickz,labelz,labelzunit,...
-%           timesteps,EP_G,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
-%           PULSE,FREQ,postpath);
-%       end
+  % Set figure properties. Note: MFiX horizontal dimensions are LENGTH
+  % (x; MATLAB X) and WIDTH (z; MATLAB Y), vertical dimension is HEIGHT
+  % (y; MATLAB Z). tick* values are in meters.
+    tickx = linspace(0,LENGTH,xpoints);
+    labelx = tickx(2:end)/xfact;
+    ticky = linspace(0,HEIGHT,ypoints);
+    labely = ticky(2:end)/yfact;
+    tickz = linspace(0,WIDTH,zpoints);
+    labelz = tickz(2:end)/zfact;
 
+    time = (0:timesteps-1)*DT;
+      
+  % Calculate characteristic inlet velocity for use in entrainment script.
+    [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG_st,...
+        BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,BC_TS1,...
+        BC_TS2,BC_TS3,VENT_R);
+        
+  % Manipulate data to time evolution over domain and save output
     vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
         ticky,labely,labelyunit,tickz,labelz,labelzunit,plumeedge,XRES,...
         YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
