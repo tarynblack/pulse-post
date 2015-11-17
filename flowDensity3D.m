@@ -95,6 +95,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         cla;
         
       % Density at every point in domain: sum of gas and particle densities
+%%% #TODO# change calculation: domaindensity = EPG*RO_G + sum(ROP_S*)
         domaindensity = (EPG.*PG./(Rgas*TG)) + ((1-EPG).*(RS1*RO_S1 + RS2*RO_S2 + RS3*RO_S3));
         
       % Determine whether flow is buoyant (less dense than atmosphere)

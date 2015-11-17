@@ -112,6 +112,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
         cla;
         
+%%% #TODO# ROP should be ROP/solid density of particle
         logS1 = log10(ROPS1 + 1E-10);
         logS2 = log10(ROPS2 + 1E-10);
         logS3 = log10(ROPS3 + 1E-10);
