@@ -65,6 +65,9 @@ clear all
   cmin = -0.5;
   cmax = 0.5;
   
+% Other colorbar limits...
+  lowTemp = 300;    % lowest temperature on colorbar [K]
+  
 % Viewing azimuth and elevation (in degrees) for 3D animations
   viewaz = -37.5;
   viewel = 20;
@@ -165,7 +168,7 @@ for i = 1:length(allruns)
     vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
-        TROPO,Y);
+        TROPO,Y,BC_TG,lowTemp,PULSE,FREQ,time);
     cd(postpath)
         
     vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
