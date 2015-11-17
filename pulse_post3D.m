@@ -93,8 +93,6 @@ clear all
   
 % Other constants...
   Rgas = 461.5;     % gas constant
-  tropo = 11E3;     % tropopause height [m]
-  atmos = 'T';      % does simulation consider atmosphere? (T/F)
   
 % Parameters for particle concentration slices figure. sdist* is the
 % fraction along the *axis at which to cut the slice (between [] and 1).
@@ -203,8 +201,8 @@ for i = 1:length(allruns)
     
     vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,tropo,...
-        atmos,Y);
+        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
+        TROPO,Y);
     cd(postpath)
         
     vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
