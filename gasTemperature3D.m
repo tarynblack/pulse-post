@@ -1,7 +1,7 @@
 function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
-    ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time )
+    ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
 %over time.
 %   Detailed explanation goes here
@@ -97,7 +97,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         hc = colorbar;
             caxis([gasTemperature_cmin BC_TG]);
             ylabel(hc,'\bf Temperature [K]','FontSize',12)
-        tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
+        tL = pulsetitle(varname,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
         
         cd(dir)

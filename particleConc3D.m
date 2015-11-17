@@ -1,7 +1,7 @@
 function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
-    RO_S1,RO_S2,RO_S3,particleConc_cmin,particleConc_cmax )
+    RO_S1,RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
@@ -124,21 +124,21 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             hS1 = slice(logS1,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS1.FaceColor = 'interp';
             hS1.EdgeColor = 'none';
-            tLS1 = pulsetitle(varS1,PULSE,time,t,run,FREQ);
+            tLS1 = pulsetitle(varS1,PULSE,time,t,title,FREQ);
             title(tLS1,'FontSize',12,'FontWeight','bold'); 
         subplot(1,3,2)
             view(saz,sel)
             hS2 = slice(logS2,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS2.FaceColor = 'interp';
             hS2.EdgeColor = 'none';
-            tLS2 = pulsetitle(varS2,PULSE,time,t,run,FREQ);
+            tLS2 = pulsetitle(varS2,PULSE,time,t,title,FREQ);
             title(tLS2,'FontSize',12,'FontWeight','bold');
         subplot(1,3,3)
             view(saz,sel)
             hS3 = slice(logS3,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS3.FaceColor = 'interp';
             hS3.EdgeColor = 'none';
-            tLS3 = pulsetitle(varS3,PULSE,time,t,run,FREQ);
+            tLS3 = pulsetitle(varS3,PULSE,time,t,title,FREQ);
             title(tLS3,'FontSize',12,'FontWeight','bold');
             hc = colorbar('location','eastoutside');
                 caxis([particleConc_cmin particleConc_cmax]);

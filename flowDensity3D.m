@@ -2,7 +2,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
     tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
     labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-    flowDensity_cmax )
+    flowDensity_cmax,titlerun )
 %flowDensity3D calculates the net density of the flow from gas and particle
 %densities and volume fractions.
 %   Detailed explanation goes here
@@ -136,7 +136,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
           hFB.EdgeColor = 'none';
           colorbar
           caxis([flowDensity_cmin flowDensity_cmax]);
-          tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
+          tL = pulsetitle(varname,PULSE,time,t,titlerun,FREQ);
           title(tL,'FontSize',12,'FontWeight','bold');
           
 %%% #TODO# clean up this section

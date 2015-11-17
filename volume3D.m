@@ -1,7 +1,7 @@
 function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
                 ticky,labely,labelyunit,tickz,labelz,labelzunit,...
                 plumeedge,XRES,YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
-                PULSE,FREQ,postpath )
+                PULSE,FREQ,postpath,titlerun )
 %volume3D makes frames of the time evolution of gas volume fraction in a
 %volcanic plume during a simulated volcanic eruption.
 %   volume3D processes gas volume fraction (EP_G) data from an MFiX run
@@ -82,7 +82,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,labelxunit,.
             hold on
         end
         
-        tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
+        tL = pulsetitle(varname,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
   
 	cd(dir)      

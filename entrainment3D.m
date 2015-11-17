@@ -1,7 +1,8 @@
 function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-    time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype )
+    time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
+    imtype,titlerun )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -160,7 +161,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         
         
         
-        tL = pulsetitle(varname,PULSE,time,t,run,FREQ);
+        tL = pulsetitle(varname,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
         
         cd(dir)
@@ -184,9 +185,9 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     
     % Plot total plume volume and change in plume volume over time
       if strcmp(PULSE,'T') == 1
-        str = sprintf('%s: Unsteady flow %.1f Hz',run,FREQ);
+        str = sprintf('%s: Unsteady flow %.1f Hz',titlerun,FREQ);
       elseif strcmp(PULSE,'F') == 1
-        str = sprintf('%s: Steady flow',run);
+        str = sprintf('%s: Steady flow',titlerun);
       end
       fig_plumevol = figure('Name','Plume Volume','visible',vis);
         hvol1 = subplot(2,1,1);

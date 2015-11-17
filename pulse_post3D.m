@@ -19,7 +19,7 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = {'888187'};
+  allruns = {'F_888187'};
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
   runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
@@ -112,6 +112,7 @@ for i = 1:length(allruns)
     sprintf('Now processing run %s',run)
 
     dir = sprintf('%s%s',runpath,run);
+    titlerun = strrep(run,'_','\_');
         
   % Load and set constant simulation parameters
     ghostcells = 4;     % MFiX adds these to each domain dimension
@@ -153,7 +154,7 @@ for i = 1:length(allruns)
     vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
         ticky,labely,labelyunit,tickz,labelz,labelzunit,plumeedge,XRES,...
         YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
-        PULSE,FREQ,postpath);
+        PULSE,FREQ,postpath,titlerun);
     cd(postpath)
 
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
@@ -165,20 +166,20 @@ for i = 1:length(allruns)
     vidPartConc = particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,RO_S1,...
-        RO_S2,RO_S3,particleConc_cmin,particleConc_cmax );
+        RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun);
     cd(postpath)
     
     vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
-        TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time);
+        TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun);
     cd(postpath)
         
     vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
         postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,...
         labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-        flowDensity_cmax);
+        flowDensity_cmax,titlerun);
     cd(postpath)
 
 %     clearvars -except i allruns
