@@ -9,7 +9,8 @@
 % are saved to the same folder <run> that contains the relevant MFiX data
 % files. 
 %
-% Special functions called: mfixData3D; setCnsts3D; volume3D
+% Special functions called: setCnsts3D; calc_inletFlow; volume3D;
+%   entrainment3D; particleConc3D; gasTemperature3D; flowDensity3D
 % Last edit: Taryn Black, 17 November 2015
 
 clear all

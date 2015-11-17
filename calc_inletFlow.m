@@ -4,7 +4,7 @@ function [ XG,vel_char,MFR ] = calc_inletFlow( charEPG,MING,MAXG,PULSE,...
 %calc_inletFlow calculates the gas mass fraction, choked velocity, and mass
 %flow rate at the inlet (volcanic vent) for a simulation.
 %   Detailed explanation goes here
-% Last edit: Taryn Black, 14 November 2015
+% Last edit: Taryn Black, 17 November 2015
 
     if strcmp(charEPG,'mingas') == 1
         EPGunst = MING;
