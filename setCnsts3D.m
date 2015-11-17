@@ -1,6 +1,6 @@
 function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
-    NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP ] ...
-    = setCnsts3D( run,dir,ghostcells )
+    NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,...
+    BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3 ] = setCnsts3D( run,dir,ghostcells )
 % setCnsts3D loads the file mfixconst_<run> and sets constant parameters for
 % post-processing from an MFiX simulation specified by <run>. The contents
 % of mfixconst are specified in allocate_arrays.f in the simulation run
@@ -22,8 +22,15 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
 %   VENT_R: radius of vent [m]
 %   DT:     time interval between each data write in the simulation
 %   TSTOP:  end time of simulation [s]
+%   ATMOS:  describes whether simulation runs with atmospheric temperature,
+%           density, etc. conditions (T) or not (F)
+%   TROPO:  altitude of tropopause [m]
+%   BC_EPG: inlet gas volume fraction (constant for steady case)
+%   BC_PG:  inlet gas pressure [Pa, or N/m2]
+%   BC_TG:  inlet gas temperature [K]
+%   BC_TS#: inlet temperature of phase# particles [K]
 %
-% Last edit: Taryn Black, 14 November 2015
+% Last edit: Taryn Black, 17 November 2015
     
     cd(dir)
     
@@ -55,6 +62,14 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     VENT_R = str2double(Cnsts.data(17));
     DT     = str2double(Cnsts.data(18));
     TSTOP  = str2double(Cnsts.data(19));
+    ATMOS  = char(Cnsts.data(20));
+    TROPO  = str2double(Cnsts.data(21));
+    BC_EPG = str2double(Cnsts.data(22));
+    BC_PG  = str2double(Cnsts.data(23));
+    BC_TG  = str2double(Cnsts.data(24));
+    BC_TS1 = str2double(Cnsts.data(25));
+    BC_TS2 = str2double(Cnsts.data(26));
+    BC_TS3 = str2double(Cnsts.data(27));
 
     
 end

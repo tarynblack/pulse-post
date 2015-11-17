@@ -10,7 +10,7 @@
 % files. 
 %
 % Special functions called: mfixData3D; setCnsts3D; volume3D
-% Last edit: Taryn Black, 14 November 2015
+% Last edit: Taryn Black, 17 November 2015
 
 clear all
 
@@ -142,7 +142,8 @@ for i = 1:length(allruns)
     % Load and set constant simulation parameters
       ghostcells = 4;     % MFiX adds these to each domain dimension
       [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
-          NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP]...
+          NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,...
+          TROPO,BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3]...
           = setCnsts3D(run,dir,ghostcells);
       cd(postpath)
 
