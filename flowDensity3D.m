@@ -1,5 +1,5 @@
 function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
-    ghostcells,postpath,Rgas,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
+    ghostcells,postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
     tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
     labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ )
 %flowDensity3D calculates the net density of the flow from gas and particle
@@ -37,9 +37,8 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     else [saz,sel] = view(3);
     end
     
-%%% Initialize figure frames
-    % #TODO# decide how to display (isosurf or slice?). Below is temporary
-    % to visualize buoyancy slice.
+%%% Initialize figure frames 
+%%% #TODO# display as density slice. Below is temporary to visualize buoyancy slice.
     cd(dir)
     fig = figure('Name','Plume Buoyancy','visible',vis);
     hold on
@@ -64,8 +63,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 
 %%% Calculate flow density at each timestep, plot, and save video.
     fID_EPG = fopen(sprintf('EP_G_%d',run));
-    fID_PG  = fopen(sprintf('P_G_%d',run));
-    fID_TG  = fopen(sprintf('T_G_%d',run));
+    fID_ROG  = fopen(sprintf('RO_G_%d',run));
     fID_RS1 = fopen(sprintf('ROP_S1_%d',run));
     fID_RS2 = fopen(sprintf('ROP_S2_%d',run));
     fID_RS3 = fopen(sprintf('ROP_S3_%d',run));
@@ -82,8 +80,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
             break
         end
-        PG  = varchunk3D(fID_PG,IMAX,JMAX,KMAX,ghostcells);
-        TG  = varchunk3D(fID_TG,IMAX,JMAX,KMAX,ghostcells);
+        ROG  = varchunk3D(fID_ROG,IMAX,JMAX,KMAX,ghostcells);
         RS1 = varchunk3D(fID_RS1,IMAX,JMAX,KMAX,ghostcells);
         RS2 = varchunk3D(fID_RS2,IMAX,JMAX,KMAX,ghostcells);
         RS3 = varchunk3D(fID_RS3,IMAX,JMAX,KMAX,ghostcells);
@@ -95,8 +92,8 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         cla;
         
       % Density at every point in domain: sum of gas and particle densities
-%%% #TODO# change calculation: domaindensity = EPG*RO_G + sum(ROP_S*)
-        domaindensity = (EPG.*PG./(Rgas*TG)) + ((1-EPG).*(RS1*RO_S1 + RS2*RO_S2 + RS3*RO_S3));
+%%% #TODO# change calculation: when using Mary's data, RS1 --> RS1*RO_S1
+        domaindensity = (EPG.*ROG) + (RS1 + RS2 + RS3);
         
       % Determine whether flow is buoyant (less dense than atmosphere)
       % using mean flow/atmospheric densities at each altitude slice.

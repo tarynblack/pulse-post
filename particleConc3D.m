@@ -1,12 +1,13 @@
 function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-    labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ )
+    labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
+    RO_S1,RO_S2,RO_S3 )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 14 November 2015
+%   Last edit: Taryn Black, 17 November 2015
 
     varS1 = 'S1 concentration';
     varS2 = 'S2 concentration';
@@ -112,10 +113,11 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
         cla;
         
-%%% #TODO# ROP should be ROP/solid density of particle
-        logS1 = log10(ROPS1 + 1E-10);
-        logS2 = log10(ROPS2 + 1E-10);
-        logS3 = log10(ROPS3 + 1E-10);
+%%% #TODO# ROP*/RO* = EPS*. After switching to using Mary's output, change
+%%% this calculation - she writes out EPS* rather than ROP*.
+        logS1 = log10((ROPS1/RO_S1) + 1E-10);
+        logS2 = log10((ROPS2/RO_S2) + 1E-10);
+        logS3 = log10((ROPS3/RO_S3) + 1E-10);
         
         subplot(1,3,1)
             view(saz,sel)
