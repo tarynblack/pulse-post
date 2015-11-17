@@ -72,15 +72,6 @@ clear all
 % Options: tif (*only if your photo viewer can read multipage
 % tif, e.g. Windows Photo Viewer), jpeg, png, bmp, other image formats...
   imtype = 'tif';
-
-% Vent parameters
-  vel_inlet = 178;      % inlet velocity [m/s]
-  BC_EPG_st = 1;        % initial gas volume fraction (steady case)      
-  BC_PG     = 1.2E5;    % inlet gas pressure [N/m2]
-  BC_TG     = 1100;     % inlet gas temperature [K]
-  BC_TS1    = 1100;     % inlet solid1 temperature [K]
-  BC_TS2    = 1100;     % inlet solid2 temperature [K]
-  BC_TS3    = 1100;     % inlet solid3 temperature [K]
   
 % Other constants...
   Rgas = 461.5;     % gas constant
@@ -148,7 +139,7 @@ for i = 1:length(allruns)
     time = (0:timesteps-1)*DT;
       
   % Calculate characteristic inlet velocity for use in entrainment script.
-    [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG_st,...
+    [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,...
         BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,BC_TS1,...
         BC_TS2,BC_TS3,VENT_R);
         

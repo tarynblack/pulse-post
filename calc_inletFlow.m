@@ -1,5 +1,5 @@
 function [ XG,vel_char,MFR ] = calc_inletFlow( charEPG,MING,MAXG,PULSE,...
-    BC_EPG_st,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
+    BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
     BC_TS1,BC_TS2,BC_TS3,VENT_R )
 %calc_inletFlow calculates the gas mass fraction, choked velocity, and mass
 %flow rate at the inlet (volcanic vent) for a simulation.
@@ -19,9 +19,9 @@ function [ XG,vel_char,MFR ] = calc_inletFlow( charEPG,MING,MAXG,PULSE,...
         vel_char = sqrt((Rgas/XG)*(EPGunst*BC_TG +((1-EPGunst)*(BC_TS1*NFR_S1+BC_TS2*NFR_S2+BC_TS3*NFR_S3))))*(XG+((1-XG)*BC_PG/(Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3))));
         MFR = pi*(VENT_R^2)*vel_char*((EPGunst*BC_PG/(Rgas*BC_TG))+(1-EPGunst)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3));
     elseif strcmp(PULSE,'F') == 1
-        XG = (1 + ((1-BC_EPG_st)*Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3)/(BC_EPG_st*BC_PG)))^(-1);
-        vel_char = sqrt((Rgas/XG)*(BC_EPG_st*BC_TG +((1-BC_EPG_st)*(BC_TS1*NFR_S1+BC_TS2*NFR_S2+BC_TS3*NFR_S3))))*(XG+((1-XG)*BC_PG/(Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3))));
-        MFR = pi*(VENT_R^2)*vel_char*((BC_EPG_st*BC_PG/(Rgas*BC_TG))+(1-BC_EPG_st)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3));
+        XG = (1 + ((1-BC_EPG)*Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3)/(BC_EPG*BC_PG)))^(-1);
+        vel_char = sqrt((Rgas/XG)*(BC_EPG*BC_TG +((1-BC_EPG)*(BC_TS1*NFR_S1+BC_TS2*NFR_S2+BC_TS3*NFR_S3))))*(XG+((1-XG)*BC_PG/(Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3))));
+        MFR = pi*(VENT_R^2)*vel_char*((BC_EPG*BC_PG/(Rgas*BC_TG))+(1-BC_EPG)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3));
     end
 
 end
