@@ -47,7 +47,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,labelxunit,.
 %         legend(names)
     
 %%% Initialize video
-    vidEPG = VideoWriter(sprintf('vidEPG_%d.avi',run));
+    vidEPG = VideoWriter(sprintf('vidEPG_%s.avi',run));
     vidEPG.Quality = 100;
     vidEPG.FrameRate = 10;
     open(vidEPG);
@@ -56,7 +56,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,labelxunit,.
     
 %%% Plot gas volume fraction isosurfaces at each timestep and save video.
 %     cd(dir)
-    fileID = fopen(sprintf('EP_G_%d',run));
+    fileID = fopen(sprintf('EP_G_%s',run));
     t = 0;
     while ~feof(fileID)
         
@@ -98,7 +98,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,labelxunit,.
     close(vidEPG);
     cd(postpath)
     
-    sprintf('EPG processing complete.\nvidEPG_%d has been saved to %s',run,dir)
+    sprintf('EPG processing complete.\nvidEPG_%s has been saved to %s',run,dir)
 
 end
 

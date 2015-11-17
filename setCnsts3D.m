@@ -36,7 +36,7 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     
     % Read in second column of mfixconst (containing values) as a cell
     % array of strings
-    fid = fopen(sprintf('mfixconst_%d',run));
+    fid = fopen(sprintf('mfixconst_%s',run));
     data = textscan(fid, '%*s %s');
     fclose(fid);
     

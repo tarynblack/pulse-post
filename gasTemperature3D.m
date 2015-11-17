@@ -51,14 +51,14 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
     
 %%% Initialize video
-    vidGasTemp = VideoWriter(sprintf('vidGasTemp_%d.avi',run));
+    vidGasTemp = VideoWriter(sprintf('vidGasTemp_%s.avi',run));
     vidGasTemp.Quality = 100;
     vidGasTemp.FrameRate = 10;
     open(vidGasTemp);
     set(gcf,'Visible',vis);
     
 %%% Plot gas temperature slice at each timestep and save video.
-    fID_TG = fopen(sprintf('T_G_%d',run));
+    fID_TG = fopen(sprintf('T_G_%s',run));
     
     t = 0;
     while ~feof(fID_TG)
@@ -111,7 +111,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     cd(dir)
     close(vidGasTemp)
     cd(postpath)
-    sprintf('Gas temperature processing complete. \nvidGasTemp_%d has been saved to %s',run,dir) 
+    sprintf('Gas temperature processing complete. \nvidGasTemp_%s has been saved to %s',run,dir) 
 
 end
 

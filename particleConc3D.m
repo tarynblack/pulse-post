@@ -79,7 +79,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
                 zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
             
 %%% Initialize video
-    vidPartConc = VideoWriter(sprintf('vidPartConc_%d.avi',run));
+    vidPartConc = VideoWriter(sprintf('vidPartConc_%s.avi',run));
     vidPartConc.Quality = 100;
     vidPartConc.FrameRate = 10;
     open(vidPartConc);
@@ -87,9 +87,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
 %%% Plot particle volume fraction concentrations at each timestep and save
 %%% video.
-    fID_S1 = fopen(sprintf('ROP_S1_%d',run));
-    fID_S2 = fopen(sprintf('ROP_S2_%d',run));
-    fID_S3 = fopen(sprintf('ROP_S3_%d',run));
+    fID_S1 = fopen(sprintf('ROP_S1_%s',run));
+    fID_S2 = fopen(sprintf('ROP_S2_%s',run));
+    fID_S3 = fopen(sprintf('ROP_S3_%s',run));
 
     t = 0;
     while ~feof(fID_EPG)
@@ -165,6 +165,6 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
     cd(postpath)
     
-    sprintf('Particle concentration processing complete. \nvidPartConc_%d has been saved to %s',run,dir)
+    sprintf('Particle concentration processing complete. \nvidPartConc_%s has been saved to %s',run,dir)
 
 end

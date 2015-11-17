@@ -28,17 +28,17 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     box on
     
 %%% Initialize video
-    vidEntr = VideoWriter(sprintf('vidEntr_%d.avi',run));
+    vidEntr = VideoWriter(sprintf('vidEntr_%s.avi',run));
     vidEntr.Quality = 100;
     vidEntr.FrameRate = 10;
     open(vidEntr);
     set(gcf,'Visible',vis);
 
 %%% Calculate entrainment at each timestep, plot, and save video.
-    fID_EPG = fopen(sprintf('EP_G_%d',run));
-    fID_UG  = fopen(sprintf('U_G_%d',run));
-    fID_VG  = fopen(sprintf('V_G_%d',run));
-    fID_WG  = fopen(sprintf('W_G_%d',run));
+    fID_EPG = fopen(sprintf('EP_G_%s',run));
+    fID_UG  = fopen(sprintf('U_G_%s',run));
+    fID_VG  = fopen(sprintf('V_G_%s',run));
+    fID_WG  = fopen(sprintf('W_G_%s',run));
         
     t = 0;
     while ~feof(fID_EPG)
@@ -172,8 +172,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
           % Save each timestep as an individual figure in either a
           % multipage tif file or other image filetype (user-specified).
             if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-                imwrite(img,sprintf('Entr_tsteps_%d.tif',run),'WriteMode','append')
-            else saveas(fig,sprintf('Entr_%03ds_%d.%s',time(t),run,imtype));
+                imwrite(img,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
+            else saveas(fig,sprintf('Entr_%03ds_%s.%s',time(t),run,imtype));
             end
             
     end
@@ -184,9 +184,9 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     
     % Plot total plume volume and change in plume volume over time
       if strcmp(PULSE,'T') == 1
-        str = sprintf('ID#%d: Unsteady flow %.1f Hz',run,FREQ);
+        str = sprintf('%s: Unsteady flow %.1f Hz',run,FREQ);
       elseif strcmp(PULSE,'F') == 1
-        str = sprintf('ID#%d: Steady flow',run);
+        str = sprintf('%s: Steady flow',run);
       end
       fig_plumevol = figure('Name','Plume Volume','visible',vis);
         hvol1 = subplot(2,1,1);
@@ -199,7 +199,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
             title(hvol2,{sprintf('%s: Change in plume volume',str)},'FontWeight','bold','FontSize',10)
             xlabel(hvol2,{'Time (s)'},'FontWeight','bold','FontSize',10)
             ylabel(hvol2,{'\DeltaVolume (m^3)'},'FontWeight','bold','FontSize',10)
-      saveas(fig_plumevol,sprintf('PlumeVolume_%d.jpg',run));
+      saveas(fig_plumevol,sprintf('PlumeVolume_%s.jpg',run));
       
     % Plot plume-averaged entrainment/expansion over time
       fig_coeff = figure('Name','Entrainment Coefficients','visible',vis);
@@ -211,11 +211,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         xlabel('Time (s)','FontWeight','bold','FontSize',10)
         ylim([-1 1])
         legend({'Total coefficient','Entrainment','Expansion'},'Box','on','Location','EastOutside','FontWeight','bold','FontSize',10)
-      saveas(fig_coeff,sprintf('Coefficients_%d.jpg',run));
+      saveas(fig_coeff,sprintf('Coefficients_%s.jpg',run));
             
     cd(postpath)
     
-    sprintf('Entrainment processing complete. \nvidEntr_%d has been saved to %s',run,dir)
+    sprintf('Entrainment processing complete. \nvidEntr_%s has been saved to %s',run,dir)
 
 end
 

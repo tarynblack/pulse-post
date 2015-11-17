@@ -19,7 +19,7 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = [888187];
+  allruns = {'888187'};
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
   runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
@@ -108,10 +108,10 @@ clear all
 
 for i = 1:length(allruns)
     
-    run = allruns(i);
-    sprintf('Now processing run #%d',run)
+    run = allruns{i};
+    sprintf('Now processing run %s',run)
 
-    dir = sprintf('%s%d',runpath,run);
+    dir = sprintf('%s%s',runpath,run);
         
   % Load and set constant simulation parameters
     ghostcells = 4;     % MFiX adds these to each domain dimension

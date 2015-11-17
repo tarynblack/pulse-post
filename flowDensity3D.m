@@ -56,18 +56,18 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
     
 %%% Initialize video
-    vidFlowDens = VideoWriter(sprintf('vidFlowDens_%d.avi',run));
+    vidFlowDens = VideoWriter(sprintf('vidFlowDens_%s.avi',run));
     vidFlowDens.Quality = 100;
     vidFlowDens.FrameRate = 10;
     open(vidFlowDens);
     set(gcf,'Visible',vis);
 
 %%% Calculate flow density at each timestep, plot, and save video.
-    fID_EPG = fopen(sprintf('EP_G_%d',run));
-    fID_ROG  = fopen(sprintf('RO_G_%d',run));
-    fID_RS1 = fopen(sprintf('ROP_S1_%d',run));
-    fID_RS2 = fopen(sprintf('ROP_S2_%d',run));
-    fID_RS3 = fopen(sprintf('ROP_S3_%d',run));
+    fID_EPG = fopen(sprintf('EP_G_%s',run));
+    fID_ROG  = fopen(sprintf('RO_G_%s',run));
+    fID_RS1 = fopen(sprintf('ROP_S1_%s',run));
+    fID_RS2 = fopen(sprintf('ROP_S2_%s',run));
+    fID_RS3 = fopen(sprintf('ROP_S3_%s',run));
     
     t = 0;
     while ~feof(fID_EPG)
@@ -151,7 +151,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     cd(dir)
     close(vidFlowDens);
     cd(postpath)
-    sprintf('Flow density processing complete. \nvidFlowDens_%d has been saved to %s',run,dir)
+    sprintf('Flow density processing complete. \nvidFlowDens_%s has been saved to %s',run,dir)
     
 end
 
