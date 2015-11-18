@@ -42,7 +42,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     fID_WG  = fopen(sprintf('W_G_%s',run));
         
     t = 0;
-    while ~feof(fID_EPG)
+    while t <= TSTOP/DT + 1
             
         t = t+1;
         
