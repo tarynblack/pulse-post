@@ -47,14 +47,18 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         t = t+1;
         
         cd(postpath)
+      % Find gas volume fraction and velocities for entire domain at current timestep
         try
             EPG = varchunk3D(fID_EPG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
             break
         end
+        U_G = varchunk3D(fID_UG,IMAX,JMAX,KMAX,ghostcells);
+        V_G = varchunk3D(fID_VG,IMAX,JMAX,KMAX,ghostcells);
+        W_G = varchunk3D(fID_WG,IMAX,JMAX,KMAX,ghostcells);
         
-        % Skip processing for first timestep - no isosurface at step one
+        % Skip processing for first timestep - no isosurface at t=0
           if t==1;
               continue
           end
@@ -63,8 +67,6 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
 
       % Find plume boundary (isosurface) and plot. 
         plumesurf = isosurface(EPG,plumeedge);
-%         plotplume = patch(plumesurf,'FaceColor',[0.5 0.5 0.5],'EdgeColor','none','FaceAlpha',0.5);
-%         hold on
         
       % Extract coordinates of plume isosurface vertices
         plumeX = plumesurf.vertices(:,1);
@@ -79,12 +81,6 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         for i = 1:length(plumenorm)
             unitnorm(:,i) = plumenorm(:,i)./norm(plumenorm(:,i));
         end
-        
-      % Find velocities for entire domain at current timestep
- %%% #TODO# move this to before the continue statement?
-        U_G = varchunk3D(fID_UG,IMAX,JMAX,KMAX,ghostcells);
-        V_G = varchunk3D(fID_VG,IMAX,JMAX,KMAX,ghostcells);
-        W_G = varchunk3D(fID_WG,IMAX,JMAX,KMAX,ghostcells);
         
       % Interpolate for velocities at plume surface vertices
         plumeU = interp3(U_G,plumeX,plumeY,plumeZ);
@@ -148,10 +144,6 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         'none','Marker','o','MarkerFaceColor','flat')
     colorbar
 
-% patch('Vertices',[plumeX plumeY plumeZ],'Faces',1:length(plumeX),...
-%             'FaceVertexCData',ecolor,'FaceColor','none','EdgeColor',...
-%             'none','Marker','o','MarkerFaceColor','flat')
-        
       % Calculate plume volume
         numcells = sum(sum(sum(EPG <= plumeedge)));
         plumevolume(t) = numcells*XRES*YRES*ZRES;
