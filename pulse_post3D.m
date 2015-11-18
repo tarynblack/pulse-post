@@ -66,8 +66,10 @@ clear all
   entrainment_cmax = 0.5;   % between -1 and 1
   particleConc_cmin = -10;  % #TODO# check this number
   particleConc_cmax = 10;   % #TODO# check this number
-  flowDensity_cmin = -9;    % #TODO# check this number
-  flowDensity_cmax = 1;     % #TODO# check this number
+  flowDensity_cmin = 0;    % #TODO# check this number
+  flowDensity_cmax = 100;     % #TODO# check this number
+  flowBuoyancy_cmin = -9;   % #TODO# check this number
+  flowBuoyancy_cmax = 1;    % #TODO# check this number
   gasTemperature_cmin = 300;    
   
 % Viewing azimuth and elevation (in degrees) for 3D animations
@@ -179,7 +181,7 @@ for i = 1:length(allruns)
         postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,...
         labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-        flowDensity_cmax,titlerun);
+        flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax);
     cd(postpath)
 
 %     clearvars -except i allruns
