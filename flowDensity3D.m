@@ -2,7 +2,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
     tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
     labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-    flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax )
+    flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,timesteps )
 %flowDensity3D calculates the net density of the flow from gas and particle
 %densities and volume fractions.
 %   Detailed explanation goes here
@@ -88,7 +88,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     fID_RS3 = fopen(sprintf('ROP_S3_%s',run));
     
     t = 0;
-    while ~feof(fID_EPG)
+    while t <= timesteps %~feof(fID_EPG)
         
         t = t+1;
         
@@ -188,7 +188,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 
     cd(dir)
     close(vidFlowDens);
-    cloes(vidFlowBuoy);
+    close(vidFlowBuoy);
     cd(postpath)
     sprintf('Flow density processing complete.\nvidFlowDens_%s has been saved to %s.\nvidFlowBuoy_%s has been saved to %s',run,dir,run,dir)
     

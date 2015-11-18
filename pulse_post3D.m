@@ -19,16 +19,16 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = {'F_888187'};
+  allruns = {'F_01_997_999'};
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
-  runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
-%     runpath = '~/data2/rundata/';
+%   runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
+    runpath = '~/data2/rundata/';
   
 % Set path for location of post-processing scripts (cannot change path file
 % on Atlas cluster).
- postpath = '/Users/taryn/Documents/GitHub/pulse-post';
-%    postpath = '~/data2/pulse-post';
+%  postpath = '/Users/taryn/Documents/GitHub/pulse-post';
+   postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nodisplay mode.
@@ -64,11 +64,11 @@ clear all
 % Animation colorbar limits
   entrainment_cmin = -0.5;  % between -1 and 1
   entrainment_cmax = 0.5;   % between -1 and 1
-  particleConc_cmin = -10;  % #TODO# check this number
+  particleConc_cmin = -5;  % #TODO# check this number
   particleConc_cmax = 10;   % #TODO# check this number
   flowDensity_cmin = 0;    % #TODO# check this number
-  flowDensity_cmax = 100;     % #TODO# check this number
-  flowBuoyancy_cmin = -9;   % #TODO# check this number
+  flowDensity_cmax = 3;     % #TODO# check this number
+  flowBuoyancy_cmin = -2;   % #TODO# check this number
   flowBuoyancy_cmax = 1;    % #TODO# check this number
   gasTemperature_cmin = 300;    
   
@@ -122,8 +122,12 @@ for i = 1:length(allruns)
         NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,BC_EPG,...
         BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3] = setCnsts3D(run,dir,ghostcells);
     cd(postpath)
+    
+%%%% #TODO# add tstop override to user-defined if you don't want to process
+%%%% full simulation.
+    TSTOP = 25;
 
-    timesteps = (TSTOP/DT)+1;
+    timesteps = TSTOP/DT;
     
   % Define grid
 %%% #TODO#: check to see if X/Y/Z are these even used
@@ -145,7 +149,7 @@ for i = 1:length(allruns)
     tickz = linspace(0,WIDTH,zpoints);
     labelz = tickz(2:end)/zfact;
 
-    time = (0:timesteps-1)*DT;
+    time = (0:timesteps)*DT;
       
   % Calculate characteristic inlet velocity for use in entrainment script.
     [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,...
@@ -153,36 +157,40 @@ for i = 1:length(allruns)
         BC_TS2,BC_TS3,VENT_R);
         
   % Manipulate data to time evolution over domain and save output
-    vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
-        ticky,labely,labelyunit,tickz,labelz,labelzunit,plumeedge,XRES,...
-        YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
-        PULSE,FREQ,postpath,titlerun);
-    cd(postpath)
-
+%     vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
+%         ticky,labely,labelyunit,tickz,labelz,labelzunit,plumeedge,XRES,...
+%         YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
+%         PULSE,FREQ,postpath,titlerun);
+%     cd(postpath)
+% 
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-        vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype);
+        vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
+        titlerun,timesteps );
     cd(postpath)
-
-    vidPartConc = particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
-        tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,RO_S1,...
-        RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun);
+% 
+%     vidPartConc = particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
+%         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
+%         labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,RO_S1,...
+%         RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun,...
+%         timesteps,PULSE,FREQ,time);
+%     cd(postpath)
+%     
+%     vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
+%         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
+%         labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
+%         TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,timesteps);
+%     cd(postpath)
+%         
+%     vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
+%         postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,...
+%         labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
+%         labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
+%         flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,timesteps);
     cd(postpath)
     
-    vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
-        tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
-        TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun);
-    cd(postpath)
-        
-    vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
-        postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,...
-        labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-        flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax);
-    cd(postpath)
+    close all
 
 %     clearvars -except i allruns
 

@@ -1,8 +1,8 @@
-function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
-    JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-    labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-    time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
-    imtype,titlerun )
+% function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
+%     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+%     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
+%     time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
+%     imtype,titlerun,timesteps )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -42,8 +42,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     fID_WG  = fopen(sprintf('W_G_%s',run));
         
     t = 0;
-    while t <= TSTOP/DT + 1
-            
+    while t <= timesteps 
+        
         t = t+1;
         
         cd(postpath)
@@ -114,9 +114,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         dlmwrite(fullfile(sprintf('%s',dir),'expn_avg-std.txt'),[avg_expn(t) std_expn(t)],'-append','delimiter','\t','precision','%0.6f');
         dlmwrite(fullfile(sprintf('%s',dir),'plot_time.txt'),time(t)','-append','delimiter','\t','precision','%0.6f');
         
-      % Plot plume surface color-coded by entrainment coefficient
-        e_color = zeros(length(e_coeff),3);
-
+  % Plot plume surface color-coded by entrainment coefficient
     nmap = 256;
 %      colormap(jet(nmap));
     colormap([winter(round(nmap*-entrainment_cmin/(entrainment_cmax-entrainment_cmin)));flipud(autumn(nmap-round(nmap*-entrainment_cmin/(entrainment_cmax-entrainment_cmin))))]);
@@ -210,5 +208,5 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     
     sprintf('Entrainment processing complete. \nvidEntr_%s has been saved to %s',run,dir)
 
-end
+% end
 

@@ -7,7 +7,7 @@ function [ tL ] = pulsetitle( varname,PULSE,time,t,titlerun,FREQ )
 
     if strcmp(PULSE,'T') == 1
         str = 'Unsteady flow';
-        tL =  ({sprintf('%s, t=%d s',varname,time(t));sprintf('%s: %s, %.1f Hz',titlerun,str,FREQ)});
+        tL =  ({sprintf('%s, t=%d s',varname,time(t));sprintf('%s: %s, %g Hz',titlerun,str,FREQ)});
     elseif strcmp(PULSE,'F') == 1
         str = 'Steady flow';
         tL = ({sprintf('%s, t=%d s',varname,time(t));sprintf('%s: %s',titlerun,str)});

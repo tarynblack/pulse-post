@@ -1,7 +1,8 @@
 function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
-    RO_S1,RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun )
+    RO_S1,RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun,...
+    timesteps,PULSE,FREQ,time )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
@@ -92,7 +93,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     fID_S3 = fopen(sprintf('ROP_S3_%s',run));
 
     t = 0;
-    while ~feof(fID_EPG)
+    while t <= timesteps %~feof(fID_EPG)
         
         t = t+1;
         
