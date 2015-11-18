@@ -8,11 +8,11 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %
 %   Special functions called: varchunk3D, pulsetitle
-%   Last edit: Taryn Black, 14 November 2015
+%   Last edit: Taryn Black, 17 November 2015
 
     varname = 'Flow density';
 
-%%% #TODO# decide whether or not to keep this - just using it temporarly to
+%%% #TODO# decide whether or not to keep this - just using it temporarily to
 %%% visualize buoyancy slice.
 %%% Ensure that 'no slice' directions are empty and determine figure
 %%% viewing angle based on slice direction
@@ -64,7 +64,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 
 %%% Calculate flow density at each timestep, plot, and save video.
     fID_EPG = fopen(sprintf('EP_G_%s',run));
-    fID_ROG  = fopen(sprintf('RO_G_%s',run));
+    fID_ROG = fopen(sprintf('RO_G_%s',run));
     fID_RS1 = fopen(sprintf('ROP_S1_%s',run));
     fID_RS2 = fopen(sprintf('ROP_S2_%s',run));
     fID_RS3 = fopen(sprintf('ROP_S3_%s',run));
@@ -105,9 +105,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         atmsdensity = domaindensity.*inatmos;
         
         for i = 1:(JMAX-ghostcells)
-            z_flowd = flowdensity(:,:,i);
             z_atmsd = atmsdensity(:,:,i);
-            avgflowdens_altitude(i) = mean(z_flowd(z_flowd~=0));
             avgatmsdens_altitude(i) = mean(z_atmsd(z_atmsd~=0));
         end
         
@@ -115,14 +113,16 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         % positively buoyant (less dense than atmosphere). Negative = flow
         % is negatively buoyant (more dense than atmosphere). Value =
         % difference in density
-          reldensity = avgatmsdens_altitude - avgflowdens_altitude;
-          reldens_3D = repmat(reldensity',1,KMAX-ghostcells,IMAX-ghostcells);
-          reldens_3D = permute(reldens_3D,[3 2 1]);
-          flowbuoyancy = reldens_3D.*inplume;
+          avgatmsdens_3D = repmat(avgatmsdens_altitude',1,KMAX-ghostcells,IMAX-ghostcells);
+          avgatmsdens_3D = permute(avgatmsdens_3D,[3 2 1]);
+          avgatmsdens_3D_inplume = avgatmsdens_3D.*inplume;
+          flowbuoyancy = avgatmsdens_3D_inplume - flowdensity;
+            mindens = min(min(min(flowbuoyancy(flowbuoyancy~=0))));
+            maxdens = max(max(max(flowbuoyancy(flowbuoyancy~=0))));
           
         % Define buoyancy colormap: red = rise, blue = collapse.
           numcolors = 256;
-          zeropoint = abs(min(reldensity))/(abs(max(reldensity))+abs(min(reldensity)));
+          zeropoint = abs(mindens)/(abs(maxdens)+abs(mindens));
           cmaplims = [1 0 0;    % red
                       1 1 1;    % white
                       0 0 1];   % blue
