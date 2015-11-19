@@ -13,7 +13,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     varEn = 'Entrainment';
     
 %%% Clear directory of appending files from previous processing attempts
-    delete('*.txt' 'Entr_t*' 'EPG_t*');
+    cd(dir)
+    delete('*.txt','Entr_t*','EPG_t*');
     
 %%% Initialize figure frames
     cd(dir)
@@ -209,11 +210,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         avg_expn(t) = mean(expn);
         std_expn(t) = std(expn);
         
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('coeff_avg-std_%s.txt',run)),[avg_coeff(t) std_coeff(t)],'-append','delimiter','\t','precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('entr_avg-std_%s.txt',run)),[avg_entr(t) std_entr(t)],'-append','delimiter','\t','precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('expn_avg-std_%s.txt',run)),[avg_expn(t) std_expn(t)],'-append','delimiter','\t','precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('plot_time_%s.txt',run)),time(t)','-append','delimiter','\t','precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('ecoeff_all_t%d.txt',time(t))),e_coeff,'delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('coeff_avg-std_%s.txt',run)),[avg_coeff(t) std_coeff(t)],'-append','delimiter','\n','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('entr_avg-std_%s.txt',run)),[avg_entr(t) std_entr(t)],'-append','delimiter','\n','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('expn_avg-std_%s.txt',run)),[avg_expn(t) std_expn(t)],'-append','delimiter','\n','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('plot_time_%s.txt',run)),time(t)','-append','delimiter','\n','precision','%g');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('ecoeff_all_t%d.txt',time(t))),e_coeff,'delimiter','\n','precision','%0.6f');
         
   % Plot plume surface color-coded by entrainment coefficient
     nmap = 256;
@@ -256,15 +257,15 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     numcells = sum(sum(sum(EPG <= plumeedge)));
     plumevolume(t) = numcells*XRES*YRES*ZRES;
     plumeheight(t) = max(plumeZ)*ZRES;
-    dlmwrite(fullfile(sprintf('%s',dir),sprintf('plumevolume_%s.txt',run)),plumevolume(t),'-append','delimiter',';','precision','%g');
-    dlmwrite(fullfile(sprintf('%s',dir),sprintf('plumeheight_%s.txt',run)),plumeheight(t),'-append','delimiter','\t','precision','%g');
+    dlmwrite(fullfile(sprintf('%s',dir),sprintf('plumevolume_%s.txt',run)),plumevolume(t),'-append','delimiter','\n','precision','%g');
+    dlmwrite(fullfile(sprintf('%s',dir),sprintf('plumeheight_%s.txt',run)),plumeheight(t),'-append','delimiter','\n','precision','%g');
     plumetoprad(t) = sqrt(3*plumevolume(t)/(pi*plumeheight(t))) - VENT_R;
         
   % Calculate entrainment coefficient using Morton linear assumption and
   % using conic plume simplification
     e_Morton = PUNV_mag./plumeV';
     e_Mconic(t) = (plumetoprad(t) - plumetoprad(t-1))/(DT*vel_char);
-    dlmwrite(fullfile(sprintf('%s',dir),sprintf('e_MortonConic_%s.txt',run)),e_Mconic(t),'-append','delimiter','\t','precision','%g');
+    dlmwrite(fullfile(sprintf('%s',dir),sprintf('e_MortonConic_%s.txt',run)),e_Mconic(t),'-append','delimiter','\n','precision','%g');
     
     cd(dir)
       vidfigEn = 'EntrCurrent.jpg';
