@@ -19,20 +19,20 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = {'F_888187'};%'F_01_997_999'};
+  allruns = {'mary_compare'};%'F_01_997_999'};
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
-  runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
-%     runpath = '~/data2/rundata/';
+%  runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
+     runpath = '~/data2/rundata/';
   
 % Set path for location of post-processing scripts (cannot change path file
 % on Atlas cluster).
- postpath = '/Users/taryn/Documents/GitHub/pulse-post';
-%    postpath = '~/data2/pulse-post';
+%    postpath = '/Users/taryn/Documents/GitHub/pulse-post';
+    postpath = '~/data2/pulse-post';
   
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nodisplay mode.
-  vis = 'on';
+  vis = 'off';
   
 % Set end time (seconds) for movies. Use [] to process entire simulation.
   tstop = 300;

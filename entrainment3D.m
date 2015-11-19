@@ -272,6 +272,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
       saveas(figEn,vidfigEn);
       imgEn = imread(vidfigEn);
       writeVideo(vidEntr,imgEn);
+
+      vidfigQ = 'QuiverCurrent.jpg';
+      saveas(figQ,vidfigQ);
+      imgQ = imread(vidfigQ);
+      writeVideo(vidQ,imgQ);
       
       vidfigEP = 'EPGCurrent.jpg';
       saveas(figEP,vidfigEP);
@@ -292,6 +297,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     
     cd(dir)
     close(vidEPG);
+    close(vidQ);
     close(vidEntr);
 
     
