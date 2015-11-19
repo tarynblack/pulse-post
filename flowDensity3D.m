@@ -2,13 +2,14 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
     tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
     labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-    flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,timesteps )
+    flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
+    timesteps,imtype )
 %flowDensity3D calculates the net density of the flow from gas and particle
 %densities and volume fractions.
 %   Detailed explanation goes here
 %
 %   Special functions called: varchunk3D, pulsetitle
-%   Last edit: Taryn Black, 17 November 2015
+%   Last edit: Taryn Black, 18 November 2015
 
     varD = 'Flow density';
     varB = 'Flow buoyancy';
@@ -183,6 +184,20 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
             saveas(figBuoy,vidfigB)
             imgB = imread(vidfigB);
             writeVideo(vidFlowBuoy,imgB);
+            
+        % Save each timestep as an individual figure in either a
+        % multipage tif file or other image filetype (user-specified).
+          if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+              imwrite(imgD,sprintf('FlowDens_tsteps_%s.tif',run),'WriteMode','append')
+          else saveas(figDens,sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype));
+          end
+          
+        % Save each timestep as an individual figure in either a
+        % multipage tif file or other image filetype (user-specified).
+          if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+              imwrite(imgB,sprintf('FlowBuoy_tsteps_%s.tif',run),'WriteMode','append')
+          else saveas(figBuoy,sprintf('FlowBuoy_%03ds_%s.%s',time(t),run,imtype));
+          end
     
     end
 

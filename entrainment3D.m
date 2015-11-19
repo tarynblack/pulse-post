@@ -1,13 +1,13 @@
-% function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
-%     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-%     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-%     time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
-%     imtype,titlerun,timesteps )
+function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
+    JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+    labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
+    time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
+    imtype,titlerun,timesteps )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 17 November 2015
+%   Last edit: Taryn Black, 18 November 2015
 
     varname = 'Entrainment';
     
@@ -160,12 +160,12 @@
           img = imread(vidfig);
           writeVideo(vidEntr,img);
             
-          % Save each timestep as an individual figure in either a
-          % multipage tif file or other image filetype (user-specified).
-            if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-                imwrite(img,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
-            else saveas(fig,sprintf('Entr_%03ds_%s.%s',time(t),run,imtype));
-            end
+      % Save each timestep as an individual figure in either a
+      % multipage tif file or other image filetype (user-specified).
+        if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+            imwrite(img,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
+        else saveas(fig,sprintf('Entr_%03ds_%s.%s',time(t),run,imtype));
+        end
             
     end
     
@@ -208,5 +208,5 @@
     
     sprintf('Entrainment processing complete. \nvidEntr_%s has been saved to %s',run,dir)
 
-% end
+end
 

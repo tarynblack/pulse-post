@@ -1,7 +1,8 @@
 function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
-    ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,timesteps )
+    ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
+    timesteps,imtype )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
 %over time.
 %   Detailed explanation goes here
@@ -105,6 +106,13 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
             saveas(fig,vidfig);
             img = imread(vidfig);
             writeVideo(vidGasTemp,img);
+            
+      % Save each timestep as an individual figure in either a
+      % multipage tif file or other image filetype (user-specified).
+        if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+            imwrite(img,sprintf('GasTemp_tsteps_%s.tif',run),'WriteMode','append')
+        else saveas(fig,sprintf('GasTemp_%03ds_%s.%s',time(t),run,imtype));
+        end
             
     end
     

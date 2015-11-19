@@ -2,13 +2,13 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
     RO_S1,RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun,...
-    timesteps,PULSE,FREQ,time )
+    timesteps,PULSE,FREQ,time,imtype )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 17 November 2015
+%   Last edit: Taryn Black, 18 November 2015
 
     varS1 = 'S1 concentration';
     varS2 = 'S2 concentration';
@@ -158,6 +158,13 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
           saveas(fig,vidfig);
           img = imread(vidfig);
           writeVideo(vidPartConc,img);
+          
+      % Save each timestep as an individual figure in either a
+      % multipage tif file or other image filetype (user-specified).
+        if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+            imwrite(img,sprintf('PartConc_tsteps_%s.tif',run),'WriteMode','append')
+        else saveas(fig,sprintf('PartConc_%03ds_%s.%s',time(t),run,imtype));
+        end
           
     end
     

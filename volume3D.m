@@ -1,7 +1,7 @@
 function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,...
     labelxunit,ticky,labely,labelyunit,tickz,labelz,labelzunit,...
     plumeedge,XRES,YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,...
-    trnEPG,time,PULSE,FREQ,postpath,titlerun )
+    trnEPG,time,PULSE,FREQ,postpath,titlerun,imtype )
 %volume3D makes frames of the time evolution of gas volume fraction in a
 %volcanic plume during a simulated volcanic eruption.
 %   volume3D processes gas volume fraction (EP_G) data from an MFiX run
@@ -12,7 +12,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,...
 %   <trnEPG>.
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 12 November 2015
+%   Last edit: Taryn Black, 18 November 2015
 
     
     varname = 'Gas volume fraction';
@@ -85,11 +85,18 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,...
         tL = pulsetitle(varname,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
   
-	cd(dir)      
+	  cd(dir)      
         vidfig = 'EPGcurrent.jpg';
         saveas(fig,vidfig);
         img = imread(vidfig);
         writeVideo(vidEPG,img);
+        
+      % Save each timestep as an individual figure in either a
+      % multipage tif file or other image filetype (user-specified).
+        if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+            imwrite(img,sprintf('EPG_tsteps_%s.tif',run),'WriteMode','append')
+        else saveas(fig,sprintf('EPG_%03ds_%s.%s',time(t),run,imtype));
+        end
         
     end
     
