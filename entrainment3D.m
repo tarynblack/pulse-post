@@ -30,6 +30,37 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     grid on
     box on
     
+    figQ = figure('Name','Isonormals and Velocities','visible',vis,'units','normalized','outerposition',[0 0 1 1]);
+    hold on
+        subfigQN = subplot(1,2,1);
+            hold on
+            view(viewaz,viewel)
+            axis equal
+            axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
+                KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
+            set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
+                xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+            set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
+                ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+            set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+                zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+            grid on
+            box on
+        subfigQV = subplot(1,2,2);
+            hold on
+            view(viewaz,viewel)
+            axis equal
+            axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
+                KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
+            set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
+                xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+            set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
+                ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+            set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+                zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+            grid on
+            box on
+            
     figEn = figure('Name','Entrainment','visible',vis,'units','normalized','outerposition',[0.5 0 0.5 1]);
     hold on
     view(viewaz,viewel)
@@ -50,6 +81,12 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     vidEPG.Quality = 100;
     vidEPG.FrameRate = 10;
     open(vidEPG);
+    set(gcf,'Visible',vis);
+    
+    vidQ = VideoWriter(sprintf('vidQuiver_%s.avi',run));
+    vidQ.Quality = 100;
+    vidQ.FrameRate = 10;
+    open(vidQ)
     set(gcf,'Visible',vis);
     
     vidEntr = VideoWriter(sprintf('vidEntr_%s.avi',run));
@@ -122,7 +159,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         plumeU = interp3(U_G,plumeX,plumeY,plumeZ);
         plumeV = interp3(V_G,plumeX,plumeY,plumeZ);
         plumeW = interp3(W_G,plumeX,plumeY,plumeZ);
-        plumevelocity = [plumeU plumeV plumeW]';
+        plumevelocity = [plumeU plumeW plumeV]';
         
       % Calculate magnitudes and directional components of plume unit
       % normal velocities (PUNV)
@@ -130,6 +167,30 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         PUNV_X = PUNV_mag.*unitnorm(1,:);
         PUNV_Y = PUNV_mag.*unitnorm(2,:);
         PUNV_Z = PUNV_mag.*unitnorm(3,:); 
+        
+      % Quiver plot of isonormals and velocities
+        figure(figQ)
+        q = 20; % reducement factor for quiver plot
+        subplot(1,2,1)
+            cla;
+            view(viewaz,viewel)
+            quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
+                plumeZ(1:q:length(plumeZ))',unitnorm(1,1:q:length(unitnorm)),...
+                unitnorm(2,1:q:length(unitnorm)),unitnorm(3,1:q:length(unitnorm)),...
+                'MaxHeadSize',10,'AutoScaleFactor',1,'LineWidth',0.1);
+            title('Plume surface isonormals')
+        subplot(1,2,2)
+            cla;
+            view(viewaz,viewel)
+            quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
+                plumeZ(1:q:length(plumeZ))',PUNV_X(1:q:length(PUNV_X)),...
+                PUNV_Y(1:q:length(PUNV_Y)),PUNV_Z(1:q:length(PUNV_Z)),...
+                'MaxHeadSize',20,'AutoScaleFactor',5,'LineWidth',0.1);
+            title('Velocity magnitudes')
+        PosQN = get(subfigQN,'position');
+        PosQV = get(subfigQV,'position');
+        PosQV(3:4) = PosQN(3:4);
+        set(subfigQV,'position',PosQV);
         
       % Calculate entrainment(-)/expansion(+) coefficient from plume velocities
         e_coeff = PUNV_mag/vel_char;
