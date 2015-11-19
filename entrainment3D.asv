@@ -12,8 +12,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     varEP = 'Gas volume fraction';
     varEn = 'Entrainment';
     
-%%% Clear directory of appending files from previous processing attempts
-    delete('*.txt' 'Entr_t*' 'EPG_t*');
+%%% Clear text files
     
 %%% Initialize figure frames
     cd(dir)
@@ -211,8 +210,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('coeff_avg-std_%s.txt',run)),[avg_coeff(t) std_coeff(t)],'-append','delimiter','\t','precision','%0.6f');
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('entr_avg-std_%s.txt',run)),[avg_entr(t) std_entr(t)],'-append','delimiter','\t','precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('expn_avg-std_%s.txt',run)),[avg_expn(t) std_expn(t)],'-append','delimiter','\t','precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('plot_time_%s.txt',run)),time(t)','-append','delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('expn_avg-std.txt'),[avg_expn(t) std_expn(t)],'-append','delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),'plot_time.txt'),time(t)','-append','delimiter','\t','precision','%0.6f');
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('ecoeff_all_t%d.txt',time(t))),e_coeff,'delimiter','\t','precision','%0.6f');
         
   % Plot plume surface color-coded by entrainment coefficient
@@ -283,8 +282,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
             imwrite(imgEn,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
             imwrite(imgEP,sprintf('EPG_tsteps_%s.tif',run),'WriteMode','append')
         else
-            saveas(figEn,sprintf('Entr_t%03d_%s.%s',time(t),run,imtype));
-            saveas(figEP,sprintf('EPG_t%03d_%s.%s',time(t),run,imtype));
+            saveas(figEn,sprintf('Entr_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figEP,sprintf('EPG_%03ds_%s.%s',time(t),run,imtype));
         end
             
     end
@@ -301,12 +300,12 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         str = sprintf('%s: Steady flow',titlerun);
       end
       fig_plumevol = figure('Name','Plume Volume','visible',vis);
-        hvol1 = subplot(2,1,1);
+        hvol1 = subplot(3,1,1);
             plot(time,plumevolume)
             title(hvol1,{sprintf('%s: Total plume volume',str)},'FontWeight','bold','FontSize',10)
             xlabel(hvol1,{'Time (s)'},'FontWeight','bold','FontSize',10)
             ylabel(hvol1,{'Volume (m^3)'},'FontWeight','bold','FontSize',10)
-        hvol2 = subplot(2,1,2);
+        hvol2 = subplot(3,1,2);
             plot(time(2:end),diff(plumevolume))
             title(hvol2,{sprintf('%s: Change in plume volume',str)},'FontWeight','bold','FontSize',10)
             xlabel(hvol2,{'Time (s)'},'FontWeight','bold','FontSize',10)
