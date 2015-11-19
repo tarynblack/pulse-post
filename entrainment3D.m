@@ -311,9 +311,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
       % multipage tif file or other image filetype (user-specified).
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(imgEn,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(imgQ,sprintf('Quiver_tsteps_%s.tif',run),'WriteMode','append')
             imwrite(imgEP,sprintf('EPG_tsteps_%s.tif',run),'WriteMode','append')
         else
             saveas(figEn,sprintf('Entr_t%03d_%s.%s',time(t),run,imtype));
+            saveas(figQ,sprintf('Quiver_t%03d_%s.%s',time(t),run,imtype));
             saveas(figEP,sprintf('EPG_t%03d_%s.%s',time(t),run,imtype));
         end
             
