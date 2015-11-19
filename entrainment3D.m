@@ -58,7 +58,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         V_G = varchunk3D(fID_VG,IMAX,JMAX,KMAX,ghostcells);
         W_G = varchunk3D(fID_WG,IMAX,JMAX,KMAX,ghostcells);
         
-        % Skip processing for first timestep - no isosurface at t=0
+        % Skip processing for first timestep when there is no plume.
           if t==1;
               continue
           end

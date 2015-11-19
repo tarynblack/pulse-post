@@ -107,7 +107,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         ROPS2 = varchunk3D(fID_S2,IMAX,JMAX,KMAX,ghostcells);
         ROPS3 = varchunk3D(fID_S3,IMAX,JMAX,KMAX,ghostcells);
         
-      % Skip processing for first timestep - no isosurface at step one
+      % Skip processing for first timestep when there is no plume.
         if t==1;
             continue
         end

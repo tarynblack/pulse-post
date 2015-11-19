@@ -105,7 +105,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         RS2 = varchunk3D(fID_RS2,IMAX,JMAX,KMAX,ghostcells);
         RS3 = varchunk3D(fID_RS3,IMAX,JMAX,KMAX,ghostcells);
         
-      % Skip processing for initial timestep
+      % Skip processing for first timestep when there is no plume.
         if t==1;
             continue
         end        

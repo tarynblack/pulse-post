@@ -74,7 +74,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
             break
         end
         
-      % Skip processing for initial timestep
+      % Skip processing for first timestep when there is no plume.
         if t==1;
             continue
         end
