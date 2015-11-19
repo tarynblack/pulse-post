@@ -175,17 +175,41 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
       % Quiver plot of isonormals and velocities
         figure(figQ)
         q = 20; % reducement factor for quiver plot
-        subplot(1,2,1)
+        subfigQN = subplot(1,2,1);
             cla;
+            hold on
             view(viewaz,viewel)
+            axis equal
+            axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
+                KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
+            set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
+                xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+            set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
+                ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+            set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+                zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+            grid on
+            box on
             quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
                 plumeZ(1:q:length(plumeZ))',unitnorm(1,1:q:length(unitnorm)),...
                 unitnorm(2,1:q:length(unitnorm)),unitnorm(3,1:q:length(unitnorm)),...
                 'MaxHeadSize',10,'AutoScaleFactor',1,'LineWidth',0.1);
             title('Plume surface isonormals')
-        subplot(1,2,2)
+        subfigQV = subplot(1,2,2);
             cla;
+            hold on
             view(viewaz,viewel)
+            axis equal
+            axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
+                KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
+            set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
+                xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+            set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
+                ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+            set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+                zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+            grid on
+            box on
             quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
                 plumeZ(1:q:length(plumeZ))',PUNV_X(1:q:length(PUNV_X)),...
                 PUNV_Y(1:q:length(PUNV_Y)),PUNV_Z(1:q:length(PUNV_Z)),...
