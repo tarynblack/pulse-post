@@ -1,6 +1,6 @@
 function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,...
-    BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3 ] = setCnsts3D( run,dir,ghostcells )
+    BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3 ] = setCnsts3D( run,dir,ghostcells,tstop )
 % setCnsts3D loads the file mfixconst_<run> and sets constant parameters for
 % post-processing from an MFiX simulation specified by <run>. The contents
 % of mfixconst are specified in allocate_arrays.f in the simulation run
@@ -61,7 +61,7 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     MAXG   = str2double(Cnsts.data(16));
     VENT_R = str2double(Cnsts.data(17));
     DT     = str2double(Cnsts.data(18));
-    TSTOP  = str2double(Cnsts.data(19));
+    END_T  = str2double(Cnsts.data(19));
     ATMOS  = char(Cnsts.data(20));
     TROPO  = str2double(Cnsts.data(21));
     BC_EPG = str2double(Cnsts.data(22));
@@ -70,6 +70,12 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     BC_TS1 = str2double(Cnsts.data(25));
     BC_TS2 = str2double(Cnsts.data(26));
     BC_TS3 = str2double(Cnsts.data(27));
+    
+  % Override simulation end time (END_T) with user-defined tstop if defined
+    if isempty(tstop) || tstop >= END_T
+        TSTOP = END_T;
+    else TSTOP = tstop;
+    end
 
     
 end

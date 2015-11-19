@@ -33,6 +33,9 @@ clear all
 % Choose whether to display ('on') or suppress ('off') figures.
 % Note: vis must be 'off' when running remotely in -nodisplay mode.
   vis = 'on';
+  
+% Set end time (seconds) for movies. Use [] to process entire simulation.
+  tstop = 300;
 
 % Define isosurfaces for which gas volume fraction should be plotted
 % <isoEPG>. Plumeedge is the gas volume fraction that defines the boundary
@@ -120,7 +123,7 @@ for i = 1:length(allruns)
     ghostcells = 4;     % MFiX adds these to each domain dimension
     [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,...
         NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,BC_EPG,...
-        BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3] = setCnsts3D(run,dir,ghostcells);
+        BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3] = setCnsts3D(run,dir,ghostcells,tstop);
     cd(postpath)
     
 %%%% #TODO# add tstop override to user-defined if you don't want to process
