@@ -51,7 +51,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         try
             EPG = varchunk3D(fID_EPG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
+            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
         U_G = varchunk3D(fID_UG,IMAX,JMAX,KMAX,ghostcells);

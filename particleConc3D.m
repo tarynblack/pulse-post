@@ -101,7 +101,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         try
             ROPS1 = varchunk3D(fID_S1,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
+            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
         ROPS2 = varchunk3D(fID_S2,IMAX,JMAX,KMAX,ghostcells);

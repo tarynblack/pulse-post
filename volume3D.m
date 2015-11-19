@@ -66,7 +66,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,...
         try
             EPG = varchunk3D(fileID,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
+            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
 %         cd(dir)

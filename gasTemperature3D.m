@@ -70,7 +70,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         try
             TG = varchunk3D(fID_TG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t-1),ME.identifier)
+            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
         
