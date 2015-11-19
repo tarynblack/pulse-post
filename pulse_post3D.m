@@ -41,12 +41,12 @@ clear all
 % and values in <trnEPG> must equal the number of isosurfaces.
   plumeedge = 1 - 1E-6;
   isoEPG = [plumeedge]; %,0.99995,0.9999,0.9995];
-  colEPG = [0.5 0.5 0.5];   % gray
+  colEPG = [0.7 0.7 0.7];   % gray
 %           [1 0 0;
 %             1 1 0;
 %             0 1 1;
 %             0 0 0];       
-  trnEPG = [0.5];%[0.1,0.2,0.3,0.5];
+  trnEPG = [0.7];%[0.1,0.2,0.3,0.5];
 
 % Number of labels to display on figures for each dimension
   xpoints = 5;      % horizontal axis 1
@@ -125,7 +125,7 @@ for i = 1:length(allruns)
     
 %%%% #TODO# add tstop override to user-defined if you don't want to process
 %%%% full simulation.
-    TSTOP = 25;
+%     TSTOP = 25;
 
     timesteps = TSTOP/DT;
     
@@ -157,17 +157,17 @@ for i = 1:length(allruns)
         BC_TS2,BC_TS3,VENT_R);
         
   % Manipulate data to time evolution over domain and save output
-    vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
-        ticky,labely,labelyunit,tickz,labelz,labelzunit,plumeedge,XRES,...
-        YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
-        PULSE,FREQ,postpath,titlerun,imtype);
-    cd(postpath)
+%     vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
+%         ticky,labely,labelyunit,tickz,labelz,labelzunit,plumeedge,XRES,...
+%         YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
+%         PULSE,FREQ,postpath,titlerun,imtype);
+%     cd(postpath)
 
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
         tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
         labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
         vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-        titlerun,timesteps );
+        titlerun,timesteps,isoEPG,colEPG,trnEPG );
     cd(postpath)
 
     vidPartConc = particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...

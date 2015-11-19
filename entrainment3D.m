@@ -2,18 +2,20 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
     time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
-    imtype,titlerun,timesteps )
+    imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Special functions called: varchunk3D; pulsetitle
 %   Last edit: Taryn Black, 18 November 2015
 
-    varname = 'Entrainment';
+    varEP = 'Gas volume fraction';
+    varEn = 'Entrainment';
     
 %%% Initialize figure frames
     cd(dir)
-    fig = figure('Name','Entrainment','visible',vis);
+    
+    figEP = figure('Name','Gas Volume Fraction','visible',vis,'units','normalized','outerposition',[0 0 0.5 1]);
     hold on
     view(viewaz,viewel)
     axis equal
@@ -28,7 +30,28 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     grid on
     box on
     
-%%% Initialize video
+    figEn = figure('Name','Entrainment','visible',vis,'units','normalized','outerposition',[0.5 0 0.5 1]);
+    hold on
+    view(viewaz,viewel)
+    axis equal
+    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
+        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
+    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
+        xlabel(sprintf('\\bf Distance (%s)',labelxunit),'FontSize',12)
+    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
+        ylabel(sprintf('\\bf Distance (%s)',labelzunit),'FontSize',12)
+    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+    grid on
+    box on
+    
+%%% Initialize videos
+    vidEPG = VideoWriter(sprintf('vidEPG_%s.avi',run));
+    vidEPG.Quality = 100;
+    vidEPG.FrameRate = 10;
+    open(vidEPG);
+    set(gcf,'Visible',vis);
+    
     vidEntr = VideoWriter(sprintf('vidEntr_%s.avi',run));
     vidEntr.Quality = 100;
     vidEntr.FrameRate = 10;
@@ -62,8 +85,21 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
           if t==1;
               continue
           end
-        
+                
+      % Find all specified gas volume fraction isosurfaces and plot.
+        figure(figEP)
         cla;
+        for j = 1:length(isoEPG)
+            surf(j) = patch(isosurface(EPG,isoEPG(j)));
+            set(surf(j),'FaceColor',colEPG(j,:),'EdgeColor','none','FaceAlpha',trnEPG(j));
+            hold on
+        end
+        camlight('right')
+        camlight('left')
+        lighting gouraud
+        
+        tLEP = pulsetitle(varEP,PULSE,time,t,titlerun,FREQ);
+        title(tLEP,'FontSize',12,'FontWeight','bold');
 
       % Find plume boundary (isosurface) and plot. 
         plumesurf = isosurface(EPG,plumeedge);
@@ -123,7 +159,6 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     cmap = colormap;
     emap = linspace(entrainment_cmin,entrainment_cmax,nmap);
     e_color = zeros(length(e_coeff),3);   
-    
     for k = 1:length(e_coeff)
         if e_coeff(k) > entrainment_cmax
             e_coeff(k) = entrainment_cmax;
@@ -131,47 +166,61 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
             e_coeff(k) = entrainment_cmin;
         end
     end
-
     e_round = interp1(emap,emap,e_coeff,'nearest');
     emap = [emap; 1:nmap];
     for j = 1:length(e_coeff)
         e_color(j,:) = cmap(emap(2,emap(1,:) == e_round(j)),:);
     end
+    colormap(figEn,cmap)
 
+  % Plot entrainment on plume surface
+    figure(figEn)
+    cla;
     patch('Vertices',[plumeX plumeY plumeZ],'Faces',1:length(plumeX),...
         'FaceVertexCData',e_color,'FaceColor','none','EdgeColor',...
         'none','Marker','o','MarkerFaceColor','flat')
     colorbar
+    caxis([entrainment_cmin entrainment_cmax])
+    tLEn = pulsetitle(varEn,PULSE,time,t,titlerun,FREQ);
+    title(tLEn,'FontSize',12,'FontWeight','bold');
+    camlight('right')
+    camlight('left')
+    lighting gouraud
 
-      % Calculate plume volume
-        numcells = sum(sum(sum(EPG <= plumeedge)));
-        plumevolume(t) = numcells*XRES*YRES*ZRES;
-        dlmwrite(fullfile(sprintf('%s',dir),'plume_volume.txt'),plumevolume(t),'-append','delimiter','\t','precision','%g');
+  % Calculate plume volume
+    numcells = sum(sum(sum(EPG <= plumeedge)));
+    plumevolume(t) = numcells*XRES*YRES*ZRES;
+    dlmwrite(fullfile(sprintf('%s',dir),'plume_volume.txt'),plumevolume(t),'-append','delimiter','\t','precision','%g');
         
-      % Calculate entrainment coefficient using Morton linear assumption
-        e_Morton = PUNV_mag./plumeV';
-        
-        
-        
-        tL = pulsetitle(varname,PULSE,time,t,titlerun,FREQ);
-        title(tL,'FontSize',12,'FontWeight','bold');
-        
-        cd(dir)
-          vidfig = 'EntrCurrent.jpg';
-          saveas(fig,vidfig);
-          img = imread(vidfig);
-          writeVideo(vidEntr,img);
+  % Calculate entrainment coefficient using Morton linear assumption
+    e_Morton = PUNV_mag./plumeV';
+    
+    
+    cd(dir)
+      vidfigEn = 'EntrCurrent.jpg';
+      saveas(figEn,vidfigEn);
+      imgEn = imread(vidfigEn);
+      writeVideo(vidEntr,imgEn);
+      
+      vidfigEP = 'EPGCurrent.jpg';
+      saveas(figEP,vidfigEP);
+      imgEP = imread(vidfigEP);
+      writeVideo(vidEPG,imgEP);
             
       % Save each timestep as an individual figure in either a
       % multipage tif file or other image filetype (user-specified).
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-            imwrite(img,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
-        else saveas(fig,sprintf('Entr_%03ds_%s.%s',time(t),run,imtype));
+            imwrite(imgEn,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(imgEP,sprintf('EPG_tsteps_%s.tif',run),'WriteMode','append')
+        else
+            saveas(figEn,sprintf('Entr_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figEP,sprintf('EPG_%03ds_%s.%s',time(t),run,imtype));
         end
             
     end
     
     cd(dir)
+    close(vidEPG);
     close(vidEntr);
 
     
@@ -208,7 +257,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
             
     cd(postpath)
     
-    sprintf('Entrainment processing complete. \nvidEntr_%s has been saved to %s',run,dir)
+    sprintf('Entrainment processing complete.\nvidEntr_%s has been saved to %s.\nvidEPG_%s has been saved to %s',run,dir,run,dir)
 
 end
 

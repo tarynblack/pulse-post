@@ -21,7 +21,7 @@ function [ vidEPG ] = volume3D( run,dir,vis,ghostcells,tickx,labelx,...
     cd(dir)
     fig = figure('Name','Gas Volume Fraction','visible',vis);
     hold on
-    view(3)
+    view(viewaz,viewel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);

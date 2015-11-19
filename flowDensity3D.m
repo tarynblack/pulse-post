@@ -179,7 +179,6 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
             imgD = imread(vidfigD);
             writeVideo(vidFlowDens,imgD);
             
-          cd(dir)
             vidfigB = 'FlowBuoyancy.jpg';
             saveas(figBuoy,vidfigB)
             imgB = imread(vidfigB);
