@@ -113,6 +113,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         dlmwrite(fullfile(sprintf('%s',dir),'entr_avg-std.txt'),[avg_entr(t) std_entr(t)],'-append','delimiter','\t','precision','%0.6f');
         dlmwrite(fullfile(sprintf('%s',dir),'expn_avg-std.txt'),[avg_expn(t) std_expn(t)],'-append','delimiter','\t','precision','%0.6f');
         dlmwrite(fullfile(sprintf('%s',dir),'plot_time.txt'),time(t)','-append','delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('ecoeff_all_t%d.txt',time(t))),e_coeff,'delimiter','\t','precision','%0.6f');
         
   % Plot plume surface color-coded by entrainment coefficient
     nmap = 256;
@@ -145,6 +146,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
       % Calculate plume volume
         numcells = sum(sum(sum(EPG <= plumeedge)));
         plumevolume(t) = numcells*XRES*YRES*ZRES;
+        dlmwrite(fullfile(sprintf('%s',dir),'plume_volume.txt'),plumevolume(t),'-append','delimiter','\t','precision','%g');
         
       % Calculate entrainment coefficient using Morton linear assumption
         e_Morton = PUNV_mag./plumeV';

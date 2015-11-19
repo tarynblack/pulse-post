@@ -185,18 +185,19 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
             imgB = imread(vidfigB);
             writeVideo(vidFlowBuoy,imgB);
             
+        % Save density and buoyancy calculations as ascii for each timestep
+          dlmwrite(fullfile(sprintf('%s',dir),sprintf('flowdensity_t%d.txt',time(t))),flowdensity,'delimiter','\t','precision','%g');
+          dlmwrite(fullfile(sprintf('%s',dir),sprintf('atmsdensity_t%d.txt',time(t))),atmsdensity,'delimiter','\t','precision','%g');
+          dlmwrite(fullfile(sprintf('%s',dir),sprintf('flowbuoyancy_t%d.txt',time(t))),flowbuoyancy,'delimiter','\t','precision','%g');
+            
         % Save each timestep as an individual figure in either a
         % multipage tif file or other image filetype (user-specified).
           if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
               imwrite(imgD,sprintf('FlowDens_tsteps_%s.tif',run),'WriteMode','append')
-          else saveas(figDens,sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype));
-          end
-          
-        % Save each timestep as an individual figure in either a
-        % multipage tif file or other image filetype (user-specified).
-          if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
               imwrite(imgB,sprintf('FlowBuoy_tsteps_%s.tif',run),'WriteMode','append')
-          else saveas(figBuoy,sprintf('FlowBuoy_%03ds_%s.%s',time(t),run,imtype));
+          else
+              saveas(figDens,sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype));
+              saveas(figBuoy,sprintf('FlowBuoy_%03ds_%s.%s',time(t),run,imtype));
           end
     
     end
