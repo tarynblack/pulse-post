@@ -271,7 +271,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     colorbar
     caxis([entrainment_cmin entrainment_cmax])
     tLEn = pulsetitle(varEn,PULSE,time,t,titlerun,FREQ);
-    title(tLEn,'FontSize',12,'FontWeight','bold');
+    tlEn2 = sprintf('Characteristic velocity: %g m/s',vel_char);
+    title([tLEn;tlEn2],'FontSize',12,'FontWeight','bold');
     camlight('right')
     camlight('left')
     lighting gouraud
