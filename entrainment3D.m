@@ -238,7 +238,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('entr_avg-std_%s.txt',run)),[avg_entr(t) std_entr(t)],'-append','delimiter','\t','precision','%0.6f');
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('expn_avg-std_%s.txt',run)),[avg_expn(t) std_expn(t)],'-append','delimiter','\t','precision','%0.6f');
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('plot_time_%s.txt',run)),time(t)','-append','delimiter','\t','precision','%g');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('ecoeff_all_t%d.txt',time(t))),e_coeff,'delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('ecoeff_all_t%03d.txt',time(t))),e_coeff,'delimiter','\t','precision','%0.6f');
         
   % Plot plume surface color-coded by entrainment coefficient
     nmap = 256;
