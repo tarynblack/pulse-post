@@ -11,7 +11,7 @@
 %
 % Special functions called: setCnsts3D; calc_inletFlow; volume3D;
 %   entrainment3D; particleConc3D; gasTemperature3D; flowDensity3D
-% Last edit: Taryn Black, 18 November 2015
+% Last edit: Taryn Black, 24 November 2015
 
 clear all
 
