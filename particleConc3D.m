@@ -100,17 +100,22 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
         t = t+1;
         
-        fID_EP = fopen(sprintf('EP_t%02d.txt',t));
+        cd(dir)
+        fclose('all');
+        clear fID*;
+        fID_EPS1 = fopen(sprintf('EP_t%02d.txt',t));
+        fID_EPS2 = fopen(sprintf('EP_t%02d.txt',t));
+        fID_EPS3 = fopen(sprintf('EP_t%02d.txt',t));
         
         cd(postpath)
         try
-            EPS1 = varchunk3D(fID_EP,EPS1import,IMAX,JMAX,KMAX,ghostcells);
+            EPS1 = varchunk3D(fID_EPS1,EPS1import,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
-        EPS2 = varchunk3D(fID_EP,EPS2import,IMAX,JMAX,KMAX,ghostcells);
-        EPS3 = varchunk3D(fID_EP,EPS3import,IMAX,JMAX,KMAX,ghostcells);
+        EPS2 = varchunk3D(fID_EPS2,EPS2import,IMAX,JMAX,KMAX,ghostcells);
+        EPS3 = varchunk3D(fID_EPS3,EPS3import,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;

@@ -19,7 +19,7 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = {'mary_compare'};%'F_01_997_999'};
+  allruns = {'F_1_996_9999'};
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
 %  runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
@@ -35,7 +35,7 @@ clear all
   vis = 'off';
   
 % Set end time (seconds) for movies. Use [] to process entire simulation.
-  tstop = 300;
+  tstop = 120;
 
 % Define isosurfaces for which gas volume fraction should be plotted
 % <isoEPG>. Plumeedge is the gas volume fraction that defines the boundary

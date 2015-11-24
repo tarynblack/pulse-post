@@ -67,6 +67,9 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         
         t = t+1;
         
+        cd(dir)
+        fclose('all');
+        clear fID*;
         fID_TG = fopen(sprintf('T_G_t%02d.txt',t));
         
         cd(postpath)

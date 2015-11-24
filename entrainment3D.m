@@ -1,8 +1,8 @@
-function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
-    JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-    labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-    time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
-    imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
+% function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
+%     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+%     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
+%     time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
+%     imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -14,7 +14,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     
 %%% Clear directory of appending files from previous processing attempts
     cd(dir)
-    delete('*.txt','Entr_t*','EPG_t*');
+%    delete('*.txt','Entr_t*','EPG_t*');
+    delete('coeff_avg-std*','entr_avg-std*','expn_avg-std*','plot_time*','ecoeff_all*','plumevolume_*','plumeheight_*','e_MortonConic_*','Entr_t*','EPG_t*','Quiver_t*');
     
 %%% Initialize figure frames
     cd(dir)
@@ -113,9 +114,14 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     while t <= timesteps 
         
         t = t+1;
-
+        
+        cd(dir)
+        fclose('all');
+        clear fID*;
         fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
-        fID_UVWG  = fopen(sprintf('U_G_t%02d.txt',t));
+        fID_UG = fopen(sprintf('U_G_t%02d.txt',t));
+        fID_VG = fopen(sprintf('U_G_t%02d.txt',t));
+        fID_WG = fopen(sprintf('U_G_t%02d.txt',t));
         
         cd(postpath)
       % Find gas volume fraction and velocities for entire domain at current timestep
@@ -125,9 +131,9 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
-        U_G = varchunk3D(fID_UVWG,UGimport,IMAX,JMAX,KMAX,ghostcells);
-        V_G = varchunk3D(fID_UVWG,VGimport,IMAX,JMAX,KMAX,ghostcells);
-        W_G = varchunk3D(fID_UVWG,WGimport,IMAX,JMAX,KMAX,ghostcells);
+        U_G = varchunk3D(fID_UG,UGimport,IMAX,JMAX,KMAX,ghostcells);
+        V_G = varchunk3D(fID_VG,VGimport,IMAX,JMAX,KMAX,ghostcells);
+        W_G = varchunk3D(fID_WG,WGimport,IMAX,JMAX,KMAX,ghostcells);
         
         % Skip processing for first timestep when there is no plume.
           if t==1;
@@ -327,8 +333,10 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
             saveas(figEP,sprintf('EPG_t%03d_%s.%s',time(t),run,imtype));
         end
         
-        fclose(fID_EPG);
-        fclose(fID_UVWG);
+%        fclose(fID_EPG);
+%        fclose(fID_UG);
+%        fclose(fID_VG);
+%        fclose(fID_WG);
             
     end
     
@@ -382,5 +390,5 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     
     sprintf('Entrainment processing complete.\nvidEntr_%s has been saved to %s.\nvidEPG_%s has been saved to %s',run,dir,run,dir)
 
-end
+% end
 
