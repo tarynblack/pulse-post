@@ -1,8 +1,8 @@
 function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
-    RO_S1,RO_S2,RO_S3,particleConc_cmin,particleConc_cmax,titlerun,...
-    timesteps,PULSE,FREQ,time,imtype )
+    particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,FREQ,...
+    time,imtype )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
@@ -88,24 +88,29 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
 %%% Plot particle volume fraction concentrations at each timestep and save
 %%% video.
-    fID_S1 = fopen(sprintf('ROP_S1_%s',run));
-    fID_S2 = fopen(sprintf('ROP_S2_%s',run));
-    fID_S3 = fopen(sprintf('ROP_S3_%s',run));
+%     fID_S1 = fopen(sprintf('ROP_S1_%s',run));
+%     fID_S2 = fopen(sprintf('ROP_S2_%s',run));
+%     fID_S3 = fopen(sprintf('ROP_S3_%s',run));
+     EPS1import = '%*f%f%*f%*f%*f%*f%*f';
+     EPS2import = '%*f%*f%f%*f%*f%*f%*f';
+     EPS3import = '%*f%*f%*f%f%*f%*f%*f';
 
     t = 0;
     while t <= timesteps %~feof(fID_EPG)
         
         t = t+1;
         
+        fID_EP = fopen(sprintf('EP_t%02d.txt',t));
+        
         cd(postpath)
         try
-            ROPS1 = varchunk3D(fID_S1,IMAX,JMAX,KMAX,ghostcells);
+            EPS1 = varchunk3D(fID_EP,EPS1import,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
-        ROPS2 = varchunk3D(fID_S2,IMAX,JMAX,KMAX,ghostcells);
-        ROPS3 = varchunk3D(fID_S3,IMAX,JMAX,KMAX,ghostcells);
+        EPS2 = varchunk3D(fID_EP,EPS2import,IMAX,JMAX,KMAX,ghostcells);
+        EPS3 = varchunk3D(fID_EP,EPS3import,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;
@@ -114,11 +119,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
         cla;
         
-%%% #TODO# ROP*/RO* = EPS*. After switching to using Mary's output, change
-%%% this calculation - she writes out EPS* rather than ROP*.
-        logS1 = log10((ROPS1/RO_S1) + 1E-10);
-        logS2 = log10((ROPS2/RO_S2) + 1E-10);
-        logS3 = log10((ROPS3/RO_S3) + 1E-10);
+        logS1 = log10(EPS1 + 1E-10);
+        logS2 = log10(EPS2 + 1E-10);
+        logS3 = log10(EPS3 + 1E-10);
         
         subplot(1,3,1)
             view(saz,sel)
@@ -165,6 +168,8 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             imwrite(img,sprintf('PartConc_tsteps_%s.tif',run),'WriteMode','append')
         else saveas(fig,sprintf('PartConc_%03ds_%s.%s',time(t),run,imtype));
         end
+        
+        fclose(fID_EP);
           
     end
     

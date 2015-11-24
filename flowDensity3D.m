@@ -82,28 +82,36 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     set(gcf,'Visible',vis);
 
 %%% Calculate flow density at each timestep, plot, and save video.
-    fID_EPG = fopen(sprintf('EP_G_%s',run));
-    fID_ROG = fopen(sprintf('RO_G_%s',run));
-    fID_RS1 = fopen(sprintf('ROP_S1_%s',run));
-    fID_RS2 = fopen(sprintf('ROP_S2_%s',run));
-    fID_RS3 = fopen(sprintf('ROP_S3_%s',run));
+%     fID_EPG = fopen(sprintf('EP_G_%s',run));
+%     fID_ROG = fopen(sprintf('RO_G_%s',run));
+%     fID_RS1 = fopen(sprintf('ROP_S1_%s',run));
+%     fID_RS2 = fopen(sprintf('ROP_S2_%s',run));
+%     fID_RS3 = fopen(sprintf('ROP_S3_%s',run));
+     EGimport = '%f%*f%*f%*f%*f%*f%*f';
+     EPS1import = '%*f%f%*f%*f%*f%*f%*f';
+     EPS2import = '%*f%*f%f%*f%*f%*f%*f';
+     EPS3import = '%*f%*f%*f%f%*f%*f%*f';
+     ROGimport = '%*f%f%*f%*f%*f%*f%*f';
     
     t = 0;
     while t <= timesteps %~feof(fID_EPG)
         
         t = t+1;
         
+        fID_EP = fopen(sprintf('EP_t%02d.txt',t));
+        fID_ROG = fopen(sprintf('Current_Density_t%02d.txt',t));
+        
         cd(postpath)
         try
-            EPG = varchunk3D(fID_EPG,IMAX,JMAX,KMAX,ghostcells);
+            EPG = varchunk3D(fID_EP,EGimport,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
-        ROG  = varchunk3D(fID_ROG,IMAX,JMAX,KMAX,ghostcells);
-        RS1 = varchunk3D(fID_RS1,IMAX,JMAX,KMAX,ghostcells);
-        RS2 = varchunk3D(fID_RS2,IMAX,JMAX,KMAX,ghostcells);
-        RS3 = varchunk3D(fID_RS3,IMAX,JMAX,KMAX,ghostcells);
+        ROG  = varchunk3D(fID_ROG,ROGimport,IMAX,JMAX,KMAX,ghostcells);
+        EPS1 = varchunk3D(fID_EP,EPS1import,IMAX,JMAX,KMAX,ghostcells);
+        EPS2 = varchunk3D(fID_EP,EPS2import,IMAX,JMAX,KMAX,ghostcells);
+        EPS3 = varchunk3D(fID_EP,EPS3import,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;
@@ -112,8 +120,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         cla;
         
       % Density at every point in domain: sum of gas and particle densities
-%%% #TODO# change calculation: when using Mary's data, RS1 --> RS1*RO_S1
-        domaindensity = (EPG.*ROG) + (RS1 + RS2 + RS3);
+        domaindensity = (EPG.*ROG)+(EPS1*RO_S1)+(EPS2*RO_S2)+(EPS3*RO_S3);
         
       % Plot density as a slice through the domain.
         figure(figDens)
@@ -198,6 +205,9 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
               saveas(figDens,sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype));
               saveas(figBuoy,sprintf('FlowBuoy_%03ds_%s.%s',time(t),run,imtype));
           end
+          
+          fclose(fID_EP);
+          fclose(fID_ROG);
     
     end
 

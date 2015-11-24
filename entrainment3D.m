@@ -7,7 +7,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
 %   entrainment3D ---does things---
 %
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 22 November 2015
+%   Last edit: Taryn Black, 23 November 2015
 
     varEP = 'Gas volume fraction';
     varEn = 'Entrainment';
@@ -100,27 +100,34 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
     set(gcf,'Visible',vis);
 
 %%% Calculate entrainment at each timestep, plot, and save video.
-    fID_EPG = fopen(sprintf('EP_G_%s',run));
-    fID_UG  = fopen(sprintf('U_G_%s',run));
-    fID_VG  = fopen(sprintf('V_G_%s',run));
-    fID_WG  = fopen(sprintf('W_G_%s',run));
+%     fID_EPG = fopen(sprintf('EP_G_%s',run));
+%     fID_UG  = fopen(sprintf('U_G_%s',run));
+%     fID_VG  = fopen(sprintf('V_G_%s',run));
+%     fID_WG  = fopen(sprintf('W_G_%s',run));
+     EGimport = '%f%*f%*f%*f%*f%*f%*f';
+     UGimport = '%f%*f%*f%*f%*f%*f';
+     VGimport = '%*f%f%*f%*f%*f%*f';
+     WGimport = '%*f%*f%f%*f%*f%*f';
         
     t = 0;
     while t <= timesteps 
         
         t = t+1;
+
+        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
+        fID_UVWG  = fopen(sprintf('U_G_t%02d.txt',t));
         
         cd(postpath)
       % Find gas volume fraction and velocities for entire domain at current timestep
         try
-            EPG = varchunk3D(fID_EPG,IMAX,JMAX,KMAX,ghostcells);
+            EPG = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
         end
-        U_G = varchunk3D(fID_UG,IMAX,JMAX,KMAX,ghostcells);
-        V_G = varchunk3D(fID_VG,IMAX,JMAX,KMAX,ghostcells);
-        W_G = varchunk3D(fID_WG,IMAX,JMAX,KMAX,ghostcells);
+        U_G = varchunk3D(fID_UVWG,UGimport,IMAX,JMAX,KMAX,ghostcells);
+        V_G = varchunk3D(fID_UVWG,VGimport,IMAX,JMAX,KMAX,ghostcells);
+        W_G = varchunk3D(fID_UVWG,WGimport,IMAX,JMAX,KMAX,ghostcells);
         
         % Skip processing for first timestep when there is no plume.
           if t==1;
@@ -319,6 +326,9 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
             saveas(figQ,sprintf('Quiver_t%03d_%s.%s',time(t),run,imtype));
             saveas(figEP,sprintf('EPG_t%03d_%s.%s',time(t),run,imtype));
         end
+        
+        fclose(fID_EPG);
+        fclose(fID_UVWG);
             
     end
     

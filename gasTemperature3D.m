@@ -59,16 +59,19 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     set(gcf,'Visible',vis);
     
 %%% Plot gas temperature slice at each timestep and save video.
-    fID_TG = fopen(sprintf('T_G_%s',run));
+%     fID_TG = fopen(sprintf('T_G_%s',run));
+     TGimport = '%f%*f%*f%*f';
     
     t = 0;
     while t <= timesteps %~feof(fID_TG)
         
         t = t+1;
         
+        fID_TG = fopen(sprintf('T_G_t%02d.txt',t));
+        
         cd(postpath)
         try
-            TG = varchunk3D(fID_TG,IMAX,JMAX,KMAX,ghostcells);
+            TG = varchunk3D(fID_TG,TGimport,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',time(t),ME.identifier)
             break
@@ -113,6 +116,8 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
             imwrite(img,sprintf('GasTemp_tsteps_%s.tif',run),'WriteMode','append')
         else saveas(fig,sprintf('GasTemp_%03ds_%s.%s',time(t),run,imtype));
         end
+        
+        fclose(fID_TG);
             
     end
     
