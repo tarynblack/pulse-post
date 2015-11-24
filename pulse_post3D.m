@@ -19,7 +19,7 @@ clear all
 %%% ================= S E T  R U N  V A R I A B L E S ================= %%%
 
 % ID numbers of MFiX runs to be processed:
-  allruns = {'fakefilename'};
+  allruns = {'notarun'};
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
 %  runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
