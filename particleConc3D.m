@@ -174,7 +174,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         else saveas(fig,sprintf('PartConc_%03ds_%s.%s',time(t),run,imtype));
         end
         
-        fclose(fID_EP);
+        fclose(fID_EPS1);
+        fclose(fID_EPS2);
+        fclose(fID_EPS3);
           
     end
     
