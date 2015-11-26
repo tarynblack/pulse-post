@@ -1,8 +1,8 @@
- function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
-     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-     labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
-     time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
-     imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
+  function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,...
+      JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
+      labelz,labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,...
+      time,vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
+      imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -354,12 +354,14 @@
       end
       fig_plumevol = figure('Name','Plume Volume','visible',vis);
         hvol1 = subplot(2,1,1);
-            plot(time(2:end),plumevolume)
+%            plot(time(2:length(plumevolume)+1),plumevolume)
+            plot(time,plumevolume)
             title(hvol1,{sprintf('%s: Total plume volume',str)},'FontWeight','bold','FontSize',10)
             xlabel(hvol1,{'Time (s)'},'FontWeight','bold','FontSize',10)
             ylabel(hvol1,{'Volume (m^3)'},'FontWeight','bold','FontSize',10)
         hvol2 = subplot(2,1,2);
-            plot(time(3:end),diff(plumevolume))
+%            plot(time(3:length(plumevolume)+1),diff(plumevolume))
+            plot(time(2:length(plumevolume)),diff(plumevolume))
             title(hvol2,{sprintf('%s: Change in plume volume',str)},'FontWeight','bold','FontSize',10)
             xlabel(hvol2,{'Time (s)'},'FontWeight','bold','FontSize',10)
             ylabel(hvol2,{'\DeltaVolume (m^3)'},'FontWeight','bold','FontSize',10)
@@ -379,7 +381,8 @@
       
     % Plot comparison Morton conic coefficient
       fig_Morton = figure('Name','Morton conic entrainment coefficient','visible',vis);
-        plot(time(2:end),e_Mconic)
+%        plot(time(2:end),e_Mconic)
+        plot(time,e_Mconic)
         title(sprintf('%s: Morton conic entrainment coefficient',str),'FontWeight','bold','FontSize',10)
         xlabel('Time (s)','FontWeight','bold','FontSize',10)
         ylabel('Coefficient','FontWeight','bold','FontSize',10)
@@ -390,5 +393,5 @@
     
     sprintf('Entrainment processing complete.\nvidEntr_%s has been saved to %s.\nvidEPG_%s has been saved to %s',run,dir,run,dir)
 
- end
+  end
 
