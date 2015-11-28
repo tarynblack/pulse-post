@@ -13,6 +13,10 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     varS1 = 'S1 concentration';
     varS2 = 'S2 concentration';
     varS3 = 'S3 concentration';
+
+%%% Clear directory of appending files from previous processing attempts
+    cd(dir)
+    delete('PartConc_*');
     
 %%% Ensure that 'no slice' directions are empty and determine figure
 %%% viewing angle based on slice direction

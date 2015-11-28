@@ -35,7 +35,7 @@ clear all
   vis = 'off';
   
 % Set end time (seconds) for movies. Use [] to process entire simulation.
-  tstop = 30;
+  tstop = 300;
 
 % Define isosurfaces for which gas volume fraction should be plotted
 % <isoEPG>. Plumeedge is the gas volume fraction that defines the boundary

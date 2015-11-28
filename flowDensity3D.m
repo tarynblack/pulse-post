@@ -14,6 +14,10 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     varD = 'Flow density';
     varB = 'Flow buoyancy';
 
+%%% Clear directory of appending files from previous processing attempts
+    cd(dir)
+    delete('flowdensity_*','atmsdensity_*','flowbuoyancy_*','FlowDens_*','FlowBuoy_*');
+
 %%% Ensure that 'no slice' directions are empty and determine figure
 %%% viewing angle based on slice direction
     if sdistX==0
@@ -139,7 +143,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         caxis([flowDensity_cmin flowDensity_cmax]);
         tLD = pulsetitle(varD,PULSE,time,t,titlerun,FREQ);
         title(tLD,'FontSize',12,'FontWeight','bold');
-        hold on
+%        hold on
         
       % Determine whether flow is buoyant (less dense than atmosphere)
       % using mean flow/atmospheric densities at each altitude slice.

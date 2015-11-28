@@ -11,6 +11,10 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
 %   Last edit: Taryn Black, 17 November 2015
 
     varname = 'Gas temperature';
+
+%%% Clear directory of appending files from previous processing attempts
+    cd(dir)
+    delete('GasTemp_*');
     
 %%% Ensure that 'no slice' directions are empty and determine figure
 %%% viewing angle based on slice direction
