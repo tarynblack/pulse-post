@@ -20,7 +20,7 @@ clear all
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Names of runs to be processed.
-  runIDs = {'F_1_996_9999'};
+  runIDs = {'F_1_998_9999'};
   
 % Path for directory containing post-processing data directories (runIDs).
   runpath = '~/data2/rundata/';
@@ -196,6 +196,12 @@ for i = 1:length(runIDs)
           flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
           timesteps,imtype);
       cd(postpath)
+
+    % Velocity magnitude calculations and figures
+      velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
+          timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
+          velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelxunit,...
+          ticky,YRES,labely,labelyunit,tickz,ZRES,labelz,labelzunit )
     
       
       close all
