@@ -1,12 +1,12 @@
 function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,...
     BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3 ] = setCnsts3D( run,dir,ghostcells,tstop )
-% setCnsts3D loads the simulation output file mfixconst_<run> containing
-% simulation constants and uses these to define post-processing parameters
-% for that simulation. The contents of mfixconst are specified in
-% write_out0.f in the simulation run directory. This function also
-% overrides the end time of the simulation if the user has defined a
-% shorter end time (tstop) for animations in post-processing.
+%setCnsts3D loads the simulation output file mfixconst_<run> containing
+%simulation constants and uses these to define post-processing parameters
+%for that simulation. The contents of mfixconst are specified in
+%write_out0.f in the simulation run directory. This function also overrides
+%the end time of the simulation if the user has defined a shorter end time
+%(tstop) for animations in post-processing.
 %
 %   IMAX:   number of cells in x direction
 %   JMAX:   number of cells in y direction

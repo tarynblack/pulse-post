@@ -3,8 +3,25 @@ function [ XG,vel_char,MFR ] = calc_inletFlow( charEPG,MING,MAXG,PULSE,...
     BC_TS1,BC_TS2,BC_TS3,VENT_R )
 %calc_inletFlow calculates the gas mass fraction, choked velocity, and mass
 %flow rate at the inlet (volcanic vent) for a simulation.
-%   Detailed explanation goes here
-% Last edit: Taryn Black, 17 November 2015
+%   If flow is steady, the standard calculations of these values apply. 
+%
+%   If flow is unsteady, then in each calculation, the (steady) gas volume
+%   fraction is replaced by a characteristic unsteady gas volume fraction
+%   representing either the minimum, maximum, or average gas volume
+%   fraction of a pulse. The user chooses which characteristic value to use
+%   (charEPG). The resulting gass mass fraction, choked velocity, and mass
+%   flow rate are then characteristic of the chosen gas volume fraction.
+%   
+%   If average gas volume fraction is selected, this function uses the
+%   result of the integral of the pulse over the pulse period, where the
+%   pulse has the form: 
+%     EPG(t) = MING*(1-MING)*abs(sin(2*pi*FREQ*t)) + MING 
+%   to calculate the average gas volume fraction. Note that this pulse form
+%   is fully sinusoidal and not clipped at values above MAXG as in the
+%   actual simulation. For large MAXG (close to 1) the difference should
+%   not be significant.
+%
+% Last edit: Taryn Black, 2 December 2015
 
     if strcmp(charEPG,'mingas') == 1
         EPGunst = MING;
