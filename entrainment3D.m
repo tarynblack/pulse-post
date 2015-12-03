@@ -397,71 +397,68 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       % ================================================================= %
             
     end
-    % ==================== E N D   T I M E   L O O P ==================== %
+  % ===================== E N D   T I M E   L O O P ===================== %
     
     
-    % End video write and finish video files
-      cd(dir)
-      close(vidEPG);
-      close(vidQ);
-      close(vidEntr);
+  % End video write and finish video files
+    cd(dir)
+    close(vidEPG);
+    close(vidQ);
+    close(vidEntr);
       
       
-    % ------------------ ENTRAINMENT TIME SERIES PLOTS ------------------ %
-    % Total plume volume and change in plume volume
-      if strcmp(PULSE,'T') == 1
-        str = sprintf('%s: Unsteady flow %.1f Hz',titlerun,FREQ);
-      elseif strcmp(PULSE,'F') == 1
-        str = sprintf('%s: Steady flow',titlerun);
-      end
-      fig_plumevol = figure('Name','Plume Volume','visible',vis);
-      hvol1 = subplot(2,1,1);
-        plot(time,plumevolume)
-        title(hvol1,{sprintf('%s: Total plume volume',str)},...
-            'FontWeight','bold','FontSize',10)
-        xlabel(hvol1,{'Time (s)'},'FontWeight','bold','FontSize',10)
-        ylabel(hvol1,{'Volume (m^3)'},'FontWeight','bold','FontSize',10)
-      hvol2 = subplot(2,1,2);
-        plot(time(2:length(plumevolume)),diff(plumevolume))
-        title(hvol2,{sprintf('%s: Change in plume volume',str)},...
-            'FontWeight','bold','FontSize',10)
-        xlabel(hvol2,{'Time (s)'},'FontWeight','bold','FontSize',10)
-        ylabel(hvol2,{'\DeltaVolume (m^3)'},'FontWeight','bold',...
-            'FontSize',10)
-      saveas(fig_plumevol,sprintf('PlumeVolume_%s.jpg',run));
-      
-    % Plume-averaged entrainment/expansion
-      fig_coeff = figure('Name','Entrainment Coefficients','visible',vis);
-      hold on
-      errorbar(time,avg_coeff,std_coeff,'k')
-      errorbar(time,avg_entr,std_entr,'b')
-      errorbar(time,avg_expn,std_expn,'r')
-      title(sprintf('%s: Plume-averaged coefficients',str),...
+  % ------------------- ENTRAINMENT TIME SERIES PLOTS ------------------- %
+  % Total plume volume and change in plume volume
+    if strcmp(PULSE,'T') == 1
+      str = sprintf('%s: Unsteady flow %.1f Hz',titlerun,FREQ);
+    elseif strcmp(PULSE,'F') == 1
+      str = sprintf('%s: Steady flow',titlerun);
+    end
+    fig_plumevol = figure('Name','Plume Volume','visible',vis);
+    hvol1 = subplot(2,1,1);
+      plot(time,plumevolume)
+      title(hvol1,{sprintf('%s: Total plume volume',str)},...
           'FontWeight','bold','FontSize',10)
-      xlabel('Time (s)','FontWeight','bold','FontSize',10)
-      ylim([-0.5 0.5])
-      legend({'Total coefficient','Entrainment','Expansion'},'Box','on',...
-          'Location','EastOutside','FontWeight','bold','FontSize',10)
-      saveas(fig_coeff,sprintf('Coefficients_%s.jpg',run));
-      
-    % Comparison conic coefficient
-      fig_Morton = figure('Name','Conic entrainment coefficient',...
-          'visible',vis);
-      plot(time,e_Mconic)
-      title(sprintf('%s: Morton conic entrainment coefficient',str),...
+      xlabel(hvol1,{'Time (s)'},'FontWeight','bold','FontSize',10)
+      ylabel(hvol1,{'Volume (m^3)'},'FontWeight','bold','FontSize',10)
+    hvol2 = subplot(2,1,2);
+      plot(time(2:length(plumevolume)),diff(plumevolume))
+      title(hvol2,{sprintf('%s: Change in plume volume',str)},...
           'FontWeight','bold','FontSize',10)
-      xlabel('Time (s)','FontWeight','bold','FontSize',10)
-      ylabel('Coefficient','FontWeight','bold','FontSize',10)
-      ylim([0 0.5])
-      saveas(fig_Morton,sprintf('MortonConic_%s.jpg',run));
-    % =================================================================== %
+      xlabel(hvol2,{'Time (s)'},'FontWeight','bold','FontSize',10)
+      ylabel(hvol2,{'\DeltaVolume (m^3)'},'FontWeight','bold','FontSize',10)
+    saveas(fig_plumevol,sprintf('PlumeVolume_%s.jpg',run));
     
+  % Plume-averaged entrainment/expansion
+    fig_coeff = figure('Name','Entrainment Coefficients','visible',vis);
+    hold on
+    errorbar(time,avg_coeff,std_coeff,'k')
+    errorbar(time,avg_entr,std_entr,'b')
+    errorbar(time,avg_expn,std_expn,'r')
+    title(sprintf('%s: Plume-averaged coefficients',str),'FontWeight',...
+        'bold','FontSize',10)
+    xlabel('Time (s)','FontWeight','bold','FontSize',10)
+    ylim([-0.5 0.5])
+    legend({'Total coefficient','Entrainment','Expansion'},'Box','on',...
+        'Location','EastOutside','FontWeight','bold','FontSize',10)
+    saveas(fig_coeff,sprintf('Coefficients_%s.jpg',run));
     
-    cd(postpath)
-    disp('Entrainment processing complete.')
-    fprintf('vidEPG_%s has been saved to %s.\n',run,dir)
-    fprintf('vidQ_%s has been saved to %s.\n',run,dir)
-    fprintf('vidEntr_%s has been saved to %s.\n',run,dir)
+  % Comparison conic coefficient
+    fig_Morton = figure('Name','Conic entrainment coefficient','visible',vis);
+    plot(time,e_Mconic)
+    title(sprintf('%s: Morton conic entrainment coefficient',str),...
+        'FontWeight','bold','FontSize',10)
+    xlabel('Time (s)','FontWeight','bold','FontSize',10)
+    ylabel('Coefficient','FontWeight','bold','FontSize',10)
+    ylim([0 0.5])
+    saveas(fig_Morton,sprintf('MortonConic_%s.jpg',run));
+  % =================================================================== %
+  
+  
+  cd(postpath)
+  disp('Entrainment processing complete.')
+  fprintf('vidEPG_%s has been saved to %s.\n',run,dir)
+  fprintf('vidQ_%s has been saved to %s.\n',run,dir)
+  fprintf('vidEntr_%s has been saved to %s.\n',run,dir)
 
-  end
-
+end
