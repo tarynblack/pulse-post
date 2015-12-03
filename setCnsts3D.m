@@ -1,10 +1,13 @@
 function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,...
     BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3 ] = setCnsts3D( run,dir,ghostcells,tstop )
-% setCnsts3D loads the file mfixconst_<run> and sets constant parameters for
-% post-processing from an MFiX simulation specified by <run>. The contents
-% of mfixconst are specified in allocate_arrays.f in the simulation run
-% directory.
+% setCnsts3D loads the simulation output file mfixconst_<run> containing
+% simulation constants and uses these to define post-processing parameters
+% for that simulation. The contents of mfixconst are specified in
+% write_out0.f in the simulation run directory. This function also
+% overrides the end time of the simulation if the user has defined a
+% shorter end time (tstop) for animations in post-processing.
+%
 %   IMAX:   number of cells in x direction
 %   JMAX:   number of cells in y direction
 %   KMAX:   number of cells in z direction
@@ -21,7 +24,7 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
 %   MAXG:   maximum gas volume fraction (unsteady flow)
 %   VENT_R: radius of vent [m]
 %   DT:     time interval between each data write in the simulation
-%   TSTOP:  end time of simulation [s]
+%   END_T:  end time of simulation [s]
 %   ATMOS:  describes whether simulation runs with atmospheric temperature,
 %           density, etc. conditions (T) or not (F)
 %   TROPO:  altitude of tropopause [m]
@@ -30,17 +33,17 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
 %   BC_TG:  inlet gas temperature [K]
 %   BC_TS#: inlet temperature of phase# particles [K]
 %
-% Last edit: Taryn Black, 17 November 2015
+% Last edit: Taryn Black, 2 December 2015
     
     cd(dir)
     
-    % Read in second column of mfixconst (containing values) as a cell
-    % array of strings
+  % Read in second column of mfixconst (containing values) as a cell
+  % array of strings
     fid = fopen(sprintf('mfixconst_%s',run));
     data = textscan(fid, '%*s %s');
     fclose(fid);
     
-    % Convert to data structure to save each cell as desired type
+  % Convert to data structure to save each cell as desired type
     Cnsts = cell2struct(data,{'data'},1);
     
     IMAX   = str2double(Cnsts.data(1)) + ghostcells;
@@ -71,7 +74,7 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     BC_TS2 = str2double(Cnsts.data(26));
     BC_TS3 = str2double(Cnsts.data(27));
     
-  % Override simulation end time (END_T) with user-defined tstop if defined
+  % Override simulation end time with user-defined tstop if defined
     if isempty(tstop) || tstop >= END_T
         TSTOP = END_T;
     else TSTOP = tstop;
