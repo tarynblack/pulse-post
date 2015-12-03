@@ -1,3 +1,7 @@
+MATLAB POST-PROCESSING INSTRUCTIONS
+TARYN BLACK
+2 DECEMBER 2015
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %======================= FOLDER STRUCTURE =======================%
 

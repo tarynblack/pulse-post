@@ -11,94 +11,107 @@
 %
 % Special functions called: setCnsts3D; calc_inletFlow; volume3D;
 %   entrainment3D; particleConc3D; gasTemperature3D; flowDensity3D
-% Last edit: Taryn Black, 24 November 2015
+% Last edit: Taryn Black, 2 December 2015
 
 clear all
 
 %%% =================================================================== %%%
-%%% ================= S E T  R U N  V A R I A B L E S ================= %%%
+%%% ================== U S E R   P A R A M E T E R S ================== %%%
 
-% ID numbers of MFiX runs to be processed:
-  allruns = {'F_1_996_9999'};
+% ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
+% Names of runs to be processed.
+  runIDs = {'F_1_996_9999'};
   
 % Set path. Must end in / & contain dirs titled by runIDs being processed.
-%  runpath = '/Users/taryn/OneDrive/Documents/MATLAB/MFIX_temp/';
-     runpath = '~/data2/rundata/';
+  runpath = '~/data2/rundata/';
   
-% Set path for location of post-processing scripts (cannot change path file
-% on Atlas cluster).
-%    postpath = '/Users/taryn/Documents/GitHub/pulse-post';
-    postpath = '~/data2/pulse-post';
-  
+% Set path for location of post-processing scripts.
+  postpath = '~/data2/pulse-post';
+% ----------------------------------------------------------------------- %
+
+
+% -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
-% Note: vis must be 'off' when running remotely in -nodisplay mode.
+% NOTE: must be 'off' when running remotely in -nodisplay mode.
   vis = 'off';
-  
-% Set end time (seconds) for movies. Use [] to process entire simulation.
+
+% Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;
+  
+% Save animation timesteps as individual figures of specified filetype.
+% Options: tif, jpeg, png, bmp, etc.
+  imtype = 'tif';
+% ----------------------------------------------------------------------- %
+  
 
-% Define isosurfaces for which gas volume fraction should be plotted
-% <isoEPG>. Plumeedge is the gas volume fraction that defines the boundary
-% of the plume. Set an RGB triple color (row in <colEPG>) and transparency
-% <trnEPG> value for each isosurface. Note: the number of rows in <colEPG>
-% and values in <trnEPG> must equal the number of isosurfaces.
+% --------------------- DEFINE PHYSICAL 'CONSTANTS' --------------------- %
+% Gas volume fraction that defines the boundary of the plume
   plumeedge = 1 - 1E-6;
-  isoEPG = [plumeedge]; %,0.99995,0.9999,0.9995];
-  colEPG = [0.7 0.7 0.7];   % gray
-%           [1 0 0;
-%             1 1 0;
-%             0 1 1;
-%             0 0 0];       
-  trnEPG = [0.7];%[0.1,0.2,0.3,0.5];
+  
+% Gas volume fraction at which to calculate characteristic (choked)
+% velocity for the UNSTEADY case. Options: mingas, maxgas, avggas
+  charEPG = 'mingas';
+  
+% Gas constant
+  Rgas = 461.5;
+% ----------------------------------------------------------------------- %
 
-% Number of labels to display on figures for each dimension
-  xpoints = 5;      % horizontal axis 1
-  ypoints = 9;      % vertical axis
-  zpoints = 5;      % horizontal axis 2
+
+% ----------------- PHYSICAL PROPERTY DISPLAY SETTINGS ------------------ %
+% Define isosurfaces <isoEPG> for which gas volume fraction should be
+% plotted. Set an RGB triple color (row in <colEPG>) and transparency
+% <trnEPG> value for each isosurface. 
+% NOTE: number of rows in <colEPG> and values in <trnEPG> must equal the
+% number of isosurfaces.
+  isoEPG = [plumeedge];
+  colEPG = [0.7 0.7 0.7];   
+  trnEPG = [0.7];
   
-% Scaling factor (meters*_fact) and unit for axes labels
-  xfact = 1000;
-  labelxunit = 'km';
-  yfact = 1000;
-  labelyunit = 'km';
-  zfact = 1000;
-  labelzunit = 'km';
-  
-% Animation colorbar limits
-  entrainment_cmin = -0.5;  % between -1 and 1
-  entrainment_cmax = 0.5;   % between -1 and 1
-  particleConc_cmin = -5;  % #TODO# check this number
-  particleConc_cmax = 10;   % #TODO# check this number
-  flowDensity_cmin = 0;    % #TODO# check this number
-  flowDensity_cmax = 3;     % #TODO# check this number
-  flowBuoyancy_cmin = -2;   % #TODO# check this number
-  flowBuoyancy_cmax = 1;    % #TODO# check this number
-  gasTemperature_cmin = 300;    
-  
+% Colorbar limits
+  % Entrainment (must be between -1 and 1)
+    entrainment_cmin = -0.5;
+    entrainment_cmax = 0.5;
+  % Particle concentration
+    particleConc_cmin = -5;
+    particleConc_cmax = 10;
+  % Flow density [kg/m3]
+    flowDensity_cmin = 0;
+    flowDensity_cmax = 3;
+  % Relative density of flow (atmos_density - flow_density)
+    flowBuoyancy_cmin = -2;
+    flowBuoyancy_cmax = 1;
+  % Gas temperature [K] (max is defined by vent inlet temperature)
+    gasTemperature_cmin = 300; 
+    
+% Slice distance and direction for 3D-slice figures. sdist* is the fraction
+% along the *axis at which to cut the slice (between 0 and 1).
+% NOTE: can only slice along one axis; use [] for other two axes.
+  sdistX = 0.5; % scales to IMAX
+  sdistY = [];  % scales to KMAX
+  sdistZ = [];  % scales to JMAX (remember MFIX 'Y' is MATLAB 'z' (up)!)
+% ----------------------------------------------------------------------- %
+
+
+% --------------------- FIGURE PROPERTIES SETTINGS ---------------------- %
 % Viewing azimuth and elevation (in degrees) for 3D animations
   viewaz = -37.5;
   viewel = 20;
   
-% Save animation timesteps as individual figures of specified filetype.
-% Options: tif (*only if your photo viewer can read multipage
-% tif, e.g. Windows Photo Viewer), jpeg, png, bmp, other image formats...
-  imtype = 'tif';
-  
-% Other constants...
-  Rgas = 461.5;     % gas constant
-  
-% Parameters for particle concentration slices figure. sdist* is the
-% fraction along the *axis at which to cut the slice (between [] and 1).
-  sdistX = 0.5; % scales to IMAX
-  sdistY = [];  % scales to KMAX
-  sdistZ = [];  % scales to JMAX (remember MFIX 'y' is MATLAB 'up'!)
-  
-% use in calc_inletFlow - calculate characteristic velocity, etc at which
-% value for unsteady gas volume fraction?
-  charEPG = 'mingas'; % 'maxgas' 'avggas'
-  
+% Number of tick labels to display on axes for each dimension
+  Xpoints = 5;      % horizontal axis 1
+  Ypoints = 9;      % vertical axis
+  Zpoints = 5;      % horizontal axis 2
 
-%%% =================================================================== %%%
+% Scaling factor (meters*_fact) and unit for axes labels
+  Xfact = 1000;     % horizontal axis 1
+  labelXunit = 'km';
+  Yfact = 1000;     % vertical axis
+  labelYunit = 'km';
+  Zfact = 1000;     % horizontal axis 2
+  labelZunit = 'km';
+% ----------------------------------------------------------------------- %   
+
+%%% ============== E N D   U S E R   P A R A M E T E R S ============== %%%
 %%% =================================================================== %%%
 
 
@@ -111,9 +124,9 @@ clear all
   end
   
 
-for i = 1:length(allruns)
+for i = 1:length(runIDs)
     
-    run = allruns{i};
+    run = runIDs{i};
     sprintf('Now processing run %s',run)
 
     dir = sprintf('%s%s',runpath,run);
@@ -125,15 +138,10 @@ for i = 1:length(allruns)
         NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,BC_EPG,...
         BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3] = setCnsts3D(run,dir,ghostcells,tstop);
     cd(postpath)
-    
-%%%% #TODO# add tstop override to user-defined if you don't want to process
-%%%% full simulation.
-%     TSTOP = 25;
 
     timesteps = TSTOP/DT;
     
   % Define grid
-%%% #TODO#: check to see if X/Y/Z are these even used
     X = LENGTH/(IMAX-ghostcells):LENGTH/(IMAX-ghostcells):LENGTH;
     Y = HEIGHT/(JMAX-ghostcells):HEIGHT/(JMAX-ghostcells):HEIGHT;
     Z = WIDTH/(KMAX-ghostcells):WIDTH/(KMAX-ghostcells):WIDTH;
@@ -145,12 +153,12 @@ for i = 1:length(allruns)
   % Set figure properties. Note: MFiX horizontal dimensions are LENGTH
   % (x; MATLAB X) and WIDTH (z; MATLAB Y), vertical dimension is HEIGHT
   % (y; MATLAB Z). tick* values are in meters.
-    tickx = linspace(0,LENGTH,xpoints);
-    labelx = tickx(2:end)/xfact;
-    ticky = linspace(0,HEIGHT,ypoints);
-    labely = ticky(2:end)/yfact;
-    tickz = linspace(0,WIDTH,zpoints);
-    labelz = tickz(2:end)/zfact;
+    tickx = linspace(0,LENGTH,Xpoints);
+    labelx = tickx(2:end)/Xfact;
+    ticky = linspace(0,HEIGHT,Ypoints);
+    labely = ticky(2:end)/Yfact;
+    tickz = linspace(0,WIDTH,Zpoints);
+    labelz = tickz(2:end)/Zfact;
 
     time = (0:timesteps)*DT;
       
@@ -160,37 +168,31 @@ for i = 1:length(allruns)
         BC_TS2,BC_TS3,VENT_R);
         
   % Manipulate data to time evolution over domain and save output
-%     vidEPG = volume3D(run,dir,vis,ghostcells,tickx,labelx,labelxunit,...
-%         ticky,labely,labelyunit,tickz,labelz,labelzunit,plumeedge,XRES,...
-%         YRES,ZRES,timesteps,IMAX,JMAX,KMAX,isoEPG,colEPG,trnEPG,time,...
-%         PULSE,FREQ,postpath,titlerun,imtype);
-%     cd(postpath)
-
     vidEntr = entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
-        tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
+        tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+        labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
         vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
         titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R );
     cd(postpath)
 
     vidPartConc = particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
-        tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
+        tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+        labelZunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
         particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,...
         FREQ,time,imtype);
     cd(postpath)
     
     vidGasTemp = gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,...
-        tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
+        tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+        labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
         TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
         timesteps,imtype);
     cd(postpath)
         
     vidFlowDens = flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,...
         postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,...
-        labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-        labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
+        labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+        labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
         flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
         timesteps,imtype);
     cd(postpath)
