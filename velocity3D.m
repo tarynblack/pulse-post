@@ -1,7 +1,7 @@
-function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
-    timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
-    velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelxunit,...
-    ticky,YRES,labely,labelyunit,tickz,ZRES,labelz,labelzunit )
+ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
+     timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
+     velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
+     ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge )
 %velocity3D Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -43,7 +43,7 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
     end
     
   % Figure and axes properties
-    fig = figure('Name','Flow speed','units','normalized','outerposition',...
+    figVelo = figure('Name','Flow speed','units','normalized','outerposition',...
         [0 0 0.5 1],'visible',vis);
     hold on
     view(saz,sel)
@@ -51,11 +51,11 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
     set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance (%s)',labelxunit),'FontSize',12)
+        xlabel(sprintf('\\bf Distance (%s)',labelXunit),'FontSize',12)
     set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance (%s)',labelzunit),'FontSize',12)
+        ylabel(sprintf('\\bf Distance (%s)',labelZunit),'FontSize',12)
     set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
     
   % Initialize video
     vidVelo = VideoWriter(sprintf('vidVelo_%s.avi',run));
@@ -67,6 +67,7 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
   
   
   % File import specifications: columns to read or skip for each variable
+    EGimport = '%f%*f%*f%*f%*f%*f%*f';
     UGimport = '%f%*f%*f%*f%*f%*f';
     VGimport = '%*f%f%*f%*f%*f%*f';
     WGimport = '%*f%*f%f%*f%*f%*f';
@@ -82,6 +83,7 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
         cd(dir)
         fclose('all');
         clear fID*;
+        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
         fID_UG = fopen(sprintf('U_G_t%02d.txt',t));
         fID_VG = fopen(sprintf('U_G_t%02d.txt',t));
         fID_WG = fopen(sprintf('U_G_t%02d.txt',t));
@@ -89,12 +91,13 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
         
       % Prepare velocities for full domain at current timestep
         try
-            U_G = varchunk3D(fID_UG,UGimport,IMAX,JMAX,KMAX,ghostcells);
+            EPG = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
         catch ME
             warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',...
                 time(t),ME.identifier)
             break
         end
+        U_G = varchunk3D(fID_UG,UGimport,IMAX,JMAX,KMAX,ghostcells);
         V_G = varchunk3D(fID_VG,VGimport,IMAX,JMAX,KMAX,ghostcells);
         W_G = varchunk3D(fID_WG,WGimport,IMAX,JMAX,KMAX,ghostcells);
         
@@ -108,6 +111,7 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
         
       
       % -------------------- FLOW SPEED SLICE FIGURE -------------------- %
+        figure(figVelo)
         hFS = slice(flowspeed,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
           hFS.FaceColor = 'interp';
           hFS.EdgeColor = 'none';
@@ -119,12 +123,18 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
       % ================================================================= %
       
       
+      % --------------------- OVERLAY PLUME OUTLINE --------------------- %
+        hEP = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        set(hEP,'EdgeColor',[1 1 1],'LineWidth',0.5);
+      % ================================================================= %
+      
+      
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
         cd(dir)
         
       % Append current flow speed frame to vidVelo
         vidfig = 'FlowSpeedCurrent.jpg';
-        saveas(fig,vidfig);
+        saveas(figVelo,vidfig);
         img = imread(vidfig);
         writeVideo(vidVelo,img);
         
@@ -134,7 +144,7 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(img,sprintf('FlowSpeed_tsteps_%s.tif',run),'WriteMode','append')
         else
-            saveas(fig,sprintf('FlowSpeed_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figVelo,sprintf('FlowSpeed_%03ds_%s.%s',time(t),run,imtype));
         end 
       % ================================================================= %
                     
@@ -150,5 +160,5 @@ function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
     disp('Flow speed processing complete.')
     fprintf('vidVelo_%s has been saved to %s.\n',run,dir)
 
-end
+ end
 

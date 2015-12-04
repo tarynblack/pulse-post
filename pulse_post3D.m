@@ -82,6 +82,9 @@ clear all
     flowBuoyancy_cmax = 1;
   % Gas temperature [K] (max is defined by vent inlet temperature)
     gasTemperature_cmin = 300; 
+  % Velocity magnitude [m/s]
+    velocity_cmin = 0;
+    velocity_cmax = 300;
     
 % Slice distance and direction for 3D-slice figures. sdist* is the fraction
 % along the *axis at which to cut the slice (between 0 and 1).
@@ -200,8 +203,8 @@ for i = 1:length(runIDs)
     % Velocity magnitude calculations and figures
       velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
           timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
-          velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelxunit,...
-          ticky,YRES,labely,labelyunit,tickz,ZRES,labelz,labelzunit )
+          velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
+          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge )
     
       
       close all
