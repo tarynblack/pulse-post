@@ -129,7 +129,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         end
         EPS2 = varchunk3D(fID_EPS2,EPS2import,IMAX,JMAX,KMAX,ghostcells);
         EPS3 = varchunk3D(fID_EPS3,EPS3import,IMAX,JMAX,KMAX,ghostcells);
-        EPG  = varchunk3D(fID_EPG,EPimport,IMAX,JMAX,KMAX,ghostcells);
+        EPG  = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;
