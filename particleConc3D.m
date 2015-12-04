@@ -2,7 +2,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
     particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,FREQ,...
-    time,imtype )
+    time,imtype,plumeedge )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
@@ -100,6 +100,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     EPS1import = '%*f%f%*f%*f%*f%*f%*f';
     EPS2import = '%*f%*f%f%*f%*f%*f%*f';
     EPS3import = '%*f%*f%*f%f%*f%*f%*f';
+    EGimport   = '%f%*f%*f%*f%*f%*f%*f';
     
     
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -115,6 +116,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         fID_EPS1 = fopen(sprintf('EP_t%02d.txt',t));
         fID_EPS2 = fopen(sprintf('EP_t%02d.txt',t));
         fID_EPS3 = fopen(sprintf('EP_t%02d.txt',t));
+        fID_EPG  = fopen(sprintf('EP_t%02d.txt',t));
         cd(postpath)
       
       % Prepare particle vol. fractions for full domain at current timestep
@@ -127,6 +129,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         end
         EPS2 = varchunk3D(fID_EPS2,EPS2import,IMAX,JMAX,KMAX,ghostcells);
         EPS3 = varchunk3D(fID_EPS3,EPS3import,IMAX,JMAX,KMAX,ghostcells);
+        EPG  = varchunk3D(fID_EPG,EPimport,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;
@@ -141,6 +144,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
         
       % ------------- PARTICLE VOLUME FRACTION SLICE FIGURES ------------ %
+                    % ----- WITH PLUME OUTLINE OVERLAY ----- %
         subplot(1,3,1)
           view(saz,sel)
           hS1 = slice(logS1,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
@@ -148,6 +152,8 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             hS1.EdgeColor = 'none';
           tLS1 = pulsetitle(varS1,PULSE,time,t,titlerun,FREQ);
           title(tLS1,'FontSize',12,'FontWeight','bold'); 
+          hEP1 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+          set(hEP1,'EdgeColor',[1 1 1],'LineWidth',0.5);
         subplot(1,3,2)
           view(saz,sel)
           hS2 = slice(logS2,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
@@ -155,6 +161,8 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             hS2.EdgeColor = 'none';
           tLS2 = pulsetitle(varS2,PULSE,time,t,titlerun,FREQ);
           title(tLS2,'FontSize',12,'FontWeight','bold');
+          hEP2 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+          set(hEP2,'EdgeColor',[1 1 1],'LineWidth',0.5);
         subplot(1,3,3)
           view(saz,sel)
           hS3 = slice(logS3,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
@@ -162,6 +170,8 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             hS3.EdgeColor = 'none';
           tLS3 = pulsetitle(varS3,PULSE,time,t,titlerun,FREQ);
           title(tLS3,'FontSize',12,'FontWeight','bold');
+          hEP3 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+          set(hEP3,'EdgeColor',[1 1 1],'LineWidth',0.5);
           hc = colorbar('location','eastoutside');
             caxis([particleConc_cmin particleConc_cmax]);
             ylabel(hc,'\bf log_1_0(Particle volume fraction)','FontSize',12)  

@@ -94,11 +94,11 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 
   
   % File import specifications: columns to read or skip for each variable
-    EGimport = '%f%*f%*f%*f%*f%*f%*f';
+    EGimport   = '%f%*f%*f%*f%*f%*f%*f';
     EPS1import = '%*f%f%*f%*f%*f%*f%*f';
     EPS2import = '%*f%*f%f%*f%*f%*f%*f';
     EPS3import = '%*f%*f%*f%f%*f%*f%*f';
-    ROGimport = '%*f%f%*f%*f%*f%*f%*f';
+    ROGimport  = '%*f%f%*f%*f%*f%*f%*f';
   
     
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -153,6 +153,13 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         tLD = pulsetitle(varD,PULSE,time,t,titlerun,FREQ);
         title(tLD,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
+      
+      
+      % --------------------- OVERLAY PLUME OUTLINE --------------------- %
+        figure(figDens)
+        hEPD = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        set(hEPD,'EdgeColor',[1 1 1],'LineWidth',0.5);
+      % ================================================================= %
         
       
       % -------------------- CALCULATE FLOW BUOYANCY -------------------- %
@@ -205,6 +212,13 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
           caxis([flowBuoyancy_cmin flowBuoyancy_cmax]);
         tLB = pulsetitle(varB,PULSE,time,t,titlerun,FREQ);
         title(tLB,'FontSize',12,'FontWeight','bold');
+      % ================================================================= %
+      
+      
+      % --------------------- OVERLAY PLUME OUTLINE --------------------- %
+        figure(figBuoy)
+        hEPB = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        set(hEPB,'EdgeColor',[0 0 0],'LineWidth',0.5);
       % ================================================================= %
         
         

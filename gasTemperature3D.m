@@ -2,7 +2,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
     labelz,labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
     ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
-    timesteps,imtype )
+    timesteps,imtype,plumeedge )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
 %over time.
 %   Detailed explanation goes here
@@ -69,6 +69,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
   
   % File import specifications: columns to read or skip for each variable
     TGimport = '%f%*f%*f%*f';
+    EGimport = '%f%*f%*f%*f%*f%*f%*f';
 
     
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -82,6 +83,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         fclose('all');
         clear fID*;
         fID_TG = fopen(sprintf('T_G_t%02d.txt',t));
+        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
         cd(postpath)
         
       % Prepare gas temperature for full domain at current timestep
@@ -92,6 +94,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
                 time(t),ME.identifier)
             break
         end
+        EPG = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;
@@ -120,6 +123,12 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
           ylabel(hc,'\bf Temperature [K]','FontSize',12)
         tL = pulsetitle(varTG,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
+      % ================================================================= %
+      
+      
+      % --------------------- OVERLAY PLUME OUTLINE --------------------- %
+        hEP = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        set(hEP,'EdgeColor',[1 1 1],'LineWidth',0.5);
       % ================================================================= %
         
       
