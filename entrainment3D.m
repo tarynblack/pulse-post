@@ -7,7 +7,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
 %   entrainment3D ---does things---
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 2 December 2015
+%   Last edit: Taryn Black, 9 December 2015
     
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -410,7 +410,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
   % ------------------- ENTRAINMENT TIME SERIES PLOTS ------------------- %
   % Total plume volume and change in plume volume
     if strcmp(PULSE,'T') == 1
-      str = sprintf('%s: Unsteady flow %.1f Hz',titlerun,FREQ);
+      str = sprintf('%s: Unsteady flow %g Hz',titlerun,FREQ);
     elseif strcmp(PULSE,'F') == 1
       str = sprintf('%s: Steady flow',titlerun);
     end
