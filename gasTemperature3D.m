@@ -52,9 +52,9 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
     set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance (%s)',labelxunit),'FontSize',12)
+        xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
     set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance (%s)',labelzunit),'FontSize',12)
+        ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
     set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
         zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
     
