@@ -9,9 +9,9 @@
 % output files.
 %
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
-% particleConc3D; gasTemperature3D; flowDensity3D 
+% particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 2 December 2015
+% Last edit: Taryn Black, 9 December 2015
 
 clear all
 

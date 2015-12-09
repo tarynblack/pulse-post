@@ -2,11 +2,12 @@
      timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
      velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
      ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge )
-%velocity3D Summary of this function goes here
+%velocity3D calculates the magnitude of gas velocity and plots as a slice
+%over time.
 %   Detailed explanation goes here
 %
 %   Functions called:
-%   Last edit: Taryn Black, 3 December 2015
+%   Last edit: Taryn Black, 9 December 2015
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -51,9 +52,9 @@
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
     set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance (%s)',labelXunit),'FontSize',12)
+        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
     set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance (%s)',labelZunit),'FontSize',12)
+        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
     set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
         zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
     

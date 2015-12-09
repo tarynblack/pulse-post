@@ -8,7 +8,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 3 December 2015
+%   Last edit: Taryn Black, 9 December 2015
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
