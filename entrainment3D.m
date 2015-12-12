@@ -332,6 +332,10 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
             'none','Marker','o','MarkerFaceColor','flat')
         colorbar
         caxis([entrainment_cmin entrainment_cmax])
+        text(1.2,0.25,'Entrainment','Units','normalized',...
+            'HorizontalAlignment','right','rotation',90);
+        text(1.2,0.75,'Expansion','Units','normalized',...
+            'HorizontalAlignment','left','rotation',90);
         tLEn = pulsetitle(varEn,PULSE,time,t,titlerun,FREQ);
         tlEn2 = sprintf('Characteristic velocity: %g m/s',vel_char);
         title([tLEn;tlEn2],'FontSize',12,'FontWeight','bold');
