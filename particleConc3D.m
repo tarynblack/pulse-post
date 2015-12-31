@@ -17,9 +17,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
-    varS1 = 'S1 concentration';
-    varS2 = 'S2 concentration';
-    varS3 = 'S3 concentration';
+    varS1 = 'Solid phase 1';
+    varS2 = 'Solid phase 2';
+    varS3 = 'Solid phase 3';
     cd(dir)
   
   % Ensure that 'no slice' directions are empty and determine figure
@@ -72,8 +72,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
       set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
         ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
-      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+%      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
+%        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
      subfigS3 = subplot(1,3,3);
        hold on
        view(saz,sel)
@@ -84,8 +85,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
          xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
        set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
          ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
-       set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-         zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+%       set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
+       set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
+%         zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
             
   % Initialize video
     vidPartConc = VideoWriter(sprintf('vidPartConc_%s.avi',run));
@@ -145,13 +147,15 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
       % ------------- PARTICLE VOLUME FRACTION SLICE FIGURES ------------ %
                     % ----- WITH PLUME OUTLINE OVERLAY ----- %
+        colormap jet
         subplot(1,3,1)
           view(saz,sel)
           hS1 = slice(logS1,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS1.FaceColor = 'interp';
             hS1.EdgeColor = 'none';
-          tLS1 = pulsetitle(varS1,PULSE,time,t,titlerun,FREQ);
-          title(tLS1,'FontSize',12,'FontWeight','bold'); 
+%          tLS1 = pulsetitle(varS1,PULSE,time,t,titlerun,FREQ);
+%          title(tLS1,'FontSize',12,'FontWeight','bold'); 
+          title(sprintf('%s',varS1));
           hEP1 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
           set(hEP1,'EdgeColor',[1 1 1],'LineWidth',0.5);
         subplot(1,3,2)
@@ -159,8 +163,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
           hS2 = slice(logS2,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS2.FaceColor = 'interp';
             hS2.EdgeColor = 'none';
-          tLS2 = pulsetitle(varS2,PULSE,time,t,titlerun,FREQ);
-          title(tLS2,'FontSize',12,'FontWeight','bold');
+%          tLS2 = pulsetitle(varS2,PULSE,time,t,titlerun,FREQ);
+%          title(tLS2,'FontSize',12,'FontWeight','bold');
+          title(sprintf('%s',varS2));
           hEP2 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
           set(hEP2,'EdgeColor',[1 1 1],'LineWidth',0.5);
         subplot(1,3,3)
@@ -168,13 +173,14 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
           hS3 = slice(logS3,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
             hS3.FaceColor = 'interp';
             hS3.EdgeColor = 'none';
-          tLS3 = pulsetitle(varS3,PULSE,time,t,titlerun,FREQ);
-          title(tLS3,'FontSize',12,'FontWeight','bold');
+%          tLS3 = pulsetitle(varS3,PULSE,time,t,titlerun,FREQ);
+%          title(tLS3,'FontSize',12,'FontWeight','bold');
+          title(sprintf('%s',varS3));
           hEP3 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
           set(hEP3,'EdgeColor',[1 1 1],'LineWidth',0.5);
-          hc = colorbar('location','eastoutside');
+          hc = colorbar('location','eastoutside','AxisLocation','in');
             caxis([particleConc_cmin particleConc_cmax]);
-            ylabel(hc,'\bf log_1_0(Particle volume fraction)','FontSize',12)  
+%            ylabel(hc,'\bf log_1_0(Particle volume fraction)','FontSize',12)  
         PosS1 = get(subfigS1,'position');
         PosS2 = get(subfigS2,'position');
         PosS3 = get(subfigS3,'position');
