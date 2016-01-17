@@ -7,7 +7,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
 %   entrainment3D ---does things---
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 16 January 2016
+%   Last edit: Taryn Black, 17 January 2016
     
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -26,6 +26,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     figEP = figure('Name','Gas Volume Fraction','visible',vis,'units',...
         'normalized','outerposition',[0 0 0.5 1]);
     hold on
+    set(figEP,'color','w')
     view(viewaz,viewel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
@@ -43,6 +44,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
         'units','normalized','outerposition',[0 0 1 1]);
     hold on
+    set(figQ,'color','w')
     subfigQN = subplot(1,2,1);
       hold on
       view(viewaz,viewel)
@@ -76,6 +78,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     figEn = figure('Name','Entrainment','visible',vis,'units',...
         'normalized','outerposition',[0.5 0 0.5 1]);
     hold on
+    set(figEn,'color','w')
     view(viewaz,viewel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
@@ -419,23 +422,27 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       str = sprintf('%s: Steady flow',titlerun);
     end
     fig_plumevol = figure('Name','Plume Volume','visible',vis);
+    set(fig_plumevol,'color','w')
     hvol1 = subplot(2,1,1);
       plot(time,plumevolume)
       title(hvol1,{sprintf('%s: Total plume volume',str)},...
           'FontWeight','bold','FontSize',10)
       xlabel(hvol1,{'Time (s)'},'FontWeight','bold','FontSize',10)
       ylabel(hvol1,{'Volume (m^3)'},'FontWeight','bold','FontSize',10)
+      box on
     hvol2 = subplot(2,1,2);
       plot(time(2:length(plumevolume)),diff(plumevolume))
       title(hvol2,{sprintf('%s: Change in plume volume',str)},...
           'FontWeight','bold','FontSize',10)
       xlabel(hvol2,{'Time (s)'},'FontWeight','bold','FontSize',10)
       ylabel(hvol2,{'\DeltaVolume (m^3)'},'FontWeight','bold','FontSize',10)
+      box on
     saveas(fig_plumevol,sprintf('PlumeVolume_%s.jpg',run));
     
   % Plume-averaged entrainment/expansion
     fig_coeff = figure('Name','Entrainment Coefficients','visible',vis);
     hold on
+    set(fig_coeff,'color','w')
     for t = 2:length(time)
         coeff_all = load(sprintf('ecoeff_all_t%03d.txt',time(t)));
         hs = scatter(time(t)*ones(1,length(coeff_all)),coeff_all,'MarkerEdgeColor',[0.5 0.5 0.5]);
@@ -461,6 +468,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
   % Comparison conic coefficient
     fig_Morton = figure('Name','Conic entrainment coefficient','visible',vis);
     plot(time,e_Mconic)
+    set(fig_Morton,'color','w')
     title(sprintf('%s: Morton conic entrainment coefficient',str),...
         'FontWeight','bold','FontSize',10)
     xlabel('Time (s)','FontWeight','bold','FontSize',10)

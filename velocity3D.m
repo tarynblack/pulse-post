@@ -7,7 +7,7 @@
 %   Detailed explanation goes here
 %
 %   Functions called:
-%   Last edit: Taryn Black, 9 December 2015
+%   Last edit: Taryn Black, 17 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -47,6 +47,8 @@
     figVelo = figure('Name','Flow speed','units','normalized','outerposition',...
         [0 0 0.5 1],'visible',vis);
     hold on
+    box on
+    set(figVelo,'color','w')
     view(saz,sel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...

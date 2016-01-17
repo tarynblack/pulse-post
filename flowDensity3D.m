@@ -9,7 +9,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %
 %   Special functions called: varchunk3D, pulsetitle
-%   Last edit: Taryn Black, 9 December 2015
+%   Last edit: Taryn Black, 17 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -51,6 +51,8 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     figDens = figure('Name','Plume Density','visible',vis,'units',...
         'normalized','outerposition',[0 0 0.5 1]);
     hold on
+    box on
+    set(figDens,'color','w')
     view(saz,sel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
@@ -66,6 +68,8 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     figBuoy = figure('Name','Plume Buoyancy','visible',vis,'units',...
         'normalized','outerposition',[0.5 0 0.5 1]);
     hold on
+    box on
+    set(figBuoy,'color','w')
     view(saz,sel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...

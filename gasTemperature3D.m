@@ -8,7 +8,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 16 December 2015
+%   Last edit: Taryn Black, 16 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -48,7 +48,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     fig = figure('Name','Gas Temperature','visible',vis,'units','normalized','outerposition',[0.5 0 0.5 1]);
     hold on
     box on
-    set(gcf,'color','w')
+    set(fig,'color','w')
     view(saz,sel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
@@ -150,7 +150,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         for j = 1:length(cvalsP)
             hPS = contourslice(logParticles,sdistX*IMAX,sdistY*KMAX,0,...
                 [cvalsP(j) cvalsP(j)]);
-            set(hPS,'EdgeColor',cmapP(j,:),'LineWidth',0.5);
+            set(hPS,'EdgeColor',cmapP(j,:),'LineWidth',1.5);
             legnam{j} = sprintf('10^{%g}',cvalsP(j));
             leg(j) = scatter(0,0,'s','filled','MarkerFaceColor',cmapP(j,:));
             if leg(j).MarkerFaceColor == [1 1 1]
