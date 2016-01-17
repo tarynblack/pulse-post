@@ -11,7 +11,7 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 9 December 2015
+% Last edit: Taryn Black, 16 January 2015
 
 clear all
 
@@ -20,20 +20,23 @@ clear all
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Names of runs to be processed.
-  runIDs = {'F_1_998_9999'};
+%   runIDs = {'F_1_998_9999'};
+  runIDs = {'testdata'};
   
 % Path for directory containing post-processing data directories (runIDs).
-  runpath = '~/data2/rundata/';
+%   runpath = '~/data2/rundata/';
+  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/';
   
 % Path for location of post-processing scripts.
-  postpath = '~/data2/pulse-post';
+%   postpath = '~/data2/pulse-post';
+  postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
 
 % -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
 % NOTE: must be 'off' when running remotely in -nodisplay mode.
-  vis = 'off';
+  vis = 'on';
 
 % Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;

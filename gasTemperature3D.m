@@ -1,6 +1,6 @@
 function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
-    JMAX,KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-    labelz,labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
+    JMAX,KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
+    labelz,labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
     ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
     timesteps,imtype,plumeedge )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
@@ -8,7 +8,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 9 December 2015
+%   Last edit: Taryn Black, 16 December 2015
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -45,18 +45,24 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     end
     
   % Figure and axes properties
-    fig = figure('Name','Gas Temperature','visible',vis);
+    fig = figure('Name','Gas Temperature','visible',vis,'units','normalized','outerposition',[0.5 0 0.5 1]);
     hold on
+    box on
+    set(gcf,'color','w')
     view(saz,sel)
     axis equal
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
     set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
     set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
     set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
+        
+    cvalsP = log10(-plumeedge+1):1:-2;
+    cmapP = colormap(flipud(bone(length(cvalsP))));
+    colormap('default');
     
   % Initialize video
     vidGasTemp = VideoWriter(sprintf('vidGasTemp_%s.avi',run));
@@ -70,6 +76,9 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
   % File import specifications: columns to read or skip for each variable
     TGimport = '%f%*f%*f%*f';
     EGimport = '%f%*f%*f%*f%*f%*f%*f';
+    EPS1import = '%*f%f%*f%*f%*f%*f%*f';
+    EPS2import = '%*f%*f%f%*f%*f%*f%*f';
+    EPS3import = '%*f%*f%*f%f%*f%*f%*f';
 
     
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -113,6 +122,9 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
             end
         end
         
+      % Calculate log of particle volume fraction
+        logParticles = log10(1 - EPG + 1E-10);
+        
         
       % ------------------- TEMPERATURE SLICE FIGURE -------------------- %
         hTG = slice(TG,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
@@ -121,14 +133,33 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         hc = colorbar;
           caxis([gasTemperature_cmin BC_TG]);
           ylabel(hc,'\bf Temperature [K]','FontSize',12)
+          hc.AxisLocation = 'in';
         tL = pulsetitle(varTG,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
+        hold on
       % ================================================================= %
       
       
       % --------------------- OVERLAY PLUME OUTLINE --------------------- %
-        hEP = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
-        set(hEP,'EdgeColor',[1 1 1],'LineWidth',0.5);
+%         hEP = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+%         set(hEP,'EdgeColor',[1 1 1],'LineWidth',0.5);
+      % ================================================================= %
+      
+      
+      % --------- OVERLAY LOG PARTICLE VOLUME FRACTION CONTOURS --------- %
+        for j = 1:length(cvalsP)
+            hPS = contourslice(logParticles,sdistX*IMAX,sdistY*KMAX,0,...
+                [cvalsP(j) cvalsP(j)]);
+            set(hPS,'EdgeColor',cmapP(j,:),'LineWidth',0.5);
+            legnam{j} = sprintf('10^{%g}',cvalsP(j));
+            leg(j) = scatter(0,0,'s','filled','MarkerFaceColor',cmapP(j,:));
+            if leg(j).MarkerFaceColor == [1 1 1]
+                set(leg(j),'MarkerEdgeColor',[0.8 0.8 0.8])
+            end
+        end       
+        hLeg = legend(leg,char(legnam));
+        set(hLeg,'Box','off','Location','eastoutside');
+        hLT = legendTitle(hLeg,sprintf('Particle\nConcentration\nContours'));
       % ================================================================= %
         
       
