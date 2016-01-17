@@ -1,13 +1,13 @@
 function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
-    KMAX,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-    labelzunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
+    KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+    labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
     vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
     titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 9 December 2015
+%   Last edit: Taryn Black, 16 January 2016
     
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -31,11 +31,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
     set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-      xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+      xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
     set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-      ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+      ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
     set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-      zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+      zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
     grid on
     box on
     
@@ -50,11 +50,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
           KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
       set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
       set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
       set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
       grid on
       box on
     subfigQV = subplot(1,2,2);
@@ -64,11 +64,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
           KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
       set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
       set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
       set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
       grid on
       box on
         
@@ -81,11 +81,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
         KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
     set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-      xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+      xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
     set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-      ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+      ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
     set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-      zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+      zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
     grid on
     box on
     
@@ -228,11 +228,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
           axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
               KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
           set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-            xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+            xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
           set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-            ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+            ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
           set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-            zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+            zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
           grid on
           box on
           quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
@@ -248,11 +248,11 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
           axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
               KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
           set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-            xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
+            xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
           set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-            ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
+            ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
           set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-            zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+            zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
           grid on
           box on
           quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
@@ -436,15 +436,26 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
   % Plume-averaged entrainment/expansion
     fig_coeff = figure('Name','Entrainment Coefficients','visible',vis);
     hold on
-    errorbar(time,avg_coeff,std_coeff,'k')
-    errorbar(time,avg_entr,std_entr,'b')
-    errorbar(time,avg_expn,std_expn,'r')
+    for t = 2:length(time)
+        coeff_all = load(sprintf('ecoeff_all_t%03d.txt',time(t)));
+        hs = scatter(time(t)*ones(1,length(coeff_all)),coeff_all,'MarkerEdgeColor',[0.5 0.5 0.5]);
+        hold on
+    end
+    hs.DisplayName = 'Full plume';
+    he1 = errorbar(time(2:end),avg_entr(2:end),std_entr(2:end),'c','LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,'DisplayName','Entrainment');
+    he2 = errorbar(time(2:end),avg_expn(2:end),std_expn(2:end),'r','LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,'DisplayName','Expansion');
+    he3 = errorbar(time(2:end),avg_coeff(2:end),std_coeff(2:end),'k','LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Total Coefficient');
     title(sprintf('%s: Plume-averaged coefficients',str),'FontWeight',...
         'bold','FontSize',10)
     xlabel('Time (s)','FontWeight','bold','FontSize',10)
-    ylim([-0.5 0.5])
-    legend({'Total coefficient','Entrainment','Expansion'},'Box','on',...
-        'Location','EastOutside','FontWeight','bold','FontSize',10)
+    xlim([0 time(end)+DT])
+    ylim([-1 1])
+    box on
+    grid on
+    hl = legend([hs he1 he2 he3],'Location','EastOutside');
+    hl.Box = 'on';
+    hl.FontWeight = 'bold';
+    hl.FontSize = 10;
     saveas(fig_coeff,sprintf('Coefficients_%s.jpg',run));
     
   % Comparison conic coefficient
