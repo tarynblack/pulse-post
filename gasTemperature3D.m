@@ -8,7 +8,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 16 January 2016
+%   Last edit: Taryn Black, 21 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -45,20 +45,22 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     end
     
   % Figure and axes properties
-    fig = figure('Name','Gas Temperature','visible',vis,'units','normalized','outerposition',[0.5 0 0.5 1]);
+    figTemp = figure('Name','Gas Temperature','visible',vis,'units',...
+        'normalized','outerposition',[0.5 0 0.5 1]);
+    set(figTemp,'color','w')
+    axTemp = axes('Parent',figTemp);
     hold on
-    box on
-    set(fig,'color','w')
-    view(saz,sel)
-    axis equal
-    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
+    set(axTemp,'box','on','FontSize',12)
+    grid(axTemp,'on');axTemp.Layer = 'top';
+    view(axTemp,saz,sel)
+    axis(axTemp,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+        JMAX-ghostcells]);
+    set(axTemp,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+    xlabel(axTemp,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axTemp,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axTemp,sprintf('\\bf Altitude (%s)',labelYunit))
         
     cvalsP = log10(-plumeedge+1):1:-2;
     cmapP = colormap(flipud(bone(length(cvalsP))));
@@ -127,13 +129,17 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         
         
       % ------------------- TEMPERATURE SLICE FIGURE -------------------- %
-        hTG = slice(TG,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
-          hTG.FaceColor = 'interp';
-          hTG.EdgeColor = 'none';
+        figure(figTemp)
+        cla(axTemp);
+        hTG = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),TG,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
+        hTG.FaceColor = 'interp';
+        hTG.EdgeColor = 'none';
         hc = colorbar;
-          caxis([gasTemperature_cmin BC_TG]);
-          ylabel(hc,'\bf Temperature [K]','FontSize',12)
-          hc.AxisLocation = 'in';
+        caxis([gasTemperature_cmin BC_TG]);
+        ylabel(hc,'\bf Temperature [K]','FontSize',12)
+        hc.AxisLocation = 'in';
         tL = pulsetitle(varTG,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
         hold on
@@ -148,14 +154,15 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
       
       % --------- OVERLAY LOG PARTICLE VOLUME FRACTION CONTOURS --------- %
         for j = 1:length(cvalsP)
-            hPS = contourslice(logParticles,sdistX*IMAX,sdistY*KMAX,0,...
-                [cvalsP(j) cvalsP(j)]);
+            hPS = contourslice(logParticles,sdistX*(IMAX-ghostcells),...
+                sdistY*(KMAX-ghostcells),0,[cvalsP(j) cvalsP(j)]);
             set(hPS,'EdgeColor',cmapP(j,:),'LineWidth',1.5);
             legnam{j} = sprintf('10^{%g}',cvalsP(j));
             leg(j) = scatter(0,0,'s','filled','MarkerFaceColor',cmapP(j,:));
             if leg(j).MarkerFaceColor == [1 1 1]
                 set(leg(j),'MarkerEdgeColor',[0.8 0.8 0.8])
             end
+            set(leg(j),'visible','off');
         end       
         hLeg = legend(leg,char(legnam));
         set(hLeg,'Box','off','Location','eastoutside');
@@ -168,7 +175,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         
       % Append current gas temperature frame to vidGasTemp
         vidfig = 'GasTempCurrent.jpg';
-        saveas(fig,vidfig);
+        saveas(figTemp,vidfig);
         img = imread(vidfig);
         writeVideo(vidGasTemp,img);
             
@@ -178,7 +185,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(img,sprintf('GasTemp_tsteps_%s.tif',run),'WriteMode','append')
         else
-            saveas(fig,sprintf('GasTemp_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figTemp,sprintf('GasTemp_%03ds_%s.%s',time(t),run,imtype));
         end
       % ================================================================= %
                     
@@ -195,4 +202,3 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     fprintf('vidGasTemp_%s has been saved to %s.\n',run,dir) 
 
 end
-
