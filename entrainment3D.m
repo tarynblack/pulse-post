@@ -7,7 +7,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
 %   entrainment3D ---does things---
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 17 January 2016
+%   Last edit: Taryn Black, 20 January 2016
     
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -25,72 +25,65 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
   % Gas volume fraction isosurface: figure and axes properties    
     figEP = figure('Name','Gas Volume Fraction','visible',vis,'units',...
         'normalized','outerposition',[0 0 0.5 1]);
-    hold on
     set(figEP,'color','w')
-    view(viewaz,viewel)
-    axis equal
-    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-      xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-      ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-      zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
-    grid on
-    box on
+    axEP = axes('Parent',figEP);
+    hold on
+    set(axEP,'box','on','FontSize',12);
+    grid(axEP,'on')
+    view(axEP,viewaz,viewel)
+    axis(axEP,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+        JMAX-ghostcells]);
+    set(axEP,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+    xlabel(sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(sprintf('\\bf Altitude (%s)',labelYunit))
     
   % Isonormal/velocity quivers: figure and axes properties
     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
         'units','normalized','outerposition',[0 0 1 1]);
-    hold on
     set(figQ,'color','w')
-    subfigQN = subplot(1,2,1);
-      hold on
-      view(viewaz,viewel)
-      axis equal
-      axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-          KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-      set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-      set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
-      grid on
-      box on
-    subfigQV = subplot(1,2,2);
-      hold on
-      view(viewaz,viewel)
-      axis equal
-      axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-          KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-      set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-      set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
-      grid on
-      box on
+    axQN = subplot(1,2,1);
+        hold on
+        axis(axQN,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+            JMAX-ghostcells]);
+        set(axQN,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+            'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+            'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+        xlabel(axQN,sprintf('\\bf Distance_x (%s)',labelXunit))
+        ylabel(axQN,sprintf('\\bf Distance_z (%s)',labelZunit))
+        zlabel(axQN,sprintf('\\bf Altitude (%s)',labelYunit))
+    axQV = subplot(1,2,2);
+        hold on
+        axis(axQV,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+            JMAX-ghostcells]);
+        set(axQV,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+            'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+            'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+        xlabel(axQV,sprintf('\\bf Distance_x (%s)',labelXunit))
+        ylabel(axQV,sprintf('\\bf Distance_z (%s)',labelZunit))
+        zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
+    set([axQN axQV],'box','on','FontSize',12)
+    grid(axQN,'on'); grid(axQV,'on');
+    view(axQN,viewaz,viewel); view(axQV,viewaz,viewel);
         
   % Entrainment isosurface: figure and axes properties
     figEn = figure('Name','Entrainment','visible',vis,'units',...
         'normalized','outerposition',[0.5 0 0.5 1]);
-    hold on
     set(figEn,'color','w')
-    view(viewaz,viewel)
-    axis equal
-    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-      xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-      ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-      zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
-    grid on
-    box on
+    axEn = axes('Parent',figEn);
+    hold on
+    set(axEn,'box','on','FontSize',12);
+    grid(axEn,'on');
+    view(axEn,viewaz,viewel)
+    axis(axEn,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,JMAX-ghostcells]);
+    set(axEn,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+    xlabel(sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(sprintf('\\bf Altitude (%s)',labelYunit))
     
   % Gas volume fraction isosurface: video
     vidEPG = VideoWriter(sprintf('vidEPG_%s.avi',run));
@@ -171,7 +164,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       % ------------ GAS VOLUME FRACTION ISOSURFACES FIGURES ------------ %
       % Find all specified isosurfaces and plot
         figure(figEP)
-        cla;
+        cla(axEP);
         for j = 1:length(isoEPG)
             surf(j) = patch(isosurface(EPG,isoEPG(j)));
             set(surf(j),'FaceColor',colEPG(j,:),'EdgeColor','none',...
@@ -222,51 +215,25 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       % --------------- ISONORMAL/VELOCITY QUIVER FIGURES --------------- %  
       % Quiver plot of isonormals and velocities
         figure(figQ)
+        cla(axQN);cla(axQV);
         q = 50; % reducement factor for quiver plot
-        subfigQN = subplot(1,2,1);
-          cla;
-          hold on
-          view(viewaz,viewel)
-          axis equal
-          axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-              KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-          set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-            xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-          set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-            ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-          set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-            zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
-          grid on
-          box on
-          quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
-              plumeZ(1:q:length(plumeZ))',unitnorm(1,1:q:length(unitnorm)),...
-              unitnorm(2,1:q:length(unitnorm)),unitnorm(3,1:q:length(unitnorm)),...
-              'MaxHeadSize',10,'AutoScaleFactor',1,'LineWidth',0.1);
-          title('Plume surface isonormals')
-        subfigQV = subplot(1,2,2);
-          cla;
-          hold on
-          view(viewaz,viewel)
-          axis equal
-          axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-              KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-          set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-            xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-          set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-            ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-          set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-            zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
-          grid on
-          box on
-          quiver3(plumeX(1:q:length(plumeX))',plumeY(1:q:length(plumeY))',...
-              plumeZ(1:q:length(plumeZ))',PUNV_X(1:q:length(PUNV_X)),...
-              PUNV_Y(1:q:length(PUNV_Y)),PUNV_Z(1:q:length(PUNV_Z)),...
-              'MaxHeadSize',20,'AutoScaleFactor',5,'LineWidth',0.1);
-          title('Velocity magnitudes')
-        PosQN = get(subfigQN,'position');
-        PosQV = get(subfigQV,'position');
+        quiver3(axQN,plumeX(1:q:length(plumeX))',...
+            plumeY(1:q:length(plumeY))',plumeZ(1:q:length(plumeZ))',...
+            unitnorm(1,1:q:length(unitnorm)),...
+            unitnorm(2,1:q:length(unitnorm)),...
+            unitnorm(3,1:q:length(unitnorm)),...
+            'MaxHeadSize',10,'AutoScaleFactor',1,'LineWidth',0.1);
+        title(axQN,'Plume surface isonormals')
+        quiver3(axQV,plumeX(1:q:length(plumeX))',...
+            plumeY(1:q:length(plumeY))',plumeZ(1:q:length(plumeZ))',...
+            PUNV_X(1:q:length(PUNV_X)),PUNV_Y(1:q:length(PUNV_Y)),...
+            PUNV_Z(1:q:length(PUNV_Z)),...
+            'MaxHeadSize',20,'AutoScaleFactor',5,'LineWidth',0.1);
+        title(axQV,'Velocity magnitudes')
+        PosQN = get(axQN,'position');
+        PosQV = get(axQV,'position');
         PosQV(3:4) = PosQN(3:4);
-        set(subfigQV,'position',PosQV);
+        set(axQV,'position',PosQV);
       % ================================================================= %
       
       
@@ -329,7 +296,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
 
       % Plot entrainment on plume surface
         figure(figEn)
-        cla;
+        cla(axEn);
         patch('Vertices',[plumeX plumeY plumeZ],'Faces',1:length(plumeX),...
             'FaceVertexCData',e_color,'FaceColor','none','EdgeColor',...
             'none','Marker','o','MarkerFaceColor','flat')
