@@ -7,7 +7,7 @@
 %   Detailed explanation goes here
 %
 %   Functions called:
-%   Last edit: Taryn Black, 17 January 2016
+%   Last edit: Taryn Black, 21 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -44,21 +44,22 @@
     end
     
   % Figure and axes properties
-    figVelo = figure('Name','Flow speed','units','normalized','outerposition',...
-        [0 0 0.5 1],'visible',vis);
-    hold on
-    box on
+    figVelo = figure('Name','Flow speed','units','normalized',...
+        'outerposition',[0 0 0.5 1],'visible',vis);
     set(figVelo,'color','w')
-    view(saz,sel)
-    axis equal
-    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelXunit),'FontSize',12)
-    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelZunit),'FontSize',12)
-    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelYunit),'FontSize',12)
+    axVelo = axes('Parent',figVelo);
+    hold on
+    set(axVelo,'box','on','FontSize',12)
+    grid(axVelo,'on');axVelo.Layer = 'top';
+    view(axVelo,saz,sel)
+    axis(axVelo,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+        JMAX-ghostcells]);
+    set(axVelo,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+    xlabel(axVelo,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axVelo,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axVelo,sprintf('\\bf Altitude (%s)',labelYunit))
     
   % Initialize video
     vidVelo = VideoWriter(sprintf('vidVelo_%s.avi',run));
@@ -115,19 +116,23 @@
       
       % -------------------- FLOW SPEED SLICE FIGURE -------------------- %
         figure(figVelo)
-        hFS = slice(flowspeed,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
-          hFS.FaceColor = 'interp';
-          hFS.EdgeColor = 'none';
+        cla(axVelo);
+        hFS = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),flowspeed,...
+            sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
+            sdistZ*(JMAX-ghostcells));
+        hFS.FaceColor = 'interp';
+        hFS.EdgeColor = 'none';
         hc = colorbar;
-          caxis([velocity_cmin velocity_cmax]);
-          ylabel(hc,'\bf Flow Speed [m/s]','FontSize',12)
+        caxis([velocity_cmin velocity_cmax]);
+        ylabel(hc,'\bf Flow Speed [m/s]','FontSize',12)
         tL = pulsetitle(varU,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
       
       
       % --------------------- OVERLAY PLUME OUTLINE --------------------- %
-        hEP = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        hEP = contourslice(EPG,sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
         set(hEP,'EdgeColor',[1 1 1],'LineWidth',0.5);
       % ================================================================= %
       
@@ -163,5 +168,4 @@
     disp('Flow speed processing complete.')
     fprintf('vidVelo_%s has been saved to %s.\n',run,dir)
 
- end
-
+    end
