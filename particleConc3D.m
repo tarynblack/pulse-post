@@ -8,7 +8,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 17 January 2016
+%   Last edit: Taryn Black, 21 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -46,52 +46,47 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     else [saz,sel] = view(3);
     end
     
+  % Subtightplot properties
+    gap = [0.01 0.01];
+    ht = 0.15;
+    wd = 0.15;
+    
   % Figure and axes properties
-    fig = figure('Name','Particle Concentrations','units','normalized',...
-        'outerposition',[0 0 1 1],'visible',vis);
-    hold on
-    set(fig,'color','w')
-    subfigS1 = subplot(1,3,1);
+    figPC = figure('Name','Particle Concentrations','units','pixels',...
+        'outerposition',[1 44 1110 780],'visible',vis);
+    set(figPC,'color','w')
+    axS1 = subtightplot(1,3,1,gap,ht,wd);
       hold on
-      box on
-      view(saz,sel)
-      axis equal
-      axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-          KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-      set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
-      set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
-      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
-    subfigS2 = subplot(1,3,2);
+      axis(axS1,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+            JMAX-ghostcells]);
+      set(axS1,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+          'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+          'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+      xlabel(axS1,sprintf('\\bf Distance_x (%s)',labelXunit))
+      ylabel(axS1,sprintf('\\bf Distance_z (%s)',labelZunit))
+      zlabel(axS1,sprintf('\\bf Altitude (%s)',labelYunit))                
+    axS2 = subtightplot(1,3,2,gap,ht,wd);
       hold on
-      box on
-      view(saz,sel)
-      axis equal
-      axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-          KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-      set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-        xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
-      set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-        ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
-%      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-      set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
-%        zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
-     subfigS3 = subplot(1,3,3);
+      axis(axS2,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+            JMAX-ghostcells]);
+      set(axS2,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+          'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+          'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
+      xlabel(axS2,sprintf('\\bf Distance_x (%s)',labelXunit))
+      ylabel(axS2,sprintf('\\bf Distance_z (%s)',labelZunit))
+     axS3 = subtightplot(1,3,3,gap,ht,wd);
        hold on
-       box on
-       view(saz,sel)
-       axis equal
-       axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-           KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-       set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-         xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
-       set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-         ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
-%       set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-       set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
-%         zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+       axis(axS3,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+            JMAX-ghostcells]);
+       set(axS3,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+          'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+          'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
+       xlabel(axS3,sprintf('\\bf Distance_x (%s)',labelXunit))
+       ylabel(axS3,sprintf('\\bf Distance_z (%s)',labelZunit))
+    set([axS1 axS2 axS3],'box','on','FontSize',12)
+    grid(axS1,'on'); grid(axS2,'on'); grid(axS3,'on');
+    axS1.Layer = 'top'; axS2.Layer = 'top'; axS3.Layer = 'top';
+    view(axS1,saz,sel);view(axS2,saz,sel);view(axS3,saz,sel);
             
   % Initialize video
     vidPartConc = VideoWriter(sprintf('vidPartConc_%s.avi',run));
@@ -152,46 +147,46 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
       % ------------- PARTICLE VOLUME FRACTION SLICE FIGURES ------------ %
                     % ----- WITH PLUME OUTLINE OVERLAY ----- %
         colormap jet
-        subplot(1,3,1)
-          view(saz,sel)
-          hS1 = slice(logS1,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
-            hS1.FaceColor = 'interp';
-            hS1.EdgeColor = 'none';
-%          tLS1 = pulsetitle(varS1,PULSE,time,t,titlerun,FREQ);
-%          title(tLS1,'FontSize',12,'FontWeight','bold'); 
-          title(sprintf('%s',varS1));
-          hEP1 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        cla(axS1);cla(axS2);cla(axS3);
+        hS1 = slice(axS1,0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),logS1,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
+          hS1.FaceColor = 'interp';
+          hS1.EdgeColor = 'none';
+%           tLS1 = pulsetitle(varS1,PULSE,time,t,titlerun,FREQ);
+%           title(tLS1,'FontSize',12,'FontWeight','bold'); 
+          title(axS1,sprintf('%s',varS1));
+          hEP1 = contourslice(axS1,EPG,sdistX*(IMAX-ghostcells),...
+              sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP1,'EdgeColor',[1 1 1],'LineWidth',0.5);
-        subplot(1,3,2)
-          view(saz,sel)
-          hS2 = slice(logS2,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
-            hS2.FaceColor = 'interp';
-            hS2.EdgeColor = 'none';
-%          tLS2 = pulsetitle(varS2,PULSE,time,t,titlerun,FREQ);
-%          title(tLS2,'FontSize',12,'FontWeight','bold');
-          title(sprintf('%s',varS2));
-          hEP2 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        hS2 = slice(axS2,0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),logS1,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
+          hS2.FaceColor = 'interp';
+          hS2.EdgeColor = 'none';
+          title(axS2,sprintf('%s',varS2));
+          hEP2 = contourslice(axS2,EPG,sdistX*(IMAX-ghostcells),...
+              sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP2,'EdgeColor',[1 1 1],'LineWidth',0.5);
-        subplot(1,3,3)
-          view(saz,sel)
-          hS3 = slice(logS3,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
-            hS3.FaceColor = 'interp';
-            hS3.EdgeColor = 'none';
-%          tLS3 = pulsetitle(varS3,PULSE,time,t,titlerun,FREQ);
-%          title(tLS3,'FontSize',12,'FontWeight','bold');
-          title(sprintf('%s',varS3));
-          hEP3 = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        hS3 = slice(axS3,0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),logS1,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
+          hS3.FaceColor = 'interp';
+          hS3.EdgeColor = 'none';
+          title(axS3,sprintf('%s',varS3));
+          hEP3 = contourslice(axS3,EPG,sdistX*(IMAX-ghostcells),...
+              sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP3,'EdgeColor',[1 1 1],'LineWidth',0.5);
-          hc = colorbar('location','eastoutside','AxisLocation','in');
-            caxis([particleConc_cmin particleConc_cmax]);
+        hc = colorbar('location','eastoutside','AxisLocation','in');
+        caxis([particleConc_cmin particleConc_cmax]);
 %            ylabel(hc,'\bf log_1_0(Particle volume fraction)','FontSize',12)  
-        PosS1 = get(subfigS1,'position');
-        PosS2 = get(subfigS2,'position');
-        PosS3 = get(subfigS3,'position');
+        PosS1 = get(axS1,'position');
+        PosS2 = get(axS2,'position');
+        PosS3 = get(axS3,'position');
         PosS2(3:4) = PosS1(3:4);
         PosS3(3:4) = PosS1(3:4);
-        set(subfigS2,'position',PosS2);
-        set(subfigS3,'position',PosS3);
+        set(axS2,'position',PosS2);
+        set(axS3,'position',PosS3);
       % ================================================================= %
 
       
@@ -200,7 +195,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
       % Append current particle concentration frame to vidPartConc
         vidfig = 'PartConcCurrent.jpg';
-        saveas(fig,vidfig);
+        saveas(figPC,vidfig);
         img = imread(vidfig);
         writeVideo(vidPartConc,img);
           
@@ -210,7 +205,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(img,sprintf('PartConc_tsteps_%s.tif',run),'WriteMode','append')
         else
-            saveas(fig,sprintf('PartConc_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figPC,sprintf('PartConc_%03ds_%s.%s',time(t),run,imtype));
         end
       % ================================================================= %
           
