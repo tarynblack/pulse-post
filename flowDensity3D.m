@@ -9,7 +9,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %
 %   Special functions called: varchunk3D, pulsetitle
-%   Last edit: Taryn Black, 17 January 2016
+%   Last edit: Taryn Black, 21 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -166,7 +166,8 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
       
       % --------------------- OVERLAY PLUME OUTLINE --------------------- %
         figure(figDens)
-        hEPD = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        hEPD = contourslice(EPG,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
         set(hEPD,'EdgeColor',[1 1 1],'LineWidth',0.5);
       % ================================================================= %
         
@@ -218,8 +219,8 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
             0.5:(JMAX-ghostcells-0.5),flowbuoyancy,...
             sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
             sdistZ*(JMAX-ghostcells));
-          hB.FaceColor = 'interp';
-          hB.EdgeColor = 'none';
+        hB.FaceColor = 'interp';
+        hB.EdgeColor = 'none';
         colorbar
         caxis([flowBuoyancy_cmin flowBuoyancy_cmax]);
         tLB = pulsetitle(varB,PULSE,time,t,titlerun,FREQ);
@@ -229,7 +230,8 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
       
       % --------------------- OVERLAY PLUME OUTLINE --------------------- %
         figure(figBuoy)
-        hEPB = contourslice(EPG,sdistX*IMAX,sdistY*KMAX,0,[plumeedge plumeedge]);
+        hEPB = contourslice(EPG,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
         set(hEPB,'EdgeColor',[0 0 0],'LineWidth',0.5);
       % ================================================================= %
         
