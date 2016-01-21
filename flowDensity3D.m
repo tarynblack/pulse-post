@@ -1,7 +1,7 @@
 function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
-    tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,labelz,...
-    labelzunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
+    tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+    labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
     flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
     timesteps,imtype )
 %flowDensity3D calculates the net density of the flow from gas and particle
@@ -50,36 +50,38 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
   % Flow density slice: figure and axes properties     
     figDens = figure('Name','Plume Density','visible',vis,'units',...
         'normalized','outerposition',[0 0 0.5 1]);
-    hold on
-    box on
     set(figDens,'color','w')
-    view(saz,sel)
-    axis equal
-    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-      xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
-    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-      ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
-    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-      zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+    axDens = axes('Parent',figDens);
+    hold on
+    set(axDens,'box','on','FontSize',12)
+    grid(axDens,'on');axDens.Layer = 'top';
+    view(axDens,saz,sel)
+    axis(axDens,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+        JMAX-ghostcells]);
+    set(axDens,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+    xlabel(axDens,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axDens,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axDens,sprintf('\\bf Altitude (%s)',labelYunit))
     
   % Flow buoyancy slice: figure and axes properties
     figBuoy = figure('Name','Plume Buoyancy','visible',vis,'units',...
         'normalized','outerposition',[0.5 0 0.5 1]);
-    hold on
-    box on
     set(figBuoy,'color','w')
-    view(saz,sel)
-    axis equal
-    axis([ghostcells-1,IMAX-(ghostcells/2),ghostcells-1,...
-        KMAX-(ghostcells/2),ghostcells-1,JMAX-(ghostcells/2)]);
-    set(gca,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,'FontSize',12)
-      xlabel(sprintf('\\bf Distance_x (%s)',labelxunit),'FontSize',12)
-    set(gca,'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,'FontSize',12)
-      ylabel(sprintf('\\bf Distance_z (%s)',labelzunit),'FontSize',12)
-    set(gca,'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely,'FontSize',12)
-      zlabel(sprintf('\\bf Altitude (%s)',labelyunit),'FontSize',12)
+    axBuoy = axes('Parent',figBuoy);
+    hold on
+    set(axBuoy,'box','on','FontSize',12)
+    grid(axBuoy,'on');axBuoy.Layer = 'top';
+    view(axBuoy,saz,sel)
+    axis(axBuoy,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+        JMAX-ghostcells]);
+    set(axBuoy,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+    xlabel(axBuoy,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axBuoy,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axBuoy,sprintf('\\bf Altitude (%s)',labelYunit))
     
   % Flow density slice: video
     vidFlowDens = VideoWriter(sprintf('vidFlowDens_%s.avi',run));
@@ -147,13 +149,16 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
       % ------------------- FLOW DENSITY SLICE FIGURE ------------------- %
         figure(figDens)
-        view(saz,sel)
-        hD = slice(domaindensity,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
-          hD.FaceColor = 'interp';
-          hD.EdgeColor = 'none';
+        cla(axDens);
+        hD = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),domaindensity,...
+            sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
+            sdistZ*(JMAX-ghostcells));
+        hD.FaceColor = 'interp';
+        hD.EdgeColor = 'none';
         colormap(figDens,'default')
         colorbar
-          caxis([flowDensity_cmin flowDensity_cmax]);
+        caxis([flowDensity_cmin flowDensity_cmax]);
         tLD = pulsetitle(varD,PULSE,time,t,titlerun,FREQ);
         title(tLD,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
@@ -208,12 +213,15 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
           
       % Plot slice of flow buoyancy ~ relative density
         figure(figBuoy)
-        view(saz,sel)
-        hB = slice(flowbuoyancy,sdistX*IMAX,sdistY*KMAX,sdistZ*JMAX);
+        cla(axBuoy);
+        hB = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),flowbuoyancy,...
+            sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
+            sdistZ*(JMAX-ghostcells));
           hB.FaceColor = 'interp';
           hB.EdgeColor = 'none';
         colorbar
-          caxis([flowBuoyancy_cmin flowBuoyancy_cmax]);
+        caxis([flowBuoyancy_cmin flowBuoyancy_cmax]);
         tLB = pulsetitle(varB,PULSE,time,t,titlerun,FREQ);
         title(tLB,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
@@ -276,4 +284,3 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     fprintf('vidFlowBuoy_%s has been saved to %s.\n',run,dir)
   
 end
-

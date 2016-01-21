@@ -36,9 +36,9 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     set(axEP,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
         'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
         'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-    xlabel(sprintf('\\bf Distance_x (%s)',labelXunit))
-    ylabel(sprintf('\\bf Distance_z (%s)',labelZunit))
-    zlabel(sprintf('\\bf Altitude (%s)',labelYunit))
+    xlabel(axEP,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axEP,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axEP,sprintf('\\bf Altitude (%s)',labelYunit))
     
   % Isonormal/velocity quivers: figure and axes properties
     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
@@ -81,9 +81,9 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     set(axEn,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
         'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
         'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-    xlabel(sprintf('\\bf Distance_x (%s)',labelXunit))
-    ylabel(sprintf('\\bf Distance_z (%s)',labelZunit))
-    zlabel(sprintf('\\bf Altitude (%s)',labelYunit))
+    xlabel(axEn,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axEn,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axEn,sprintf('\\bf Altitude (%s)',labelYunit))
     
   % Gas volume fraction isosurface: video
     vidEPG = VideoWriter(sprintf('vidEPG_%s.avi',run));
