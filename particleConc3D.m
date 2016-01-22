@@ -1,6 +1,6 @@
 function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
-    ghostcells,tickx,labelx,labelxunit,ticky,labely,labelyunit,tickz,...
-    labelz,labelzunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
+    ghostcells,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
+    labelz,labelZunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
     particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,FREQ,...
     time,imtype,plumeedge )
 %particleConc3D plots a volume slice of the concentration of each particle
@@ -20,6 +20,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     varS1 = 'Solid phase 1';
     varS2 = 'Solid phase 2';
     varS3 = 'Solid phase 3';
+    varPC = 'Particle concentration';
     cd(dir)
   
   % Ensure that 'no slice' directions are empty and determine figure
@@ -83,7 +84,10 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
           'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
        xlabel(axS3,sprintf('\\bf Distance_x (%s)',labelXunit))
        ylabel(axS3,sprintf('\\bf Distance_z (%s)',labelZunit))
-    set([axS1 axS2 axS3],'box','on','FontSize',12)
+       cbPC = colorbar(axS3,'Location','eastoutside','AxisLocation',...
+           'out','FontSize',12);
+       cbPC.Label.String = '\bflog_{10}(Particle volume fraction)';
+    set([axS1 axS2 axS3],'box','on','TickDir','in','FontSize',12)
     grid(axS1,'on'); grid(axS2,'on'); grid(axS3,'on');
     axS1.Layer = 'top'; axS2.Layer = 'top'; axS3.Layer = 'top';
     view(axS1,saz,sel);view(axS2,saz,sel);view(axS3,saz,sel);
@@ -153,9 +157,8 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
           hS1.FaceColor = 'interp';
           hS1.EdgeColor = 'none';
-%           tLS1 = pulsetitle(varS1,PULSE,time,t,titlerun,FREQ);
-%           title(tLS1,'FontSize',12,'FontWeight','bold'); 
-          title(axS1,sprintf('%s',varS1));
+          tLS1 = pulsetitle(varPC,PULSE,time,t,titlerun,FREQ);
+          title(axS1,sprintf('%s\n%s',tLS1{1},varS1));
           hEP1 = contourslice(axS1,EPG,sdistX*(IMAX-ghostcells),...
               sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP1,'EdgeColor',[1 1 1],'LineWidth',0.5);
@@ -173,13 +176,11 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
             sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
           hS3.FaceColor = 'interp';
           hS3.EdgeColor = 'none';
-          title(axS3,sprintf('%s',varS3));
+          title(axS3,sprintf('%s\n%s',tLS1{2},varS3));
           hEP3 = contourslice(axS3,EPG,sdistX*(IMAX-ghostcells),...
               sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP3,'EdgeColor',[1 1 1],'LineWidth',0.5);
-        hc = colorbar('location','eastoutside','AxisLocation','in');
-        caxis([particleConc_cmin particleConc_cmax]);
-%            ylabel(hc,'\bf log_1_0(Particle volume fraction)','FontSize',12)  
+        caxis(axS3,[particleConc_cmin particleConc_cmax]);
         PosS1 = get(axS1,'position');
         PosS2 = get(axS2,'position');
         PosS3 = get(axS3,'position');
