@@ -23,10 +23,15 @@
     varQ2 = 'Velocity magnitudes';
     varEn = 'Entrainment';
     cd(dir)
+  
+  % Subtightplot properties    
+    gap = [0.01 0.01];
+    ht = 0.1;
+    wd = 0.1;
 
   % Gas volume fraction isosurface: figure and axes properties    
     figEP = figure('Name','Gas Volume Fraction','visible',vis,'units',...
-        'normalized','outerposition',[0 0 0.37 1]);
+        'normalized','outerposition',[0 0 0.37 1],'PaperPositionMode','auto');
     set(figEP,'color','w')
     axEP = axes('Parent',figEP);
     hold on
@@ -44,19 +49,19 @@
     
   % Isonormal/velocity quivers: figure and axes properties
     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
-        'units','normalized','outerposition',[0 0 1 1]);
+        'units','normalized','outerposition',[0 0 0.75 1],'PaperPositionMode','auto');
     set(figQ,'color','w')
-    axQN = subplot(1,2,1);
+    axQN = subtightplot(1,2,1,gap,ht,wd);
         hold on
         axis(axQN,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
             JMAX-ghostcells]);
         set(axQN,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
             'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
             'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
-        xlabel(axQN,sprintf('\\bf Distance_x (%s)',labelXunit))
+%         xlabel(axQN,sprintf('\\bf Distance_x (%s)',labelXunit))
         ylabel(axQN,sprintf('\\bf Distance_z (%s)',labelZunit))
         zlabel(axQN,sprintf('\\bf Altitude (%s)',labelYunit))
-    axQV = subplot(1,2,2);
+    axQV = subtightplot(1,2,2,gap,ht,wd);
         hold on
         axis(axQV,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
             JMAX-ghostcells]);
@@ -64,15 +69,15 @@
             'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
             'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
         xlabel(axQV,sprintf('\\bf Distance_x (%s)',labelXunit))
-        ylabel(axQV,sprintf('\\bf Distance_z (%s)',labelZunit))
-        zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
+%         ylabel(axQV,sprintf('\\bf Distance_z (%s)',labelZunit))
+%         zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
     set([axQN axQV],'box','on','TickDir','in','FontSize',12)
     grid(axQN,'on'); grid(axQV,'on');
     view(axQN,viewaz,viewel); view(axQV,viewaz,viewel);
         
   % Entrainment isosurface: figure and axes properties
     figEn = figure('Name','Entrainment','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.45 1]);
+        'normalized','outerposition',[0.5 0 0.45 1],'PaperPositionMode','auto');
     set(figEn,'color','w')
     axEn = axes('Parent',figEn);
     hold on
