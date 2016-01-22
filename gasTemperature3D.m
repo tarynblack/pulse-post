@@ -50,7 +50,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     set(figTemp,'color','w')
     axTemp = axes('Parent',figTemp);
     hold on
-    set(axTemp,'box','on','FontSize',12)
+    set(axTemp,'box','on','TickDir','in','FontSize',12)
     grid(axTemp,'on');axTemp.Layer = 'top';
     view(axTemp,saz,sel)
     axis(axTemp,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -61,10 +61,12 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     xlabel(axTemp,sprintf('\\bf Distance_x (%s)',labelXunit))
     ylabel(axTemp,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axTemp,sprintf('\\bf Altitude (%s)',labelYunit))
+    cbTemp = colorbar(axTemp,'AxisLocation','in','FontSize',12);
+    cbTemp.Label.String = '\bf Temperature (K)';
         
-    cvalsP = log10(-plumeedge+1):1:-2;
-    cmapP = colormap(flipud(bone(length(cvalsP))));
-    colormap('default');
+    cvalsPC = log10(-plumeedge+1):1:-2;
+    cmapPC = colormap(flipud(bone(length(cvalsPC))));
+    colormap(figTemp,'default');
     
   % Initialize video
     vidGasTemp = VideoWriter(sprintf('vidGasTemp_%s.avi',run));
@@ -136,10 +138,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
             sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
         hTG.FaceColor = 'interp';
         hTG.EdgeColor = 'none';
-        hc = colorbar;
-        caxis([gasTemperature_cmin BC_TG]);
-        ylabel(hc,'\bf Temperature [K]','FontSize',12)
-        hc.AxisLocation = 'in';
+        caxis(axTemp,[gasTemperature_cmin BC_TG]);
         tL = pulsetitle(varTG,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
         hold on
@@ -153,12 +152,12 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
       
       
       % --------- OVERLAY LOG PARTICLE VOLUME FRACTION CONTOURS --------- %
-        for j = 1:length(cvalsP)
+        for j = 1:length(cvalsPC)
             hPS = contourslice(logParticles,sdistX*(IMAX-ghostcells),...
-                sdistY*(KMAX-ghostcells),0,[cvalsP(j) cvalsP(j)]);
-            set(hPS,'EdgeColor',cmapP(j,:),'LineWidth',1.5);
-            legnam{j} = sprintf('10^{%g}',cvalsP(j));
-            leg(j) = scatter(0,0,'s','filled','MarkerFaceColor',cmapP(j,:));
+                sdistY*(KMAX-ghostcells),0,[cvalsPC(j) cvalsPC(j)]);
+            set(hPS,'EdgeColor',cmapPC(j,:),'LineWidth',1.5);
+            legnam{j} = sprintf('10^{%g}',cvalsPC(j));
+            leg(j) = scatter(0,0,'s','filled','MarkerFaceColor',cmapPC(j,:));
             if leg(j).MarkerFaceColor == [1 1 1]
                 set(leg(j),'MarkerEdgeColor',[0.8 0.8 0.8])
             end

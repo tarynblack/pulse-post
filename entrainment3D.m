@@ -7,7 +7,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
 %   entrainment3D ---does things---
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 20 January 2016
+%   Last edit: Taryn Black, 21 January 2016
     
   % Clear directory of appending files from previous processing attempts
     cd(dir)
