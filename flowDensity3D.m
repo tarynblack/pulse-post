@@ -13,14 +13,14 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
-    delete('flowdensity_*','atmsdensity_*','flowbuoyancy_*',...
-        'FlowDens_*','FlowBuoy_*');
+    delete('flowdensity_*','atmsdensity_*','flowreldens_*',...
+        'FlowDens_*','FlowRelD_*');
     
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
     varD = 'Flow density';
-    varB = 'Flow buoyancy';
+    varB = 'Relative density';
     cd(dir)
 
   % Ensure that 'no slice' directions are empty and determine figure
@@ -49,11 +49,11 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
   % Flow density slice: figure and axes properties     
     figDens = figure('Name','Plume Density','visible',vis,'units',...
-        'normalized','outerposition',[0 0 0.5 1]);
+        'normalized','outerposition',[0 0 0.4 1]);
     set(figDens,'color','w')
     axDens = axes('Parent',figDens);
     hold on
-    set(axDens,'box','on','FontSize',12)
+    set(axDens,'box','on','TickDir','in','FontSize',12)
     grid(axDens,'on');axDens.Layer = 'top';
     view(axDens,saz,sel)
     axis(axDens,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -64,24 +64,30 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     xlabel(axDens,sprintf('\\bf Distance_x (%s)',labelXunit))
     ylabel(axDens,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axDens,sprintf('\\bf Altitude (%s)',labelYunit))
+    colormap(figDens,'default')
+    cbDens = colorbar(axDens,'AxisLocation','in','FontSize',12);
+    cbDens.Label.String = '\bfFlow Density (kg/m^3)';
+        
     
-  % Flow buoyancy slice: figure and axes properties
-    figBuoy = figure('Name','Plume Buoyancy','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.5 1]);
-    set(figBuoy,'color','w')
-    axBuoy = axes('Parent',figBuoy);
+  % Flow relative density slice: figure and axes properties
+    figRelD = figure('Name','Relative density','visible',vis,'units',...
+        'normalized','outerposition',[0.5 0 0.4 1]);
+    set(figRelD,'color','w')
+    axRelD = axes('Parent',figRelD);
     hold on
-    set(axBuoy,'box','on','FontSize',12)
-    grid(axBuoy,'on');axBuoy.Layer = 'top';
-    view(axBuoy,saz,sel)
-    axis(axBuoy,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+    set(axRelD,'box','on','TickDir','in','FontSize',12)
+    grid(axRelD,'on');axRelD.Layer = 'top';
+    view(axRelD,saz,sel)
+    axis(axRelD,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
         JMAX-ghostcells]);
-    set(axBuoy,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+    set(axRelD,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
         'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
         'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-    xlabel(axBuoy,sprintf('\\bf Distance_x (%s)',labelXunit))
-    ylabel(axBuoy,sprintf('\\bf Distance_z (%s)',labelZunit))
-    zlabel(axBuoy,sprintf('\\bf Altitude (%s)',labelYunit))
+    xlabel(axRelD,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axRelD,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axRelD,sprintf('\\bf Altitude (%s)',labelYunit))
+    cbRelD = colorbar(axRelD,'AxisLocation','in','FontSize',12);
+    cbRelD.Label.String = '\bfFlow Density relative to Atmosphere (kg/m^3)';
     
   % Flow density slice: video
     vidFlowDens = VideoWriter(sprintf('vidFlowDens_%s.avi',run));
@@ -90,11 +96,11 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     open(vidFlowDens);
     set(gcf,'Visible',vis);
     
-  % Flow buoyancy: video
-    vidFlowBuoy = VideoWriter(sprintf('vidFlowBuoy_%s.avi',run));
-    vidFlowBuoy.Quality = 100;
-    vidFlowBuoy.FrameRate = 10;
-    open(vidFlowBuoy);
+  % Flow relative density: video
+    vidFlowReld = VideoWriter(sprintf('vidFlowRelD_%s.avi',run));
+    vidFlowReld.Quality = 100;
+    vidFlowReld.FrameRate = 10;
+    open(vidFlowReld);
     set(gcf,'Visible',vis);
   % ===================================================================== %
 
@@ -156,9 +162,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
             sdistZ*(JMAX-ghostcells));
         hD.FaceColor = 'interp';
         hD.EdgeColor = 'none';
-        colormap(figDens,'default')
-        colorbar
-        caxis([flowDensity_cmin flowDensity_cmax]);
+        caxis(axDens,[flowDensity_cmin flowDensity_cmax]);
         tLD = pulsetitle(varD,PULSE,time,t,titlerun,FREQ);
         title(tLD,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
@@ -172,7 +176,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
       % ================================================================= %
         
       
-      % -------------------- CALCULATE FLOW BUOYANCY -------------------- %
+      % ---------------- CALCULATE FLOW RELATIVE DENSITY ---------------- %
       % Determine whether domain elements are inside or outside plume
         inplume = EPG <= plumeedge;
         inatmos = EPG > plumeedge;
@@ -194,14 +198,14 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
             IMAX-ghostcells);
         avgatmsdens_3D = permute(avgatmsdens_3D,[3 2 1]);
         avgatmsdens_3D_inplume = avgatmsdens_3D.*inplume;
-        flowbuoyancy = avgatmsdens_3D_inplume - flowdensity;
-        mindens = min(min(min(flowbuoyancy(flowbuoyancy~=0))));
-        maxdens = max(max(max(flowbuoyancy(flowbuoyancy~=0))));
+        flowreldens = avgatmsdens_3D_inplume - flowdensity;
+        mindens = min(flowreldens(flowreldens(:)~=0));
+        maxdens = max(flowreldens(flowreldens(:)~=0));
       % ================================================================= %
       
       
-      % --------------------- BUOYANCY SLICE FIGURES -------------------- %
-      % Define buoyancy colormap: red = rise, blue = collapse.
+      % ----------------- RELATIVE DENSITY SLICE FIGURES ---------------- %
+      % Define relative density colormap: red = rise, blue = collapse.
         numcolors = 256;
         zeropoint = abs(mindens)/(abs(maxdens)+abs(mindens));
         cmaplims = [1 0 0;    % red
@@ -210,26 +214,25 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         fixcpts = [numcolors-1 numcolors*(1-(abs(flowBuoyancy_cmax)/...
             (abs(flowBuoyancy_cmin)+abs(flowBuoyancy_cmax)))) 0];
         cmapB = interp1(fixcpts/numcolors,cmaplims,linspace(0,1,numcolors));
-        colormap(figBuoy,cmapB)
+        colormap(figRelD,cmapB)
           
-      % Plot slice of flow buoyancy ~ relative density
-        figure(figBuoy)
-        cla(axBuoy);
+      % Plot slice of flow relative density
+        figure(figRelD)
+        cla(axRelD);
         hB = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
-            0.5:(JMAX-ghostcells-0.5),flowbuoyancy,...
+            0.5:(JMAX-ghostcells-0.5),flowreldens,...
             sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
             sdistZ*(JMAX-ghostcells));
         hB.FaceColor = 'interp';
         hB.EdgeColor = 'none';
-        colorbar
-        caxis([flowBuoyancy_cmin flowBuoyancy_cmax]);
+        caxis(axRelD,[flowBuoyancy_cmin flowBuoyancy_cmax]);
         tLB = pulsetitle(varB,PULSE,time,t,titlerun,FREQ);
         title(tLB,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
       
       
       % --------------------- OVERLAY PLUME OUTLINE --------------------- %
-        figure(figBuoy)
+        figure(figRelD)
         hEPB = contourslice(EPG,sdistX*(IMAX-ghostcells),...
             sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
         set(hEPB,'EdgeColor',[0 0 0],'LineWidth',0.5);
@@ -245,29 +248,29 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         imgD = imread(vidfigD);
         writeVideo(vidFlowDens,imgD);
           
-      % Append current flow buoyancy frame to vidFlowBuoy
-        vidfigB = 'FlowBuoyancy.jpg';
-        saveas(figBuoy,vidfigB)
-        imgB = imread(vidfigB);
-        writeVideo(vidFlowBuoy,imgB);
+      % Append current flow relative density frame to vidFlowRelD
+        vidfigRD = 'FlowRelDensity.jpg';
+        saveas(figRelD,vidfigRD)
+        imgRD = imread(vidfigRD);
+        writeVideo(vidFlowReld,imgRD);
           
-      % Save density and buoyancy calculations at each timestep
+      % Save density and relative density calculations at each timestep
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('flowdensity_t%03d.txt',...
             time(t))),flowdensity,'delimiter','\t','precision','%g');
         dlmwrite(fullfile(sprintf('%s',dir),sprintf('atmsdensity_t%03d.txt',...
             time(t))),atmsdensity,'delimiter','\t','precision','%g');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('flowbuoyancy_t%03d.txt',...
-            time(t))),flowbuoyancy,'delimiter','\t','precision','%g');
+        dlmwrite(fullfile(sprintf('%s',dir),sprintf('flowreldens_t%03d.txt',...
+            time(t))),flowreldens,'delimiter','\t','precision','%g');
           
       % If user-specified image filetype is tif, append current timestep
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(imgD,sprintf('FlowDens_tsteps_%s.tif',run),'WriteMode','append')
-            imwrite(imgB,sprintf('FlowBuoy_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(imgRD,sprintf('FlowRelD_tsteps_%s.tif',run),'WriteMode','append')
         else
             saveas(figDens,sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype));
-            saveas(figBuoy,sprintf('FlowBuoy_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figRelD,sprintf('FlowRelD_%03ds_%s.%s',time(t),run,imtype));
         end
       % ================================================================= %
 
@@ -278,11 +281,11 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
   % End video write and finish video files
     cd(dir)
     close(vidFlowDens);
-    close(vidFlowBuoy);
+    close(vidFlowReld);
     
     cd(postpath)
     disp('Flow density processing complete.')
     fprintf('vidFlowDens_%s has been saved to %s.\n',run,dir)
-    fprintf('vidFlowBuoy_%s has been saved to %s.\n',run,dir)
+    fprintf('vidFlowRelD_%s has been saved to %s.\n',run,dir)
   
 end
