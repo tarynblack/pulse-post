@@ -46,7 +46,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     
   % Figure and axes properties
     figTemp = figure('Name','Gas Temperature','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.5 1]);
+        'normalized','outerposition',[0.5 0 0.45 1]);
     set(figTemp,'color','w')
     axTemp = axes('Parent',figTemp);
     hold on
@@ -62,7 +62,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     ylabel(axTemp,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axTemp,sprintf('\\bf Altitude (%s)',labelYunit))
     cbTemp = colorbar(axTemp,'AxisLocation','in','FontSize',12);
-    cbTemp.Label.String = '\bf Temperature (K)';
+    cbTemp.Label.String = '\bfTemperature (K)';
         
     cvalsPC = log10(-plumeedge+1):1:-2;
     cmapPC = colormap(flipud(bone(length(cvalsPC))));
