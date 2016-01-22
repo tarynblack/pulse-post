@@ -28,7 +28,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     set(figEP,'color','w')
     axEP = axes('Parent',figEP);
     hold on
-    set(axEP,'box','on','FontSize',12);
+    set(axEP,'box','on','TickDir','in','FontSize',12);
     grid(axEP,'on')
     view(axEP,viewaz,viewel)
     axis(axEP,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -64,7 +64,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         xlabel(axQV,sprintf('\\bf Distance_x (%s)',labelXunit))
         ylabel(axQV,sprintf('\\bf Distance_z (%s)',labelZunit))
         zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
-    set([axQN axQV],'box','on','FontSize',12)
+    set([axQN axQV],'box','on','TickDir','in','FontSize',12)
     grid(axQN,'on'); grid(axQV,'on');
     view(axQN,viewaz,viewel); view(axQV,viewaz,viewel);
         
@@ -74,7 +74,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     set(figEn,'color','w')
     axEn = axes('Parent',figEn);
     hold on
-    set(axEn,'box','on','FontSize',12);
+    set(axEn,'box','on','TickDir','in','FontSize',12);
     grid(axEn,'on');
     view(axEn,viewaz,viewel)
     axis(axEn,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,JMAX-ghostcells]);
@@ -302,10 +302,10 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
             'none','Marker','o','MarkerFaceColor','flat')
         colorbar
         caxis([entrainment_cmin entrainment_cmax])
-        text(1.2,0.25,'Entrainment','Units','normalized',...
-            'HorizontalAlignment','right','rotation',90);
-        text(1.2,0.75,'Expansion','Units','normalized',...
-            'HorizontalAlignment','left','rotation',90);
+        text(1.25,0.3,'\bfEntrainment','Units','normalized',...
+            'HorizontalAlignment','right','rotation',90,'FontSize',12);
+        text(1.25,0.7,'\bfExpansion','Units','normalized',...
+            'HorizontalAlignment','left','rotation',90,'FontSize',12);
         tLEn = pulsetitle(varEn,PULSE,time,t,titlerun,FREQ);
         tlEn2 = sprintf('Characteristic velocity: %g m/s',vel_char);
         title([tLEn;tlEn2],'FontSize',12,'FontWeight','bold');
