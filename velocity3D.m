@@ -7,7 +7,7 @@
 %   Detailed explanation goes here
 %
 %   Functions called:
-%   Last edit: Taryn Black, 21 January 2016
+%   Last edit: Taryn Black, 22 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -45,11 +45,10 @@
     
   % Figure and axes properties
     figVelo = figure('Name','Flow speed','units','normalized',...
-        'outerposition',[0 0 0.4 1],'visible',vis);
-    set(figVelo,'color','w')
-    axVelo = axes('Parent',figVelo);
+        'outerposition',[0 0 0.4 1],'visible',vis,'PaperPositionMode',...
+        'auto','color','w');
+    axVelo = axes('Parent',figVelo,'box','on','TickDir','in','FontSize',12);
     hold on
-    set(axVelo,'box','on','TickDir','in','FontSize',12)
     grid(axVelo,'on');axVelo.Layer = 'top';
     view(axVelo,saz,sel)
     axis(axVelo,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...

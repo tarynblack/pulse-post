@@ -8,7 +8,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 21 January 2016
+%   Last edit: Taryn Black, 22 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -46,11 +46,10 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     
   % Figure and axes properties
     figTemp = figure('Name','Gas Temperature','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.45 1]);
-    set(figTemp,'color','w')
-    axTemp = axes('Parent',figTemp);
+        'normalized','outerposition',[0.5 0 0.45 1],'PaperPositionMode',...
+        'auto','color','w');
+    axTemp = axes('Parent',figTemp,'box','on','TickDir','in','FontSize',12);
     hold on
-    set(axTemp,'box','on','TickDir','in','FontSize',12)
     grid(axTemp,'on');axTemp.Layer = 'top';
     view(axTemp,saz,sel)
     axis(axTemp,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...

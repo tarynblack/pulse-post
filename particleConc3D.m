@@ -8,7 +8,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 21 January 2016
+%   Last edit: Taryn Black, 22 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -54,8 +54,8 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
   % Figure and axes properties
     figPC = figure('Name','Particle Concentrations','units','pixels',...
-        'outerposition',[1 44 1110 780],'visible',vis);
-    set(figPC,'color','w')
+        'outerposition',[1 44 1110 780],'visible',vis,'color','w',...
+        'PaperPositionMode','auto');
     axS1 = subtightplot(1,3,1,gap,ht,wd);
       hold on
       axis(axS1,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...

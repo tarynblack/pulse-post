@@ -11,7 +11,7 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 16 January 2015
+% Last edit: Taryn Black, 22 January 2015
 
 clear all
 
@@ -207,10 +207,11 @@ for i = 1:length(runIDs)
       velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
           timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
           velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
-          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge )
+          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge);
     
       
       close all
       clearvars -except i allruns
+      disp('P O S T - P R O C E S S I N G   C O M P L E T E')
 
 end

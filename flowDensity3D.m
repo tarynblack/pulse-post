@@ -9,7 +9,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %
 %   Special functions called: varchunk3D, pulsetitle
-%   Last edit: Taryn Black, 21 January 2016
+%   Last edit: Taryn Black, 22 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -49,11 +49,10 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
   % Flow density slice: figure and axes properties     
     figDens = figure('Name','Plume Density','visible',vis,'units',...
-        'normalized','outerposition',[0 0 0.4 1]);
-    set(figDens,'color','w')
-    axDens = axes('Parent',figDens);
+        'normalized','outerposition',[0 0 0.4 1],'PaperPositionMode',...
+        'auto','color','w');
+    axDens = axes('Parent',figDens,'box','on','TickDir','in','FontSize',12);
     hold on
-    set(axDens,'box','on','TickDir','in','FontSize',12)
     grid(axDens,'on');axDens.Layer = 'top';
     view(axDens,saz,sel)
     axis(axDens,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -71,11 +70,10 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
   % Flow relative density slice: figure and axes properties
     figRelD = figure('Name','Relative density','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.4 1]);
-    set(figRelD,'color','w')
-    axRelD = axes('Parent',figRelD);
+        'normalized','outerposition',[0.5 0 0.4 1],'PaperPositionMode',...
+        'auto','color','w');
+    axRelD = axes('Parent',figRelD,'box','on','TickDir','in','FontSize',12);
     hold on
-    set(axRelD,'box','on','TickDir','in','FontSize',12)
     grid(axRelD,'on');axRelD.Layer = 'top';
     view(axRelD,saz,sel)
     axis(axRelD,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
