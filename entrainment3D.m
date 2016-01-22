@@ -24,7 +24,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
 
   % Gas volume fraction isosurface: figure and axes properties    
     figEP = figure('Name','Gas Volume Fraction','visible',vis,'units',...
-        'normalized','outerposition',[0 0 0.5 1]);
+        'normalized','outerposition',[0 0 0.37 1]);
     set(figEP,'color','w')
     axEP = axes('Parent',figEP);
     hold on
@@ -70,7 +70,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         
   % Entrainment isosurface: figure and axes properties
     figEn = figure('Name','Entrainment','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.5 1]);
+        'normalized','outerposition',[0.5 0 0.45 1]);
     set(figEn,'color','w')
     axEn = axes('Parent',figEn);
     hold on
@@ -84,6 +84,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     xlabel(axEn,sprintf('\\bf Distance_x (%s)',labelXunit))
     ylabel(axEn,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axEn,sprintf('\\bf Altitude (%s)',labelYunit))
+    cbEn = colorbar(axEn,'AxisLocation','out','FontSize',12);
     
   % Gas volume fraction isosurface: video
     vidEPG = VideoWriter(sprintf('vidEPG_%s.avi',run));
@@ -300,11 +301,10 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         patch('Vertices',[plumeX plumeY plumeZ],'Faces',1:length(plumeX),...
             'FaceVertexCData',e_color,'FaceColor','none','EdgeColor',...
             'none','Marker','o','MarkerFaceColor','flat')
-        colorbar
-        caxis([entrainment_cmin entrainment_cmax])
-        text(1.25,0.3,'\bfEntrainment','Units','normalized',...
+        caxis(axEn,[entrainment_cmin entrainment_cmax])
+        text(1.17,0.3,'\bfEntrainment','Units','normalized',...
             'HorizontalAlignment','right','rotation',90,'FontSize',12);
-        text(1.25,0.7,'\bfExpansion','Units','normalized',...
+        text(1.17,0.7,'\bfExpansion','Units','normalized',...
             'HorizontalAlignment','left','rotation',90,'FontSize',12);
         tLEn = pulsetitle(varEn,PULSE,time,t,titlerun,FREQ);
         tlEn2 = sprintf('Characteristic velocity: %g m/s',vel_char);
