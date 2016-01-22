@@ -1,13 +1,13 @@
-function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
-    KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
-    labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-    vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-    titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
+% function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
+%     KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+%     labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
+%     vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
+%     titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 21 January 2016
+%   Last edit: Taryn Black, 22 January 2016
     
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -19,6 +19,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
     varEP = 'Gas volume fraction';
+    varQ1 = 'Plume surface isonormals';
+    varQ2 = 'Velocity magnitudes';
     varEn = 'Entrainment';
     cd(dir)
 
@@ -176,7 +178,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         camlight('left')
         lighting gouraud
         tLEP = pulsetitle(varEP,PULSE,time,t,titlerun,FREQ);
-        title(tLEP,'FontSize',12,'FontWeight','bold');
+        title(tLEP,'FontWeight','bold');
       % ================================================================= %
 
       
@@ -224,13 +226,15 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
             unitnorm(2,1:q:length(unitnorm)),...
             unitnorm(3,1:q:length(unitnorm)),...
             'MaxHeadSize',10,'AutoScaleFactor',1,'LineWidth',0.1);
-        title(axQN,'Plume surface isonormals')
+        tLQ1 = pulsetitle(varQ1,PULSE,time,t,titlerun,FREQ);
+        title(axQN,tLQ1,'FontWeight','bold')
         quiver3(axQV,plumeX(1:q:length(plumeX))',...
             plumeY(1:q:length(plumeY))',plumeZ(1:q:length(plumeZ))',...
             PUNV_X(1:q:length(PUNV_X)),PUNV_Y(1:q:length(PUNV_Y)),...
             PUNV_Z(1:q:length(PUNV_Z)),...
             'MaxHeadSize',20,'AutoScaleFactor',5,'LineWidth',0.1);
-        title(axQV,'Velocity magnitudes')
+        tLQ2 = pulsetitle(varQ2,PULSE,time,t,titlerun,FREQ);
+        title(axQV,tLQ2,'FontWeight','bold')
         PosQN = get(axQN,'position');
         PosQV = get(axQV,'position');
         PosQV(3:4) = PosQN(3:4);
@@ -308,7 +312,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
             'HorizontalAlignment','left','rotation',90,'FontSize',12);
         tLEn = pulsetitle(varEn,PULSE,time,t,titlerun,FREQ);
         tlEn2 = sprintf('Characteristic velocity: %g m/s',vel_char);
-        title([tLEn;tlEn2],'FontSize',12,'FontWeight','bold');
+        title([tLEn;tlEn2],'FontWeight','bold');
         camlight('right')
         camlight('left')
         lighting gouraud
@@ -451,4 +455,4 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
   fprintf('vidQ_%s has been saved to %s.\n',run,dir)
   fprintf('vidEntr_%s has been saved to %s.\n',run,dir)
 
-end
+% end
