@@ -1,8 +1,8 @@
-% function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
-%     KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
-%     labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-%     vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-%     titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
+function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
+    KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+    labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
+    vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
+    titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -31,11 +31,10 @@
 
   % Gas volume fraction isosurface: figure and axes properties    
     figEP = figure('Name','Gas Volume Fraction','visible',vis,'units',...
-        'normalized','outerposition',[0 0 0.37 1],'PaperPositionMode','auto');
-    set(figEP,'color','w')
-    axEP = axes('Parent',figEP);
+        'normalized','outerposition',[0 0 0.37 1],'PaperPositionMode',...
+        'auto','color','w');
+    axEP = axes('Parent',figEP,'box','on','TickDir','in','FontSize',12);
     hold on
-    set(axEP,'box','on','TickDir','in','FontSize',12);
     grid(axEP,'on')
     view(axEP,viewaz,viewel)
     axis(axEP,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -49,8 +48,8 @@
     
   % Isonormal/velocity quivers: figure and axes properties
     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
-        'units','normalized','outerposition',[0 0 0.75 1],'PaperPositionMode','auto');
-    set(figQ,'color','w')
+        'units','normalized','outerposition',[0 0 0.75 1],...
+        'PaperPositionMode','auto','color','w');
     axQN = subtightplot(1,2,1,gap,ht,wd);
         hold on
         axis(axQN,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -77,11 +76,10 @@
         
   % Entrainment isosurface: figure and axes properties
     figEn = figure('Name','Entrainment','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.45 1],'PaperPositionMode','auto');
-    set(figEn,'color','w')
-    axEn = axes('Parent',figEn);
+        'normalized','outerposition',[0.5 0 0.45 1],'color','w',...
+        'PaperPositionMode','auto');
+    axEn = axes('Parent',figEn,'box','on','TickDir','in','FontSize',12);
     hold on
-    set(axEn,'box','on','TickDir','in','FontSize',12);
     grid(axEn,'on');
     view(axEn,viewaz,viewel)
     axis(axEn,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,JMAX-ghostcells]);
@@ -397,59 +395,74 @@
     elseif strcmp(PULSE,'F') == 1
       str = sprintf('%s: Steady flow',titlerun);
     end
-    fig_plumevol = figure('Name','Plume Volume','visible',vis);
-    set(fig_plumevol,'color','w')
-    hvol1 = subplot(2,1,1);
+    fig_plumevol = figure('Name','Plume Volume','visible',vis,'units',...
+        'normalized','outerposition',[0 0 1 1],'PaperPositionMode',...
+        'auto','color','w');
+    axVol1 = subplot(2,1,1);
       plot(time,plumevolume)
-      title(hvol1,{sprintf('%s: Total plume volume',str)},...
-          'FontWeight','bold','FontSize',10)
-      xlabel(hvol1,{'Time (s)'},'FontWeight','bold','FontSize',10)
-      ylabel(hvol1,{'Volume (m^3)'},'FontWeight','bold','FontSize',10)
-      box on
-    hvol2 = subplot(2,1,2);
+      title(axVol1,{sprintf('%s: Total plume volume',str)},...
+          'FontWeight','bold')
+      xlabel(axVol1,{'Time (s)'},'FontWeight','bold')
+      ylabel(axVol1,{'Volume (m^3)'},'FontWeight','bold')
+    axVol2 = subplot(2,1,2);
       plot(time(2:length(plumevolume)),diff(plumevolume))
-      title(hvol2,{sprintf('%s: Change in plume volume',str)},...
-          'FontWeight','bold','FontSize',10)
-      xlabel(hvol2,{'Time (s)'},'FontWeight','bold','FontSize',10)
-      ylabel(hvol2,{'\DeltaVolume (m^3)'},'FontWeight','bold','FontSize',10)
-      box on
+      title(axVol2,{sprintf('%s: Change in plume volume',str)},...
+          'FontWeight','bold')
+      xlabel(axVol2,{'Time (s)'},'FontWeight','bold')
+      ylabel(axVol2,{'\DeltaVolume (m^3)'},'FontWeight','bold')
+    set([axVol1 axVol2],'box','on','FontSize',12)
+    grid(axVol1,'on'); grid(axVol2,'on')
     saveas(fig_plumevol,sprintf('PlumeVolume_%s.jpg',run));
     
   % Plume-averaged entrainment/expansion
-    fig_coeff = figure('Name','Entrainment Coefficients','visible',vis);
+    figCoeff = figure('Name','Entrainment Coefficients','visible',vis,...
+        'units','normalized','outerposition',[0 0 1 1],...
+        'PaperPositionMode','auto','color','w');
+    axCoeff = axes('Parent',figCoeff,'box','on','FontSize',12);
+    grid(axCoeff,'on');
+    axCoeff.YMinorGrid = 'on';
     hold on
-    set(fig_coeff,'color','w')
     for t = 2:length(time)
         coeff_all = load(sprintf('ecoeff_all_t%03d.txt',time(t)));
-        hs = scatter(time(t)*ones(1,length(coeff_all)),coeff_all,'MarkerEdgeColor',[0.5 0.5 0.5]);
+        hs = scatter(time(t)*ones(1,length(coeff_all)),coeff_all,...
+            'MarkerEdgeColor',[0.5 0.5 0.5]);
         hold on
     end
     hs.DisplayName = 'Full plume';
-    he1 = errorbar(time(2:end),avg_entr(2:end),std_entr(2:end),'c','LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,'DisplayName','Entrainment');
-    he2 = errorbar(time(2:end),avg_expn(2:end),std_expn(2:end),'r','LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,'DisplayName','Expansion');
-    he3 = errorbar(time(2:end),avg_coeff(2:end),std_coeff(2:end),'k','LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Total Coefficient');
-    title(sprintf('%s: Plume-averaged coefficients',str),'FontWeight',...
-        'bold','FontSize',10)
-    xlabel('Time (s)','FontWeight','bold','FontSize',10)
-    xlim([0 time(end)+DT])
-    ylim([-1 1])
-    box on
-    grid on
+    he1 = errorbar(time(2:end),avg_entr(2:end),std_entr(2:end),'c',...
+        'LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,...
+        'DisplayName','Entrainment');
+    he2 = errorbar(time(2:end),avg_expn(2:end),std_expn(2:end),'r',...
+        'LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,...
+        'DisplayName','Expansion');
+    he3 = errorbar(time(2:end),avg_coeff(2:end),std_coeff(2:end),'k',...
+        'LineWidth',3,'Marker','+','MarkerSize',10,...
+        'DisplayName','Total Coefficient');
+    title(axCoeff,sprintf('%s: Plume-averaged coefficients',str),...
+        'FontWeight','bold')
+    xlabel(axCoeff,'Time (s)','FontWeight','bold')
+    ylabel(axCoeff,'Entrainment/Expansion Coefficient','FontWeight','bold')
+    xlim(axCoeff,[0 time(end)+DT])
+    ylim(axCoeff,[-1 1])
+    line(xlim,[0 0],'color',[0.1 0.1 0.1],'LineWidth',0.5);
     hl = legend([hs he1 he2 he3],'Location','EastOutside');
     hl.Box = 'on';
     hl.FontWeight = 'bold';
     hl.FontSize = 10;
-    saveas(fig_coeff,sprintf('Coefficients_%s.jpg',run));
+    saveas(figCoeff,sprintf('Coefficients_%s.jpg',run));
     
   % Comparison conic coefficient
-    fig_Morton = figure('Name','Conic entrainment coefficient','visible',vis);
-    plot(time,e_Mconic)
-    set(fig_Morton,'color','w')
-    title(sprintf('%s: Morton conic entrainment coefficient',str),...
-        'FontWeight','bold','FontSize',10)
-    xlabel('Time (s)','FontWeight','bold','FontSize',10)
-    ylabel('Coefficient','FontWeight','bold','FontSize',10)
-    ylim([0 0.5])
+    fig_Morton = figure('Name','Conic entrainment coefficient','units',...
+        'normalized','outerposition',[0 0.3 1 0.5],'visible',vis,...
+        'PaperPositionMode','auto','color','w');
+    axMor = axes('Parent',fig_Morton,'box','on','FontSize',12); 
+    plot(axMor,time,e_Mconic)
+    title(axMor,sprintf('%s: Morton conic entrainment coefficient',str),...
+        'FontWeight','bold')
+    xlabel(axMor,'Time (s)','FontWeight','bold')
+    ylabel(axMor,'Coefficient','FontWeight','bold')
+    ylim([0 1])
+    grid(axMor,'on');
     saveas(fig_Morton,sprintf('MortonConic_%s.jpg',run));
   % =================================================================== %
   
@@ -460,4 +473,4 @@
   fprintf('vidQ_%s has been saved to %s.\n',run,dir)
   fprintf('vidEntr_%s has been saved to %s.\n',run,dir)
 
-% end
+end
