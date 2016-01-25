@@ -11,7 +11,7 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 16 January 2015
+% Last edit: Taryn Black, 22 January 2015
 
 clear all
 
@@ -79,9 +79,9 @@ clear all
     particleConc_cmax = 10;
   % Flow density [kg/m3]
     flowDensity_cmin = 0;
-    flowDensity_cmax = 3;
+    flowDensity_cmax = 8;
   % Relative density of flow (atmos_density - flow_density)
-    flowBuoyancy_cmin = -2;
+    flowBuoyancy_cmin = -3;
     flowBuoyancy_cmax = 1;
   % Gas temperature [K] (max is defined by vent inlet temperature)
     gasTemperature_cmin = 300; 
@@ -125,9 +125,9 @@ clear all
 % Display error if color/transparency doesn't match # of isosurfaces:
   [Crow,Ccol] = size(colEPG);
   if Crow ~= length(isoEPG)
-      error('Error. \nNumber of rows in colEPG must match length of isoEPG.')
+      error('Error: Number of rows in colEPG must match length of isoEPG.')
   elseif length(trnEPG) ~= length(isoEPG)
-      error('Error. \nLength of trnEPG must match length of isoEPG.')
+      error('Error: Length of trnEPG must match length of isoEPG.')
   end
   
   
@@ -207,10 +207,13 @@ for i = 1:length(runIDs)
       velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
           timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
           velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
-          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge )
-    
+          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge);
+      cd(postpath)
       
       close all
       clearvars -except i allruns
+      disp('* ================================================= *')
+      disp('   P O S T - P R O C E S S I N G   C O M P L E T E')
+      disp('* ================================================= *')
 
 end

@@ -7,7 +7,7 @@
 %   Detailed explanation goes here
 %
 %   Functions called:
-%   Last edit: Taryn Black, 21 January 2016
+%   Last edit: Taryn Black, 22 January 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -45,11 +45,10 @@
     
   % Figure and axes properties
     figVelo = figure('Name','Flow speed','units','normalized',...
-        'outerposition',[0 0 0.5 1],'visible',vis);
-    set(figVelo,'color','w')
-    axVelo = axes('Parent',figVelo);
+        'outerposition',[0 0 0.4 1],'visible',vis,'PaperPositionMode',...
+        'auto','color','w');
+    axVelo = axes('Parent',figVelo,'box','on','TickDir','in','FontSize',12);
     hold on
-    set(axVelo,'box','on','FontSize',12)
     grid(axVelo,'on');axVelo.Layer = 'top';
     view(axVelo,saz,sel)
     axis(axVelo,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -60,6 +59,8 @@
     xlabel(axVelo,sprintf('\\bf Distance_x (%s)',labelXunit))
     ylabel(axVelo,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axVelo,sprintf('\\bf Altitude (%s)',labelYunit))
+    cbVelo = colorbar(axVelo,'AxisLocation','in','FontSize',12);
+    cbVelo.Label.String = '\bfFlow Speed (m/s)';
     
   % Initialize video
     vidVelo = VideoWriter(sprintf('vidVelo_%s.avi',run));
@@ -123,9 +124,7 @@
             sdistZ*(JMAX-ghostcells));
         hFS.FaceColor = 'interp';
         hFS.EdgeColor = 'none';
-        hc = colorbar;
-        caxis([velocity_cmin velocity_cmax]);
-        ylabel(hc,'\bf Flow Speed [m/s]','FontSize',12)
+        caxis(axVelo,[velocity_cmin velocity_cmax]);
         tL = pulsetitle(varU,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
@@ -168,4 +167,4 @@
     disp('Flow speed processing complete.')
     fprintf('vidVelo_%s has been saved to %s.\n',run,dir)
 
-    end
+end
