@@ -11,7 +11,7 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 22 January 2015
+% Last edit: Taryn Black, 13 February 2016
 
 clear all
 
@@ -76,7 +76,7 @@ clear all
     entrainment_cmax = 0.5;
   % Particle concentration
     particleConc_cmin = -5;
-    particleConc_cmax = 10;
+    particleConc_cmax = -3;
   % Flow density [kg/m3]
     flowDensity_cmin = 0;
     flowDensity_cmax = 8;
@@ -88,6 +88,12 @@ clear all
   % Velocity magnitude [m/s]
     velocity_cmin = 0;
     velocity_cmax = 300;
+  % Vorticity
+    vorticity_cmin = -20;
+    vorticity_cmax = 20;
+    
+% Altitudes at which to display z_vorticity (x-y plane), scaled to HEIGHT=1
+  zvort_alts = [0.05 0.3 0.55 0.8];
     
 % Slice distance and direction for 3D-slice figures. sdist* is the fraction
 % along the *axis at which to cut the slice (between 0 and 1).
@@ -143,7 +149,7 @@ for i = 1:length(runIDs)
       ghostcells = 4;     % MFiX adds these to each domain dimension
       [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
           NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,...
-          TROPO,BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3] ...
+          TROPO,BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3,D_S1,D_S2,D_S3] ...
           = setCnsts3D(run,dir,ghostcells,tstop);
       cd(postpath)
       timesteps = TSTOP/DT;
@@ -183,7 +189,7 @@ for i = 1:length(runIDs)
           labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
           XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
           particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,...
-          FREQ,time,imtype,plumeedge);
+          FREQ,time,imtype,plumeedge,D_S1,D_S2,D_S3);
       cd(postpath)
     
     % Gas temperature calculations and figures
@@ -207,11 +213,13 @@ for i = 1:length(runIDs)
       velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
           timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
           velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
-          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge);
+          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,...
+          imtype,plumeedge,viewaz,viewel,Y,vorticity_cmin,...
+          vorticity_cmax,zvort_alts);
       cd(postpath)
       
       close all
-      clearvars -except i allruns
+%       clearvars -except i allruns
       disp('* ================================================= *')
       disp('   P O S T - P R O C E S S I N G   C O M P L E T E')
       disp('* ================================================= *')
