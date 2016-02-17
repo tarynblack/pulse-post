@@ -1,6 +1,7 @@
 function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,...
-    BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3 ] = setCnsts3D( run,dir,ghostcells,tstop )
+    BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3,D_S1,D_S2,D_S3 ] = 
+    setCnsts3D( run,dir,ghostcells,tstop )
 %setCnsts3D loads the simulation output file mfixconst_<run> containing
 %simulation constants and uses these to define post-processing parameters
 %for that simulation. The contents of mfixconst are specified in
@@ -32,8 +33,9 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
 %   BC_PG:  inlet gas pressure [Pa, or N/m2]
 %   BC_TG:  inlet gas temperature [K]
 %   BC_TS#: inlet temperature of phase# particles [K]
+%   D_S#:   diameter of phase# particles (m)
 %
-% Last edit: Taryn Black, 2 December 2015
+% Last edit: Taryn Black, 13 February 2016
     
     cd(dir)
     
@@ -73,6 +75,9 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     BC_TS1 = str2double(Cnsts.data(25));
     BC_TS2 = str2double(Cnsts.data(26));
     BC_TS3 = str2double(Cnsts.data(27));
+    D_S1   = str2double(Cnsts.data(28));
+    D_S2   = str2double(Cnsts.data(29));
+    D_S3   = str2double(Cnsts.data(30));
     
   % Override simulation end time with user-defined tstop if defined
     if isempty(tstop) || tstop >= END_T

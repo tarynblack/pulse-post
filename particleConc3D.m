@@ -2,13 +2,13 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
     labelz,labelZunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
     particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,FREQ,...
-    time,imtype,plumeedge )
+    time,imtype,plumeedge,D_S1,D_S2,D_S3 )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 22 January 2016
+%   Last edit: Taryn Black, 12 February 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(dir)
@@ -17,9 +17,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
-    varS1 = 'Solid phase 1';
-    varS2 = 'Solid phase 2';
-    varS3 = 'Solid phase 3';
+    varS1 = sprintf('Solid phase 1 (d = %g mm)',D_S1*1E3);
+    varS2 = sprintf('Solid phase 2 (d = %g mm)',D_S2*1E3);
+    varS3 = sprintf('Solid phase 3 (d = %g mm)',D_S3*1E3);
     varPC = 'Particle concentration';
     cd(dir)
   
@@ -162,8 +162,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
           hEP1 = contourslice(axS1,EPG,sdistX*(IMAX-ghostcells),...
               sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP1,'EdgeColor',[1 1 1],'LineWidth',0.5);
+          caxis(axS1,[particleConc_cmin,particleConc_cmax]);
         hS2 = slice(axS2,0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
-            0.5:(JMAX-ghostcells-0.5),logS1,sdistX*(IMAX-ghostcells),...
+            0.5:(JMAX-ghostcells-0.5),logS2,sdistX*(IMAX-ghostcells),...
             sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
           hS2.FaceColor = 'interp';
           hS2.EdgeColor = 'none';
@@ -171,8 +172,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
           hEP2 = contourslice(axS2,EPG,sdistX*(IMAX-ghostcells),...
               sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP2,'EdgeColor',[1 1 1],'LineWidth',0.5);
+          caxis(axS2,[particleConc_cmin,particleConc_cmax]);
         hS3 = slice(axS3,0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
-            0.5:(JMAX-ghostcells-0.5),logS1,sdistX*(IMAX-ghostcells),...
+            0.5:(JMAX-ghostcells-0.5),logS3,sdistX*(IMAX-ghostcells),...
             sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
           hS3.FaceColor = 'interp';
           hS3.EdgeColor = 'none';
@@ -180,7 +182,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
           hEP3 = contourslice(axS3,EPG,sdistX*(IMAX-ghostcells),...
               sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
           set(hEP3,'EdgeColor',[1 1 1],'LineWidth',0.5);
-        caxis(axS3,[particleConc_cmin particleConc_cmax]);
+          caxis(axS3,[particleConc_cmin particleConc_cmax]);
         PosS1 = get(axS1,'position');
         PosS2 = get(axS2,'position');
         PosS3 = get(axS3,'position');
