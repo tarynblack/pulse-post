@@ -440,8 +440,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         'DisplayName','Total Coefficient');
     title(axCoeff,sprintf('%s: Plume-averaged coefficients',str),...
         'FontWeight','bold')
-    xlabel(axCoeff,'Time (s)','FontWeight','bold')
-    ylabel(axCoeff,'Entrainment/Expansion Coefficient','FontWeight','bold')
+    xlabel(axCoeff,'\bfTime (s)')
+    ylabel(axCoeff,'\bfEntrainment/Expansion Coefficient')
     xlim(axCoeff,[0 time(end)+DT])
     ylim(axCoeff,[-1 1])
     line(xlim,[0 0],'color',[0.1 0.1 0.1],'LineWidth',0.5);
@@ -459,8 +459,8 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     plot(axMor,time,e_Mconic)
     title(axMor,sprintf('%s: Morton conic entrainment coefficient',str),...
         'FontWeight','bold')
-    xlabel(axMor,'Time (s)','FontWeight','bold')
-    ylabel(axMor,'Coefficient','FontWeight','bold')
+    xlabel(axMor,'\bfTime (s)')
+    ylabel(axMor,'\bfCoefficient')
     ylim([0 1])
     grid(axMor,'on');
     saveas(fig_Morton,sprintf('MortonConic_%s.jpg',run));
