@@ -91,9 +91,15 @@ clear all
   % Vorticity
     vorticity_cmin = -20;
     vorticity_cmax = 20;
+  % Mass flux [kg/m2.s]
+    massflux_cmin = 0;
+    massflux_cmax = 6;
     
-% Altitudes at which to display z_vorticity (x-y plane), scaled to HEIGHT=1
-  zvort_alts = [0.05 0.3 0.55 0.8];
+% Altitudes [meters] at which to display z_vorticity (x-y plane)
+  zvort_alts = [250 1500 2750 4000];
+  
+% Altitudes [meters] at which to calculate vertical mass flux
+  massflux_alts = [0 3000 5000];
     
 % Slice distance and direction for 3D-slice figures. sdist* is the fraction
 % along the *axis at which to cut the slice (between 0 and 1).
@@ -111,7 +117,7 @@ clear all
   
 % Number of tick labels to display on axes for each dimension
   Xpoints = 5;      % horizontal axis 1
-  Ypoints = 9;      % vertical axis
+  Ypoints = 11;      % vertical axis
   Zpoints = 5;      % horizontal axis 2
 
 % Scaling factor (meters*_fact) and unit for axes labels
@@ -155,13 +161,13 @@ for i = 1:length(runIDs)
       timesteps = TSTOP/DT;
       time = (0:timesteps)*DT;
     
-    % Define domain grid and dimensional spatial resolution [meters/cell]
-      X = LENGTH/(IMAX-ghostcells):LENGTH/(IMAX-ghostcells):LENGTH;
-      Y = HEIGHT/(JMAX-ghostcells):HEIGHT/(JMAX-ghostcells):HEIGHT;
-      Z = WIDTH/(KMAX-ghostcells):WIDTH/(KMAX-ghostcells):WIDTH;
+    % Define dimensional spatial resolution [meters/cell] and domain grid
       XRES = LENGTH/(IMAX - ghostcells);
       YRES = HEIGHT/(JMAX - ghostcells);
       ZRES = WIDTH/(KMAX - ghostcells);
+      XGRID = XRES:XRES:LENGTH;
+      YGRID = YRES:YRES:HEIGHT;
+      ZGRID = ZRES:ZRES:WIDTH;
         
     % Define tick locations and labels
       tickx = linspace(0,LENGTH,Xpoints);
@@ -170,6 +176,15 @@ for i = 1:length(runIDs)
       labely = ticky(2:end)/Yfact;
       tickz = linspace(0,WIDTH,Zpoints);
       labelz = tickz(2:end)/Zfact;
+      
+    % Redefine vorticity and mass flux altitudes as vector indices
+      zvort_alts(zvort_alts==0) = YRES;
+      zvort_alts = zvort_alts./YRES;
+      
+      massflux_alts(massflux_alts==0) = YRES;
+      massflux_legend = strcat(strsplit(num2str(massflux_alts/Yfact)),...
+          {' '},cellstr(labelYunit));
+      massflux_alts = massflux_alts./YRES;
       
     % Calculate characteristic inlet velocity
       [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,...
@@ -196,7 +211,7 @@ for i = 1:length(runIDs)
       gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,tickx,...
           labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
           labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
-          TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
+          TROPO,YGRID,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
           timesteps,imtype,plumeedge);
       cd(postpath)
      
@@ -214,8 +229,16 @@ for i = 1:length(runIDs)
           timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
           velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
           ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,...
-          imtype,plumeedge,viewaz,viewel,Y,vorticity_cmin,...
+          imtype,plumeedge,viewaz,viewel,YGRID,vorticity_cmin,...
           vorticity_cmax,zvort_alts);
+      cd(postpath)
+            
+    % Mass flux calculations and figures
+      massFlux3D(dir,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
+          tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
+          labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
+          massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,...
+          PULSE,FREQ,time,titlerun,massflux_legend)
       cd(postpath)
       
       close all
