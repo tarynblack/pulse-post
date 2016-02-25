@@ -1,7 +1,7 @@
 function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
     labelz,labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
-    ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
+    ATMOS,TROPO,YGRID,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
     timesteps,imtype,plumeedge )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
 %over time.
@@ -117,10 +117,10 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
       % Apply atmospheric correction (equation of state for gas)
         if strcmp(ATMOS,'T') == 1
             for i = 1:(JMAX-ghostcells)
-                if Y(i) <= TROPO
-                    TG(:,:,i) = TG(:,:,i) - 0.0098*Y(i);
-                elseif Y(i) > TROPO
-                    TG(:,:,i) = TG(:,:,i) - 0.0098*TROPO + 0.001*Y(i);
+                if YGRID(i) <= TROPO
+                    TG(:,:,i) = TG(:,:,i) - 0.0098*YGRID(i);
+                elseif YGRID(i) > TROPO
+                    TG(:,:,i) = TG(:,:,i) - 0.0098*TROPO + 0.001*YGRID(i);
                 end
             end
         end
