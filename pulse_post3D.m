@@ -24,19 +24,19 @@ clear all
   runIDs = {'testdata'};
   
 % Path for directory containing post-processing data directories (runIDs).
-%   runpath = '~/data2/rundata/';
-  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/';
+  runpath = '~/data2/pulse-post/';
+%   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/';
   
 % Path for location of post-processing scripts.
-%   postpath = '~/data2/pulse-post';
-  postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
+  postpath = '~/data2/pulse-post';
+%   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
 
 % -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
 % NOTE: must be 'off' when running remotely in -nodisplay mode.
-  vis = 'on';
+  vis = 'off';
 
 % Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;
@@ -238,7 +238,7 @@ for i = 1:length(runIDs)
           tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
           labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
           massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,...
-          PULSE,FREQ,time,titlerun,massflux_legend)
+          PULSE,FREQ,time,titlerun,massflux_legend,imtype);
       cd(postpath)
       
       close all

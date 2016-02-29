@@ -73,6 +73,7 @@
     figVort = figure('Name','Vorticity','units','normalized','visible',...
         vis,'outerposition',[0 0 1 1],'PaperPositionMode','auto',...
         'color','w');
+    cd(postpath)
     axVortX = subtightplot(1,3,1,gap,ht,wd);
         hold on
         axis(axVortX,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -109,6 +110,7 @@
     grid(axVortX,'on'); grid(axVortY,'on'); grid(axVortZ,'on');
     view(axVortX,viewaz,viewel); view(axVortY,viewaz,viewel); 
         view(axVortZ,viewaz,viewel)
+    cd(dir)
     
   % Initialize video
     vidVelo = VideoWriter(sprintf('vidVelo_%s.avi',run));
