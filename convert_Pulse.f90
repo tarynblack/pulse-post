@@ -11,18 +11,18 @@ INTEGER:: ios, int_temp,int_check,int_pos1,int_min1,int_pos2,int_min2
 DOUBLE PRECISION:: infinity = 1e30
 INTEGER::yc,YMAX,I,J,K,IMAX,JMAX,KMAX,timesteps,RMAX,THMAX,ZMAX,rc,zc,tc,t,I_yp1,I_ym1,I_zp1,I_zm1,I_xp1,I_xm1,temp_rc
 INTEGER::write_size,write_end,loop_open,fid_temp,fid_EP_P,fid_EP_G,fid_U, fid_ISO6,fid_GRAD4pt, fid_GRADsize,fid_GradV,fid_GradE  
-INTEGER::fid_EP_G_t,fid_U_t,fid_ISO3,fid_Ri,fid_ROP1,fid_ROP2,fid_Dot,fid_c
+INTEGER::fid_EP_G_t,fid_U_t,fid_ISO3,fid_Ri,fid_ROP1,fid_ROP2,fid_Dot,fid_c,fid_V_t
 
 INTEGER::Z_minus,Z_plus,X_minus,Y_plus,Z_total,I_local
 
 DOUBLE PRECISION,ALLOCATABLE::EP_P(:,:,:),Iso_6(:,:,:)
 DOUBLE PRECISION,ALLOCATABLE::Iso_3(:,:,:),four_point_Iso3(:,:,:),four_point(:,:,:)
-DOUBLE PRECISION, ALLOCATABLE :: T_G(:,:,:),U_G(:,:,:), VEL_6(:,:,:),VEL_3(:,:,:),VEL_ALL(:,:,:), VEL_temp(:,:), VEL_temp2(:,:), Richardson(:,:,:)
+DOUBLE PRECISION, ALLOCATABLE :: T_G(:,:,:),U_G(:,:,:),V_S(:,:,:),VEL_6(:,:,:),VEL_3(:,:,:),VEL_ALL(:,:,:), VEL_temp(:,:), VEL_temp2(:,:), Richardson(:,:,:)
 DOUBLE PRECISION, ALLOCATABLE :: Ri_Dilute(:,:,:), Ri_Dense(:,:,:),char_dense(:), char_dilute(:),VEL_DENSE(:,:), VEL_DILUTE(:,:),ambient_height(:)
 
 
 DOUBLE PRECISION, ALLOCATABLE :: topo2(:),topography(:),EP_G1(:,:),XXX(:,:),YYY(:,:),ZZZ(:,:),RO_G(:,:)
-DOUBLE PRECISION, ALLOCATABLE :: T_G1(:,:), V_G1(:,:),U_G1(:,:),W_G1(:,:),T_S1(:,:),T_S2(:,:),ROP_S1(:,:),ROP_S2(:,:),ROP_S3(:,:)
+DOUBLE PRECISION, ALLOCATABLE :: T_G1(:,:), V_G1(:,:),U_G1(:,:),W_G1(:,:),T_S1(:,:),T_S2(:,:),ROP_S1(:,:),ROP_S2(:,:),ROP_S3(:,:),V_S11(:,:),V_S21(:,:),V_S31(:,:)
 DOUBLE PRECISION, ALLOCATABLE :: RO_C(:,:,:)
 
 INTEGER, ALLOCATABLE::Location_I(:,:)
@@ -52,9 +52,13 @@ OPEN(106,FILE='ROP_S1',form='unformatted')
 OPEN(107,FILE='ROP_S2',form='unformatted')
 OPEN(108,FILE='ROP_S3',form='unformatted')
 
+OPEN(109,FILE='V_S1',form='unformatted')
+OPEN(110,FILE='V_S2',form='unformatted')
+OPEN(111,FILE='V_S3',form='unformatted')
+
 
 !------------OPEN files-----------!
-initial_vel = 152.61
+initial_vel = 98.02
 !-------- Boundaries for Gradient Calculations -----------!
 max_dilute  = 6.5
 min_dilute  = 5.5
@@ -74,10 +78,10 @@ rho_p       = 2500.0 !kg/m**3
 !--------------------------- Constants ------------------------------------------!
 
 !-------- Set Size, Timesteps, and write size ------------!
-timesteps=81  !0
-RMAX=164
-ZMAX=164
-YMAX=204
+timesteps=11  !0
+RMAX=54
+ZMAX=104
+YMAX=54
 
 length1 = RMAX*ZMAX*YMAX
 
@@ -121,6 +125,9 @@ DO t=1,timesteps
   num_open = 1300+t
   OPEN(num_open,FILE='T_G_t'//trim(x1)//'.txt')
 
+  num_open = 1400+t
+  OPEN(num_open,FILE='V_S_t'//trim(x1)//'.txt')
+
   num_open = 1700+t
   OPEN(num_open,FILE='Richardson_t'//trim(x1)//'.txt')
 
@@ -151,6 +158,9 @@ ALLOCATE( RO_G(length1,timesteps))
 ALLOCATE( ROP_S1(length1,timesteps))
 ALLOCATE( ROP_S2(length1,timesteps))
 ALLOCATE( ROP_S3(length1,timesteps))
+ALLOCATE( V_S11(length1,timesteps))
+ALLOCATE( V_S21(length1,timesteps))
+ALLOCATE( V_S31(length1,timesteps))
 
 ALLOCATE( XXX(length1,1))
 ALLOCATE( ZZZ(length1,1))
@@ -173,6 +183,7 @@ ALLOCATE(T_G(length1,4,timesteps))
 ALLOCATE(U_G(length1,6,timesteps))
 ALLOCATE(Richardson(length1,5,timesteps))
 ALLOCATE(RO_C(length1,7,timesteps))
+ALLOCATE(V_S(length1,3,timesteps))
 
 ALLOCATE(Location_I(length1,timesteps))
 
@@ -280,6 +291,21 @@ DO I=1,timesteps
      READ(108) ROP_S3(:,I)
 END DO
 
+REWIND(109)
+DO I=1,timesteps
+     READ(109) V_S11(:,I)
+END DO
+
+REWIND(110)
+DO I=1,timesteps
+     READ(110) V_S21(:,I)
+END DO
+
+REWIND(111)
+DO I=1,timesteps
+     READ(111) V_S31(:,I)
+END DO
+
 !------------------------------ Read and Set to Variable ----------------------------!
 
 
@@ -290,6 +316,7 @@ DO t=1,timesteps
         fid_EP_G_t  = 1100+t
         fid_U_t     = 1200+t
         fid_temp    = 1300+t
+        fid_V_t     = 1400+t
         fid_c       = 1800+t
        DO I=1,RMAX*ZMAX*YMAX
           !------------------ Volume Fraction of Gas or Particles ------------------!
@@ -327,6 +354,11 @@ DO t=1,timesteps
           U_G(I,6,t) = ZZZ(I,1)
           !WRITE(fid_U,300) U_G(I,1:6,t) WRITE LATER DOWN AFTER VELOCITY
           !CORRECTION
+
+          !--------------------Vertical Velocity of Particles-----------------------!
+          V_S(I,1,t) = V_S11(I,t)
+          V_S(I,2,t) = V_S21(I,t)
+          V_S(I,3,t) = V_S31(I,t)
 
        END DO
 !------------------- Write Variable and set to 3D variable for gradient calculation ------------------!
@@ -453,6 +485,7 @@ sum1 = 1
     WRITE(fid_Ri,401) Richardson(I,1:5,t)
     WRITE(fid_U_t,300) U_G(I,1:6,t)
     WRITE(fid_c,407) RO_C(I,1:7,t)
+    WRITE(fid_V_t,901) V_S(I,1:3,t)
   END DO
 
 END DO
@@ -722,6 +755,8 @@ CALL SYSTEM_CLOCK(t2, clock_rate, clock_max )
 806 FORMAT(7F22.5,3i7)
 803 FORMAT(1X(5ES22.5),1X(3F22.12))
 407 FORMAT(7F22.12)
+901 FORMAT(6F22.12)
+
 
 END PROGRAM
 
