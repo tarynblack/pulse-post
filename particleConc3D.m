@@ -1,17 +1,17 @@
-function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
+function [ vidPartConc ] = particleConc3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
     labelz,labelZunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
     particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,FREQ,...
-    time,imtype,plumeedge,D_S1,D_S2,D_S3 )
+    time,imtype,plumeedge,D_S1,D_S2,D_S3,savepath )
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 12 February 2016
+%   Last edit: Taryn Black, 2 March 2016
 
   % Clear directory of appending files from previous processing attempts
-    cd(dir)
+    cd(savepath)
     delete('PartConc_*');
     
     
@@ -21,7 +21,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     varS2 = sprintf('Solid phase 2 (d = %g mm)',D_S2*1E3);
     varS3 = sprintf('Solid phase 3 (d = %g mm)',D_S3*1E3);
     varPC = 'Particle concentration';
-    cd(dir)
+    cd(runpath)
   
   % Ensure that 'no slice' directions are empty and determine figure
   % viewing angle based on slice direction
@@ -92,9 +92,9 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     grid(axS1,'on'); grid(axS2,'on'); grid(axS3,'on');
     axS1.Layer = 'top'; axS2.Layer = 'top'; axS3.Layer = 'top';
     view(axS1,saz,sel);view(axS2,saz,sel);view(axS3,saz,sel);
-    cd(dir)
             
   % Initialize video
+    cd(savepath)
     vidPartConc = VideoWriter(sprintf('vidPartConc_%s.avi',run));
     vidPartConc.Quality = 100;
     vidPartConc.FrameRate = 10;
@@ -117,7 +117,7 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
         t = t+1;
         
       % Queue up current timestep files
-        cd(dir)
+        cd(runpath)
         fclose('all');
         clear fID*;
         fID_EPS1 = fopen(sprintf('EP_t%02d.txt',t));
@@ -196,11 +196,11 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
 
       
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
-        cd(dir)
+        cd(savepath)
         
       % Append current particle concentration frame to vidPartConc
         vidfig = 'PartConcCurrent.jpg';
-        saveas(figPC,vidfig);
+        saveas(figPC,fullfile(savepath,vidfig));
         img = imread(vidfig);
         writeVideo(vidPartConc,img);
           
@@ -208,9 +208,11 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-            imwrite(img,sprintf('PartConc_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(img,fullfile(savepath,sprintf('PartConc_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
         else
-            saveas(figPC,sprintf('PartConc_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figPC,fullfile(savepath,...
+                sprintf('PartConc_%03ds_%s.%s',time(t),run,imtype)));
         end
       % ================================================================= %
           
@@ -219,11 +221,11 @@ function [ vidPartConc ] = particleConc3D( run,dir,vis,IMAX,JMAX,KMAX,...
     
   
   % End video write and finish video files
-    cd(dir)
+    cd(savepath)
     close(vidPartConc);
     
     cd(postpath)    
     disp('Particle concentration processing complete.')
-    fprintf('vidPartConc_%s has been saved to %s.\n',run,dir)
+    fprintf('vidPartConc_%s has been saved to %s.\n',run,savepath)
 
 end

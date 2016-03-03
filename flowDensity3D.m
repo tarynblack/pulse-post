@@ -1,18 +1,18 @@
-function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
+function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     ghostcells,postpath,RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,...
     tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
     labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
     flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
-    timesteps,imtype )
+    timesteps,imtype,savepath )
 %flowDensity3D calculates the net density of the flow from gas and particle
 %densities and volume fractions.
 %   Detailed explanation goes here
 %
 %   Special functions called: varchunk3D, pulsetitle
-%   Last edit: Taryn Black, 22 January 2016
+%   Last edit: Taryn Black, 2 March 2016
 
   % Clear directory of appending files from previous processing attempts
-    cd(dir)
+    cd(savepath)
     delete('flowdensity_*','atmsdensity_*','flowreldens_*',...
         'FlowDens_*','FlowRelD_*');
     
@@ -21,7 +21,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
   % Define variable names for figures
     varD = 'Flow density';
     varB = 'Relative density';
-    cd(dir)
+    cd(runpath)
 
   % Ensure that 'no slice' directions are empty and determine figure
   % viewing angle based on slice direction
@@ -88,6 +88,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
     cbRelD.Label.String = '\bfFlow Density relative to Atmosphere (kg/m^3)';
     
   % Flow density slice: video
+    cd(savepath)
     vidFlowDens = VideoWriter(sprintf('vidFlowDens_%s.avi',run));
     vidFlowDens.Quality = 100;
     vidFlowDens.FrameRate = 10;
@@ -118,7 +119,7 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         t = t+1;
        
       % Queue up current timestep files
-        cd(dir)
+        cd(runpath)
         fclose('all');
         clear fID*;
         fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
@@ -197,15 +198,15 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         avgatmsdens_3D = permute(avgatmsdens_3D,[3 2 1]);
         avgatmsdens_3D_inplume = avgatmsdens_3D.*inplume;
         flowreldens = avgatmsdens_3D_inplume - flowdensity;
-        mindens = min(flowreldens(flowreldens(:)~=0));
-        maxdens = max(flowreldens(flowreldens(:)~=0));
+%         mindens = min(flowreldens(flowreldens(:)~=0));
+%         maxdens = max(flowreldens(flowreldens(:)~=0));
       % ================================================================= %
       
       
       % ----------------- RELATIVE DENSITY SLICE FIGURES ---------------- %
       % Define relative density colormap: red = rise, blue = collapse.
         numcolors = 256;
-        zeropoint = abs(mindens)/(abs(maxdens)+abs(mindens));
+%         zeropoint = abs(mindens)/(abs(maxdens)+abs(mindens));
         cmaplims = [1 0 0;    % red
                     1 1 1;    % white
                     0 0 1];   % blue
@@ -238,37 +239,41 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
         
         
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
-        cd(dir)
+        cd(savepath)
         
       % Append current flow density frame to vidFlowDens
         vidfigD = 'FlowDensity.jpg';
-        saveas(figDens,vidfigD)
+        saveas(figDens,fullfile(savepath,vidfigD))
         imgD = imread(vidfigD);
         writeVideo(vidFlowDens,imgD);
           
       % Append current flow relative density frame to vidFlowRelD
         vidfigRD = 'FlowRelDensity.jpg';
-        saveas(figRelD,vidfigRD)
+        saveas(figRelD,fullfile(savepath,vidfigRD))
         imgRD = imread(vidfigRD);
         writeVideo(vidFlowReld,imgRD);
           
       % Save density and relative density calculations at each timestep
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('flowdensity_t%03d.txt',...
+        dlmwrite(fullfile(savepath,sprintf('flowdensity_t%03d.txt',...
             time(t))),flowdensity,'delimiter','\t','precision','%g');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('atmsdensity_t%03d.txt',...
+        dlmwrite(fullfile(savepath,sprintf('atmsdensity_t%03d.txt',...
             time(t))),atmsdensity,'delimiter','\t','precision','%g');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('flowreldens_t%03d.txt',...
+        dlmwrite(fullfile(savepath,sprintf('flowreldens_t%03d.txt',...
             time(t))),flowreldens,'delimiter','\t','precision','%g');
           
       % If user-specified image filetype is tif, append current timestep
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-            imwrite(imgD,sprintf('FlowDens_tsteps_%s.tif',run),'WriteMode','append')
-            imwrite(imgRD,sprintf('FlowRelD_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(imgD,fullfile(savepath,sprintf('FlowDens_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
+            imwrite(imgRD,fullfile(savepath,sprintf('FlowRelD_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
         else
-            saveas(figDens,sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype));
-            saveas(figRelD,sprintf('FlowRelD_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figDens,fullfile(savepath,...
+                sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype)));
+            saveas(figRelD,fullfile(savepath,...
+                sprintf('FlowRelD_%03ds_%s.%s',time(t),run,imtype)));
         end
       % ================================================================= %
 
@@ -277,13 +282,13 @@ function [ vidFlowDens ] = flowDensity3D( run,dir,vis,IMAX,JMAX,KMAX,...
   
   
   % End video write and finish video files
-    cd(dir)
+    cd(savepath)
     close(vidFlowDens);
     close(vidFlowReld);
     
     cd(postpath)
     disp('Flow density processing complete.')
-    fprintf('vidFlowDens_%s has been saved to %s.\n',run,dir)
-    fprintf('vidFlowRelD_%s has been saved to %s.\n',run,dir)
+    fprintf('vidFlowDens_%s has been saved to %s.\n',run,savepath)
+    fprintf('vidFlowRelD_%s has been saved to %s.\n',run,savepath)
   
 end
