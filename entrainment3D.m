@@ -1,8 +1,8 @@
-function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
+function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
     labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
     vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-    titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R )
+    titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -10,7 +10,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
 %   Last edit: Taryn Black, 22 January 2016
     
   % Clear directory of appending files from previous processing attempts
-    cd(dir)
+    cd(savepath)
     delete('coeff_avg-std*','entr_avg-std*','expn_avg-std*',...
         'plot_time*','ecoeff_all*','plumevolume_*','plumeheight_*',...
         'e_MortonConic_*','Entr_t*','EPG_t*','Quiver_t*');
@@ -22,7 +22,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     varQ1 = 'Plume surface isonormals';
     varQ2 = 'Velocity magnitudes';
     varEn = 'Entrainment';
-    cd(dir)
+    cd(runpath)
   
   % Subtightplot properties    
     gap = [0.01 0.01];
@@ -50,6 +50,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
         'units','normalized','outerposition',[0 0 0.75 1],...
         'PaperPositionMode','auto','color','w');
+    cd(postpath)
     axQN = subtightplot(1,2,1,gap,ht,wd);
         hold on
         axis(axQN,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -73,6 +74,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     set([axQN axQV],'box','on','TickDir','in','FontSize',12)
     grid(axQN,'on'); grid(axQV,'on');
     view(axQN,viewaz,viewel); view(axQV,viewaz,viewel);
+    cd(savepath)
         
   % Entrainment isosurface: figure and axes properties
     figEn = figure('Name','Entrainment','visible',vis,'units',...
@@ -140,7 +142,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         t = t+1;
         
       % Queue up current timestep files
-        cd(dir)
+        cd(runpath)
         fclose('all');
         clear fID*;
         fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
@@ -261,18 +263,18 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         std_expn(t) = std(expn);
         
       % Save all calculated entrainment values at each timestep
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('coeff_avg-std_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('coeff_avg-std_%s.txt',...
             run)),[avg_coeff(t) std_coeff(t)],'-append','delimiter','\t',...
             'precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('entr_avg-std_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('entr_avg-std_%s.txt',...
             run)),[avg_entr(t) std_entr(t)],'-append','delimiter','\t',...
             'precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('expn_avg-std_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('expn_avg-std_%s.txt',...
             run)),[avg_expn(t) std_expn(t)],'-append','delimiter','\t',...
             'precision','%0.6f');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('plot_time_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('plot_time_%s.txt',...
             run)),time(t)','-append','delimiter','\t','precision','%g');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('ecoeff_all_t%03d.txt',...
+        dlmwrite(fullfile(savepath,sprintf('ecoeff_all_t%03d.txt',...
             time(t))),e_coeff,'delimiter','\t','precision','%0.6f');
       % ================================================================= %
       
@@ -328,38 +330,38 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
         plumevolume(t) = numcells*XRES*YRES*ZRES;
         plumeheight(t) = max(plumeZ)*ZRES;
         plumetoprad(t) = sqrt(3*plumevolume(t)/(pi*plumeheight(t)))-VENT_R;
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('plumevolume_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('plumevolume_%s.txt',...
             run)),plumevolume(t),'-append','delimiter','\t','precision','%g');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('plumeheight_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('plumeheight_%s.txt',...
             run)),plumeheight(t),'-append','delimiter','\t','precision','%g');
         
       % Calculate entrainment coefficient using Morton linear assumption
       % and using conic plume simplification
         e_Morton = PUNV_mag./plumeV';
         e_Mconic(t) = (plumetoprad(t) - plumetoprad(t-1))/(DT*vel_char);
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('e_MortonConic_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('e_MortonConic_%s.txt',...
             run)),e_Mconic(t),'-append','delimiter','\t','precision','%g');
       % ================================================================= %
       
       
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
-        cd(dir)
+        cd(savepath)
         
       % Append current gas volume fraction frame to vidEPG
         vidfigEP = 'EPGCurrent.jpg';
-        saveas(figEP,vidfigEP);
+        saveas(figEP,fullfile(savepath,vidfigEP));
         imgEP = imread(vidfigEP);
         writeVideo(vidEPG,imgEP);
 
       % Append current isonormal/velocity quiver frame to vidQ
         vidfigQ = 'QuiverCurrent.jpg';
-        saveas(figQ,vidfigQ);
+        saveas(figQ,fullfile(savepath,vidfigQ));
         imgQ = imread(vidfigQ);
         writeVideo(vidQ,imgQ);
         
       % Append current entrainment frame to vidEntr
         vidfigEn = 'EntrCurrent.jpg';
-        saveas(figEn,vidfigEn);
+        saveas(figEn,fullfile(savepath,vidfigEn));
         imgEn = imread(vidfigEn);
         writeVideo(vidEntr,imgEn);
             
@@ -367,13 +369,19 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-            imwrite(imgEn,sprintf('Entr_tsteps_%s.tif',run),'WriteMode','append')
-            imwrite(imgQ,sprintf('Quiver_tsteps_%s.tif',run),'WriteMode','append')
-            imwrite(imgEP,sprintf('EPG_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(imgEn,fullfile(savepath,sprintf('Entr_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
+            imwrite(imgQ,fullfile(savepath,sprintf('Quiver_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
+            imwrite(imgEP,fullfile(savepath,sprintf('EPG_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
         else
-            saveas(figEn,sprintf('Entr_t%03d_%s.%s',time(t),run,imtype));
-            saveas(figQ,sprintf('Quiver_t%03d_%s.%s',time(t),run,imtype));
-            saveas(figEP,sprintf('EPG_t%03d_%s.%s',time(t),run,imtype));
+            saveas(figEn,fullfile(savepath,sprintf('Entr_t%03d_%s.%s',...
+                time(t),run,imtype)));
+            saveas(figQ,fullfile(savepath,sprintf('Quiver_t%03d_%s.%s',...
+                time(t),run,imtype)));
+            saveas(figEP,fullfile(savepath,sprintf('EPG_t%03d_%s.%s',...
+                time(t),run,imtype)));
         end
       % ================================================================= %
             
@@ -382,7 +390,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     
     
   % End video write and finish video files
-    cd(dir)
+    cd(savepath)
     close(vidEPG);
     close(vidQ);
     close(vidEntr);
@@ -412,7 +420,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
       ylabel(axVol2,{'\DeltaVolume (m^3)'},'FontWeight','bold')
     set([axVol1 axVol2],'box','on','FontSize',12)
     grid(axVol1,'on'); grid(axVol2,'on')
-    saveas(fig_plumevol,sprintf('PlumeVolume_%s.jpg',run));
+    saveas(fig_plumevol,fullfile(savepath,sprintf('PlumeVolume_%s.jpg',run)));
     
   % Plume-averaged entrainment/expansion
     figCoeff = figure('Name','Entrainment Coefficients','visible',vis,...
@@ -449,7 +457,7 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     hl.Box = 'on';
     hl.FontWeight = 'bold';
     hl.FontSize = 10;
-    saveas(figCoeff,sprintf('Coefficients_%s.jpg',run));
+    saveas(figCoeff,fullfile(savepath,sprintf('Coefficients_%s.jpg',run)));
     
   % Comparison conic coefficient
     fig_Morton = figure('Name','Conic entrainment coefficient','units',...
@@ -463,14 +471,14 @@ function [ vidEntr ] = entrainment3D( run,dir,vis,ghostcells,IMAX,JMAX,...
     ylabel(axMor,'\bfCoefficient')
     ylim([0 1])
     grid(axMor,'on');
-    saveas(fig_Morton,sprintf('MortonConic_%s.jpg',run));
+    saveas(fig_Morton,fullfile(savepath,sprintf('MortonConic_%s.jpg',run)));
   % =================================================================== %
   
   
   cd(postpath)
   disp('Entrainment processing complete.')
-  fprintf('vidEPG_%s has been saved to %s.\n',run,dir)
-  fprintf('vidQ_%s has been saved to %s.\n',run,dir)
-  fprintf('vidEntr_%s has been saved to %s.\n',run,dir)
+  fprintf('vidEPG_%s has been saved to %s.\n',run,savepath)
+  fprintf('vidQ_%s has been saved to %s.\n',run,savepath)
+  fprintf('vidEntr_%s has been saved to %s.\n',run,savepath)
 
 end

@@ -1,17 +1,17 @@
- function [ vidVelo ] = velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
+ function [ vidVelo ] = velocity3D( runpath,sdistX,sdistY,sdistZ,vis,run,...
      timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
      velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
      ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,...
-     plumeedge,viewaz,viewel,YGRID,vorticity_cmin,vorticity_cmax,zvort_alts )
+     plumeedge,viewaz,viewel,YGRID,vorticity_cmin,vorticity_cmax,zvort_alts,savepath )
 %velocity3D calculates the magnitude of gas velocity and plots as a slice
 %over time. Also plots vorticity.
 %   Detailed explanation goes here
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 18 February 2016
+%   Last edit: Taryn Black, 2 March 2016
 
   % Clear directory of appending files from previous processing attempts
-    cd(dir)   
+    cd(savepath)   
     delete('FlowSpeed*','Vorticity*')
 
 
@@ -73,6 +73,7 @@
     figVort = figure('Name','Vorticity','units','normalized','visible',...
         vis,'outerposition',[0 0 1 1],'PaperPositionMode','auto',...
         'color','w');
+    cd(postpath)
     axVortX = subtightplot(1,3,1,gap,ht,wd);
         hold on
         axis(axVortX,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
@@ -110,7 +111,9 @@
     view(axVortX,viewaz,viewel); view(axVortY,viewaz,viewel); 
         view(axVortZ,viewaz,viewel)
     
+    
   % Initialize video
+    cd(savepath)
     vidVelo = VideoWriter(sprintf('vidVelo_%s.avi',run));
     vidVelo.Quality = 100;
     vidVelo.FrameRate = 10;
@@ -139,7 +142,7 @@
         t = t+1;
         
       % Queue up current timestep files
-        cd(dir)
+        cd(runpath)
         fclose('all');
         clear fID*;
         fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
@@ -246,16 +249,16 @@
       
       
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
-        cd(dir)
+        cd(savepath)
         
       % Append current flow speed frame to vidVelo, vidvort
         vidfigvelo = 'FlowSpeedCurrent.jpg';
-        saveas(figVelo,vidfigvelo);
+        saveas(figVelo,fullfile(savepath,vidfigvelo));
         imgvelo = imread(vidfigvelo);
         writeVideo(vidVelo,imgvelo);
         
         vidfigvort = 'VorticityCurrent.jpg';
-        saveas(figVort,vidfigvort);
+        saveas(figVort,fullfile(savepath,vidfigvort));
         imgvort = imread(vidfigvort);
         writeVideo(vidVort,imgvort);
         
@@ -263,11 +266,15 @@
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-            imwrite(imgvelo,sprintf('FlowSpeed_tsteps_%s.tif',run),'WriteMode','append')
-            imwrite(imgvort,sprintf('Vorticity_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(imgvelo,fullfile(savepath,sprintf('FlowSpeed_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
+            imwrite(imgvort,fullfile(savepath,sprintf('Vorticity_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
         else
-            saveas(figVelo,sprintf('FlowSpeed_%03ds_%s.%s',time(t),run,imtype));
-            saveas(figVort,sprintf('Vorticity_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figVelo,fullfile(savepath,...
+                sprintf('FlowSpeed_%03ds_%s.%s',time(t),run,imtype)));
+            saveas(figVort,fullfile(savepath,...
+                sprintf('Vorticity_%03ds_%s.%s',time(t),run,imtype)));
         end 
       % ================================================================= %
                     
@@ -276,13 +283,13 @@
     
   
   % End video write and finish video files
-    cd(dir)
+    cd(savepath)
     close(vidVelo)
     close(vidVort)
     
     cd(postpath)
     disp('Flow speed processing complete.')
-    fprintf('vidVelo_%s has been saved to %s.\n',run,dir)
-    fprintf('vidVort_%s has been saved to %s.\n',run,dir)
+    fprintf('vidVelo_%s has been saved to %s.\n',run,savepath)
+    fprintf('vidVort_%s has been saved to %s.\n',run,savepath)
 
 end

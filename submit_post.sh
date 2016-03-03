@@ -1,6 +1,5 @@
 #PBS -N submit_post
 #PBS -l nodes=1:ppn=1
-#PBS -l mem=4gb
 #PBS -l walltime=30:00:00
 #PBS -q atlas-6
 #PBS -k oe

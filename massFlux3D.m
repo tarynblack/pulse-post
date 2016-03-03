@@ -1,16 +1,16 @@
-function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
+function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     IMAX,JMAX,KMAX,tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
     labelXunit,labelYunit,labelZunit,run,timesteps,postpath,massflux_alts,...
     RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,PULSE,FREQ,...
-    time,titlerun,massflux_legend )
+    time,titlerun,massflux_legend,imtype,savepath )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 18 February 2016
+%   Last edit: Taryn Black, 2 March 2016
 
   % Clear directory of appending files from previous processing attempts
-    cd(dir)
+    cd(savepath)
     delete('massflux*','netmassflux*','*MFlux*')
 
 
@@ -38,6 +38,7 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
     cbMFlux.Label.String = '\bfMass Flux (kg/m^2s)';
     
   % Initialize video
+    cd(savepath)
     vidMFlux = VideoWriter(sprintf('vidMFlux_%s.avi',run));
     vidMFlux.Quality = 100;
     vidMFlux.FrameRate = 10;
@@ -50,13 +51,9 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
     EPGimport = '%f%*f%*f%*f%*f%*f%*f';
     ROGimport = '%*f%f%*f%*f%*f%*f%*f';
     VGimport  = '%*f%f%*f%*f%*f%*f';
-%     VS1import = '%f%*f%*f';
-%     VS2import = '%*f%f%*f';
-%     VS3import = '%*f%*f%f';
-    
-    VS1import = '%*f%f%*f%*f%*f%*f%*f';
-    VS2import = '%*f%*f%f%*f%*f%*f%*f';
-    VS3import = '%*f%*f%*f%f%*f%*f%*f';
+    VS1import = '%f%*f%*f';
+    VS2import = '%*f%f%*f';
+    VS3import = '%*f%*f%f';
     
   
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -66,19 +63,16 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
         t = t+1;
         
       % Queue up current timestep files
-        cd(dir)
+        cd(runpath)
         fclose('all');
         clear fID*;
         fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
         fID_ROG = fopen(sprintf('EP_t%02d.txt',t));
         fID_VG  = fopen(sprintf('U_G_t%02d.txt',t));
-%         fID_VS1 = fopen(sprintf('V_S_t%02d.txt',t));
-%         fID_VS2 = fopen(sprintf('V_S_t%02d.txt',t));
-%         fID_VS3 = fopen(sprintf('V_S_t%02d.txt',t));
+        fID_VS1 = fopen(sprintf('V_S_t%02d.txt',t));
+        fID_VS2 = fopen(sprintf('V_S_t%02d.txt',t));
+        fID_VS3 = fopen(sprintf('V_S_t%02d.txt',t));
 
-        fID_VS1 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_VS2 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_VS3 = fopen(sprintf('EP_t%02d.txt',t));
         cd(postpath)
         
       % Prepare velocities for full domain at current timestep
@@ -107,9 +101,9 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
         netMF_alts(:,t) = netmassflux(massflux_alts);
     
       % Save all calculated mass fluxes (incl. net) at each timestep
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('massflux_all_t%03d.txt',...
+        dlmwrite(fullfile(savepath,sprintf('massflux_all_t%03d.txt',...
             time(t))),massflux,'delimiter','\t');
-        dlmwrite(fullfile(sprintf('%s',dir),sprintf('netmassflux_%s.txt',...
+        dlmwrite(fullfile(savepath,sprintf('netmassflux_%s.txt',...
             run)),[time(t) netmassflux'],'-append','delimiter','\t');
         
         
@@ -129,11 +123,11 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
       
       
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
-        cd(dir)
+        cd(savepath)
         
       % Append current mass flux frame to vidMFlux
         vidfigMF = 'MFluxCurrent.jpg';
-        saveas(figMFlux,vidfigMF);
+        saveas(figMFlux,fullfile(savepath,vidfigMF));
         imgMF = imread(vidfigMF);
         writeVideo(vidMFlux,imgMF);
         
@@ -141,9 +135,11 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-            imwrite(imgMF,sprintf('MFlux_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(imgMF,fullfile(savepath,sprintf('MFlux_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
         else
-            saveas(figMF,sprintf('MFlux_t%03d_%s.%s',time(t),run,imtype));
+            saveas(figMF,fullfile(savepath,sprintf('MFlux_t%03d_%s.%s',...
+                time(t),run,imtype)));
         end
       % ================================================================= %
       
@@ -152,7 +148,7 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
   
   
   % End video write and finish video files
-    cd(dir)
+    cd(savepath)
     close(vidMFlux);
     
     
@@ -174,13 +170,13 @@ function [ vidMFlux ] = massFlux3D( dir,vis,viewaz,viewel,ghostcells,...
     title(axNetMF,sprintf('%s: Net mass flux through specified altitudes',str))
     xlabel(axNetMF,'\bfTime (s)')
     ylabel(axNetMF,'\bfNet mass flux (kg/m^2s)')
-    saveas(figNetMF,sprintf('NetMassFlux_tseries_%s.jpg',run))
+    saveas(figNetMF,fullfile(savepath,sprintf('NetMassFlux_tseries_%s.jpg',run)))
   % ===================================================================== %
   
   
   cd(postpath)
   disp('Mass flux processing complete.')
-  fprintf('vidMFlux_%s has been saved to %s.\n',run,dir)
+  fprintf('vidMFlux_%s has been saved to %s.\n',run,savepath)
 
 end
 
