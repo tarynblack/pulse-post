@@ -7,7 +7,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 %   Detailed explanation goes here
 %
 %   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 2 March 2016
+%   Last edit: Taryn Black, 3 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -36,6 +36,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     zlabel(axMFlux,sprintf('\\bfAltitude (%s)',labelYunit))
     cbMFlux = colorbar(axMFlux,'AxisLocation','out','FontSize',12);
     cbMFlux.Label.String = '\bfMass Flux (kg/m^2s)';
+    cbMFlux.Ticks = -log10(abs(massflux_cmin)):log10(massflux_cmax);
+    cbMFlux.TickLabels = cellstr(num2str([-10.^(abs(-log10(abs...
+        (massflux_cmin)):-1)) 0 10.^(1:log10(massflux_cmax))]','%.0e\n'));
     
   % Initialize video
     cd(savepath)
@@ -106,17 +109,22 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         dlmwrite(fullfile(savepath,sprintf('netmassflux_%s.txt',...
             run)),[time(t) netmassflux'],'-append','delimiter','\t');
         
+      % Separate positive and negative mass fluxes for logarithmic plotting
+        logMF = massflux;
+        logMF(logMF>0) = log10(logMF(logMF>0));
+        logMF(logMF<0) = -log10(abs(logMF(logMF<0)));
+        
         
       % --------------------- MASS FLUX SLICE FIGURE -------------------- %
         figure(figMFlux)
         cla(axMFlux);
         hMF = slice(axMFlux,1:IMAX-ghostcells,1:KMAX-ghostcells,...
-            1:JMAX-ghostcells,massflux,[],[],massflux_alts);
+            1:JMAX-ghostcells,logMF,[],[],massflux_alts);
         set(hMF,'FaceColor','interp','EdgeColor','none')
         hEPZ = contourslice(axMFlux,EPG,0,0,massflux_alts,...
             [plumeedge plumeedge]);
         set(hEPZ,'EdgeColor',[1 1 1],'LineWidth',0.5);
-        caxis(axMFlux,[massflux_cmin massflux_cmax]);
+        caxis(axMFlux,[-log10(abs(massflux_cmin)) log10(massflux_cmax)]);
         tMF = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
         title(axMFlux,tMF,'FontWeight','bold');
       % ================================================================= %
