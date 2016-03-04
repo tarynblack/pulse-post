@@ -1,24 +1,24 @@
-function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
+function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
     labelz,labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
-    ATMOS,TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
-    timesteps,imtype,plumeedge )
+    ATMOS,TROPO,YGRID,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
+    timesteps,imtype,plumeedge,savepath )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
 %over time.
 %   Detailed explanation goes here
 %   
 %   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 22 January 2016
+%   Last edit: Taryn Black, 2 March 2016
 
   % Clear directory of appending files from previous processing attempts
-    cd(dir)
+    cd(savepath)
     delete('GasTemp_*');
     
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
     varTG = 'Gas temperature';
-    cd(dir)
+    cd(runpath)
     
   % Ensure that 'no slice' directions are empty and determine figure
   % viewing angle based on slice direction
@@ -68,6 +68,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     colormap(figTemp,'default');
     
   % Initialize video
+    cd(savepath)
     vidGasTemp = VideoWriter(sprintf('vidGasTemp_%s.avi',run));
     vidGasTemp.Quality = 100;
     vidGasTemp.FrameRate = 10;
@@ -79,9 +80,6 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
   % File import specifications: columns to read or skip for each variable
     TGimport = '%f%*f%*f%*f';
     EGimport = '%f%*f%*f%*f%*f%*f%*f';
-    EPS1import = '%*f%f%*f%*f%*f%*f%*f';
-    EPS2import = '%*f%*f%f%*f%*f%*f%*f';
-    EPS3import = '%*f%*f%*f%f%*f%*f%*f';
 
     
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -91,7 +89,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         t = t+1;
         
       % Queue up current timestep files
-        cd(dir)
+        cd(runpath)
         fclose('all');
         clear fID*;
         fID_TG = fopen(sprintf('T_G_t%02d.txt',t));
@@ -117,10 +115,10 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
       % Apply atmospheric correction (equation of state for gas)
         if strcmp(ATMOS,'T') == 1
             for i = 1:(JMAX-ghostcells)
-                if Y(i) <= TROPO
-                    TG(:,:,i) = TG(:,:,i) - 0.0098*Y(i);
-                elseif Y(i) > TROPO
-                    TG(:,:,i) = TG(:,:,i) - 0.0098*TROPO + 0.001*Y(i);
+                if YGRID(i) <= TROPO
+                    TG(:,:,i) = TG(:,:,i) - 0.0098*YGRID(i);
+                elseif YGRID(i) > TROPO
+                    TG(:,:,i) = TG(:,:,i) - 0.0098*TROPO + 0.001*YGRID(i);
                 end
             end
         end
@@ -169,11 +167,11 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
         
       
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
-        cd(dir)
+        cd(savepath)
         
       % Append current gas temperature frame to vidGasTemp
         vidfig = 'GasTempCurrent.jpg';
-        saveas(figTemp,vidfig);
+        saveas(figTemp,fullfile(savepath,vidfig));
         img = imread(vidfig);
         writeVideo(vidGasTemp,img);
             
@@ -181,9 +179,11 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-            imwrite(img,sprintf('GasTemp_tsteps_%s.tif',run),'WriteMode','append')
+            imwrite(img,fullfile(savepath,sprintf('GasTemp_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
         else
-            saveas(figTemp,sprintf('GasTemp_%03ds_%s.%s',time(t),run,imtype));
+            saveas(figTemp,fullfile(savepath,...
+                sprintf('GasTemp_%03ds_%s.%s',time(t),run,imtype)));
         end
       % ================================================================= %
                     
@@ -192,11 +192,11 @@ function [ vidGasTemp ] = gasTemperature3D( run,dir,vis,ghostcells,IMAX,...
     
   
   % End video write and finish video files
-    cd(dir)
+    cd(savepath)
     close(vidGasTemp)
     
     cd(postpath)
     disp('Gas temperature processing complete.')
-    fprintf('vidGasTemp_%s has been saved to %s.\n',run,dir) 
+    fprintf('vidGasTemp_%s has been saved to %s.\n',run,savepath) 
 
 end

@@ -1,7 +1,7 @@
 function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,TROPO,...
-    BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3,D_S1,D_S2,D_S3 ] = 
-    setCnsts3D( run,dir,ghostcells,tstop )
+    BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3,D_S1,D_S2,D_S3 ] = ...
+    setCnsts3D( run,runpath,ghostcells,tstop )
 %setCnsts3D loads the simulation output file mfixconst_<run> containing
 %simulation constants and uses these to define post-processing parameters
 %for that simulation. The contents of mfixconst are specified in
@@ -37,7 +37,7 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
 %
 % Last edit: Taryn Black, 13 February 2016
     
-    cd(dir)
+    cd(runpath)
     
   % Read in second column of mfixconst (containing values) as a cell
   % array of strings

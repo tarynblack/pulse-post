@@ -11,21 +11,23 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 13 February 2016
+% Last edit: Taryn Black, 2 March 2016
 
-clear all
+% clear all
 
 %%% =================================================================== %%%
 %%% ================== U S E R   P A R A M E T E R S ================== %%%
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
-% Names of runs to be processed.
-%   runIDs = {'F_1_998_9999'};
-  runIDs = {'testdata'};
+% Name of run to be processed.
+  run = 'testdata';
   
-% Path for directory containing post-processing data directories (runIDs).
-%   runpath = '~/data2/rundata/';
-  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/';
+% Path for directory containing run data files to be processed.
+%   runpath = '~/data2/rundata/testdata';
+  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
+
+%   savepath = '~/data/ProductionRuns_Storage/testdata';
+  savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
 % Path for location of post-processing scripts.
 %   postpath = '~/data2/pulse-post';
@@ -36,7 +38,7 @@ clear all
 % -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
 % NOTE: must be 'off' when running remotely in -nodisplay mode.
-  vis = 'on';
+  vis = 'off';
 
 % Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;
@@ -91,9 +93,15 @@ clear all
   % Vorticity
     vorticity_cmin = -20;
     vorticity_cmax = 20;
+  % Mass flux [kg/m2.s]
+    massflux_cmin = -1E5;
+    massflux_cmax = 1E8;
     
-% Altitudes at which to display z_vorticity (x-y plane), scaled to HEIGHT=1
-  zvort_alts = [0.05 0.3 0.55 0.8];
+% Altitudes [meters] at which to display z_vorticity (x-y plane)
+  zvort_alts = [250 1500 2750 4000];
+  
+% Altitudes [meters] at which to calculate vertical mass flux
+  massflux_alts = [0 3000 5000];
     
 % Slice distance and direction for 3D-slice figures. sdist* is the fraction
 % along the *axis at which to cut the slice (between 0 and 1).
@@ -111,7 +119,7 @@ clear all
   
 % Number of tick labels to display on axes for each dimension
   Xpoints = 5;      % horizontal axis 1
-  Ypoints = 9;      % vertical axis
+  Ypoints = 11;      % vertical axis
   Zpoints = 5;      % horizontal axis 2
 
 % Scaling factor (meters*_fact) and unit for axes labels
@@ -137,91 +145,102 @@ clear all
   end
   
   
-%%% GENERATE FIGURES AND DO CALCULATIONS FOR EACH RUN
-for i = 1:length(runIDs)
-    
-      run = runIDs{i};
-      disp(sprintf('Now processing run %s',run))
-      dir = sprintf('%s%s',runpath,run);
-      titlerun = strrep(run,'_','\_');
+%%% GENERATE FIGURES AND DO CALCULATIONS FOR RUN    
+  fprintf('Processing run %s.\n',run)
+  titlerun = strrep(run,'_','\_');
         
-    % Define post-processing constants from simulation parameters
-      ghostcells = 4;     % MFiX adds these to each domain dimension
-      [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
-          NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,...
-          TROPO,BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3,D_S1,D_S2,D_S3] ...
-          = setCnsts3D(run,dir,ghostcells,tstop);
-      cd(postpath)
-      timesteps = TSTOP/DT;
-      time = (0:timesteps)*DT;
+% Define post-processing constants from simulation parameters
+  ghostcells = 4;     % MFiX adds these to each domain dimension
+  [IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
+      NFR_S2,NFR_S3,PULSE,FREQ,MING,MAXG,VENT_R,DT,TSTOP,ATMOS,...
+      TROPO,BC_EPG,BC_PG,BC_TG,BC_TS1,BC_TS2,BC_TS3,D_S1,D_S2,D_S3] ...
+      = setCnsts3D(run,runpath,ghostcells,tstop);
+  cd(postpath)
+  timesteps = TSTOP/DT;
+  time = (0:timesteps)*DT;
     
-    % Define domain grid and dimensional spatial resolution [meters/cell]
-      X = LENGTH/(IMAX-ghostcells):LENGTH/(IMAX-ghostcells):LENGTH;
-      Y = HEIGHT/(JMAX-ghostcells):HEIGHT/(JMAX-ghostcells):HEIGHT;
-      Z = WIDTH/(KMAX-ghostcells):WIDTH/(KMAX-ghostcells):WIDTH;
-      XRES = LENGTH/(IMAX - ghostcells);
-      YRES = HEIGHT/(JMAX - ghostcells);
-      ZRES = WIDTH/(KMAX - ghostcells);
-        
-    % Define tick locations and labels
-      tickx = linspace(0,LENGTH,Xpoints);
-      labelx = tickx(2:end)/Xfact;
-      ticky = linspace(0,HEIGHT,Ypoints);
-      labely = ticky(2:end)/Yfact;
-      tickz = linspace(0,WIDTH,Zpoints);
-      labelz = tickz(2:end)/Zfact;
-      
-    % Calculate characteristic inlet velocity
-      [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,...
-          BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
-          BC_TS1,BC_TS2,BC_TS3,VENT_R);
-        
-    % Entrainment and gas volume fraction calculations and figures
-      entrainment3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
-          labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
-          plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
-          entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-          titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R);
-      cd(postpath)
-      
-    % Particle concentration calculations and figures
-      particleConc3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,tickx,labelx,...
-          labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
-          XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
-          particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,...
-          FREQ,time,imtype,plumeedge,D_S1,D_S2,D_S3);
-      cd(postpath)
+% Define dimensional spatial resolution [meters/cell] and domain grid
+  XRES = LENGTH/(IMAX - ghostcells);
+  YRES = HEIGHT/(JMAX - ghostcells);
+  ZRES = WIDTH/(KMAX - ghostcells);
+  XGRID = XRES:XRES:LENGTH;
+  YGRID = YRES:YRES:HEIGHT;
+  ZGRID = ZRES:ZRES:WIDTH;
     
-    % Gas temperature calculations and figures
-      gasTemperature3D(run,dir,vis,ghostcells,IMAX,JMAX,KMAX,tickx,...
-          labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
-          labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
-          TROPO,Y,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
-          timesteps,imtype,plumeedge);
-      cd(postpath)
-     
-    % Density and buoyancy calculations and figures  
-      flowDensity3D(run,dir,vis,IMAX,JMAX,KMAX,ghostcells,postpath,...
-          RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,labelx,...
-          labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
-          XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-          flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
-          timesteps,imtype);
-      cd(postpath)
+% Define tick locations and labels
+  tickx = linspace(0,LENGTH,Xpoints);
+  labelx = tickx(2:end)/Xfact;
+  ticky = linspace(0,HEIGHT,Ypoints);
+  labely = ticky(2:end)/Yfact;
+  tickz = linspace(0,WIDTH,Zpoints);
+  labelz = tickz(2:end)/Zfact;
+  
+% Redefine vorticity and mass flux altitudes as vector indices
+  zvort_alts(zvort_alts==0) = YRES;
+  zvort_alts = zvort_alts./YRES;
+  
+  massflux_alts(massflux_alts==0) = YRES;
+  massflux_legend = strcat(strsplit(num2str(massflux_alts/Yfact)),...
+      {' '},cellstr(labelYunit));
+  massflux_alts = massflux_alts./YRES;
+  
+% Calculate characteristic inlet velocity
+  [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,...
+      BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
+      BC_TS1,BC_TS2,BC_TS3,VENT_R);
+    
+% Entrainment and gas volume fraction calculations and figures
+  entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
+      labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
+      plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
+      entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
+      titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath);
+  cd(postpath)
+  
+% Particle concentration calculations and figures
+  particleConc3D(run,runpath,vis,IMAX,JMAX,KMAX,ghostcells,tickx,labelx,...
+      labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
+      XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
+      particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,...
+      FREQ,time,imtype,plumeedge,D_S1,D_S2,D_S3,savepath);
+  cd(postpath)
 
-    % Velocity magnitude calculations and figures
-      velocity3D( dir,sdistX,sdistY,sdistZ,vis,run,...
-          timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
-          velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
-          ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,...
-          imtype,plumeedge,viewaz,viewel,Y,vorticity_cmin,...
-          vorticity_cmax,zvort_alts);
-      cd(postpath)
-      
-      close all
-%       clearvars -except i allruns
-      disp('* ================================================= *')
-      disp('   P O S T - P R O C E S S I N G   C O M P L E T E')
-      disp('* ================================================= *')
+% Gas temperature calculations and figures
+  gasTemperature3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,...
+      labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
+      labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
+      TROPO,YGRID,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
+      timesteps,imtype,plumeedge,savepath);
+  cd(postpath)
+ 
+% Density and buoyancy calculations and figures  
+  flowDensity3D(run,runpath,vis,IMAX,JMAX,KMAX,ghostcells,postpath,...
+      RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,labelx,...
+      labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
+      XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
+      flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
+      timesteps,imtype,savepath);
+  cd(postpath)
 
-end
+% Velocity magnitude calculations and figures
+  velocity3D( runpath,sdistX,sdistY,sdistZ,vis,run,...
+      timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
+      velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
+      ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,...
+      imtype,plumeedge,viewaz,viewel,YGRID,vorticity_cmin,...
+      vorticity_cmax,zvort_alts,savepath);
+  cd(postpath)
+        
+% Mass flux calculations and figures
+  massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
+      tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
+      labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
+      massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,...
+      PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath);
+  cd(postpath)
+  
+  close all
+
+  disp('* ================================================= *')
+  disp('   P O S T - P R O C E S S I N G   C O M P L E T E')
+  disp('* ================================================= *')
