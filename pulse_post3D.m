@@ -94,8 +94,8 @@
     vorticity_cmin = -20;
     vorticity_cmax = 20;
   % Mass flux [kg/m2.s]
-    massflux_cmin = 0;
-    massflux_cmax = 6;
+    massflux_cmin = -1E5;
+    massflux_cmax = 1E8;
     
 % Altitudes [meters] at which to display z_vorticity (x-y plane)
   zvort_alts = [250 1500 2750 4000];
