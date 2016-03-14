@@ -41,13 +41,13 @@
     
     if isempty(sdistX) && isempty(sdistY)
         saz = 0;
-        sel = 0;
+        sel = 90;
     elseif isempty(sdistY) && isempty(sdistZ)
         saz = 90;
         sel = 0;
     elseif isempty(sdistX) && isempty(sdistZ)
         saz = 0;
-        sel = 90;
+        sel = 0;
     else [saz,sel] = view(3);
     end
     
@@ -170,6 +170,7 @@
         
       % Calculate magnitude of velocity everywhere
         flowspeed = sqrt(U_G.^2 + V_G.^2 + W_G.^2);
+%         flowspeed = W_G;
         
       
       % -------------------- FLOW SPEED SLICE FIGURE -------------------- %
@@ -195,7 +196,7 @@
       
       
       % ----------------- CALCULATE AND PLOT VORTICITY ------------------ %
-        [curlx,curly,curlz] = curl(U_G,V_G,W_G);
+        [curlx,curly,curlz] = curl(U_G,W_G,V_G);
         
         figure(figVort)
         cla(axVortX);cla(axVortY);cla(axVortZ);

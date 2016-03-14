@@ -34,13 +34,13 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
     
     if isempty(sdistX) && isempty(sdistY)
         saz = 0;
-        sel = 0;
+        sel = 90;
     elseif isempty(sdistY) && isempty(sdistZ)
         saz = 90;
         sel = 0;
     elseif isempty(sdistX) && isempty(sdistZ)
         saz = 0;
-        sel = 90;
+        sel = 0;
     else [saz,sel] = view(3);
     end
     
