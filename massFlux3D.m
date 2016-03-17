@@ -2,12 +2,14 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     IMAX,JMAX,KMAX,tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
     labelXunit,labelYunit,labelZunit,run,timesteps,postpath,massflux_alts,...
     RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,PULSE,FREQ,...
-    time,titlerun,massflux_legend,imtype,savepath )
+    time,titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
+    readROG,fnameROG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG,...
+    readVS1,fnameVS1,readVS2,fnameVS2,readVS3,fnameVS3 )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
-%   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 3 March 2016
+%   Functions called: loadTimestep3D; pulsetitle
+%   Last edit: Taryn Black, 17 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -69,28 +71,28 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         cd(runpath)
         fclose('all');
         clear fID*;
-        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
-        fID_ROG = fopen(sprintf('EP_t%02d.txt',t));
-        fID_VG  = fopen(sprintf('U_G_t%02d.txt',t));
-        fID_VS1 = fopen(sprintf('V_S_t%02d.txt',t));
-        fID_VS2 = fopen(sprintf('V_S_t%02d.txt',t));
-        fID_VS3 = fopen(sprintf('V_S_t%02d.txt',t));
 
         cd(postpath)
+        fID_EPG = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
+        fID_ROG = fileReadType(fnameROG,readROG,t,runpath,postpath);
+        fID_VG = fileReadType(fnameVG,readVG,t,runpath,postpath);
+        fID_VS1 = fileReadType(fnameVS1,readVS1,t,runpath,postpath);
+        fID_VS2 = fileReadType(fnameVS2,readVS2,t,runpath,postpath);
+        fID_VS3 = fileReadType(fnameVS3,readVS3,t,runpath,postpath);
         
       % Prepare velocities for full domain at current timestep
         try
-            EPG = varchunk3D(fID_EPG,EPGimport,IMAX,JMAX,KMAX,ghostcells);
+            EPG = loadTimestep3D(fID_EPG,EPGimport,readEPG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',...
+            warning('Error in loadTimestep3D at t=%d s:\n%s\nContinuing to next simulation.',...
                 time(t),ME.identifier)
             break
         end
-        ROG = varchunk3D(fID_ROG,ROGimport,IMAX,JMAX,KMAX,ghostcells);
-        V_G  = varchunk3D(fID_VG,VGimport,IMAX,JMAX,KMAX,ghostcells);
-        V_S1 = varchunk3D(fID_VS1,VS1import,IMAX,JMAX,KMAX,ghostcells);
-        V_S2 = varchunk3D(fID_VS2,VS2import,IMAX,JMAX,KMAX,ghostcells);
-        V_S3 = varchunk3D(fID_VS3,VS3import,IMAX,JMAX,KMAX,ghostcells);
+        ROG = loadTimestep3D(fID_ROG,ROGimport,readROG,IMAX,JMAX,KMAX,ghostcells);
+        V_G  = loadTimestep3D(fID_VG,VGimport,readVG,IMAX,JMAX,KMAX,ghostcells);
+        V_S1 = loadTimestep3D(fID_VS1,VS1import,readVS1,IMAX,JMAX,KMAX,ghostcells);
+        V_S2 = loadTimestep3D(fID_VS2,VS2import,readVS2,IMAX,JMAX,KMAX,ghostcells);
+        V_S3 = loadTimestep3D(fID_VS3,VS3import,readVS3,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume
         if t==1;

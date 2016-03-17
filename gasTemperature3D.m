@@ -2,13 +2,13 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
     JMAX,KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
     labelz,labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,...
     ATMOS,TROPO,YGRID,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
-    timesteps,imtype,plumeedge,savepath )
+    timesteps,imtype,plumeedge,savepath,readTG,fnameTG,readEPG,fnameEPG )
 %gasTemperature3D plots a volume slice of the gas temperature of the plume
 %over time.
 %   Detailed explanation goes here
 %   
-%   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 2 March 2016
+%   Special functions called: loadTimestep3D; pulsetitle
+%   Last edit: Taryn Black, 17 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -92,19 +92,20 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
         cd(runpath)
         fclose('all');
         clear fID*;
-        fID_TG = fopen(sprintf('T_G_t%02d.txt',t));
-        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
+        
         cd(postpath)
+        fID_TG  = fileReadType(fnameTG,readTG,t,runpath,postpath);
+        fID_EPG = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
         
       % Prepare gas temperature for full domain at current timestep
         try
-            TG = varchunk3D(fID_TG,TGimport,IMAX,JMAX,KMAX,ghostcells);
+            TG = loadTimestep3D(fID_TG,TGimport,readTG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',...
+            warning('Error in loadTimestep3D at t=%d s:\n%s\nContinuing to next simulation.',...
                 time(t),ME.identifier)
             break
         end
-        EPG = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
+        EPG = loadTimestep3D(fID_EPG,EGimport,readEPG,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;

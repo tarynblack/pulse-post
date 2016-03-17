@@ -2,13 +2,14 @@ function [ vidPartConc ] = particleConc3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     ghostcells,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,...
     labelz,labelZunit,XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
     particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,FREQ,...
-    time,imtype,plumeedge,D_S1,D_S2,D_S3,savepath )
+    time,imtype,plumeedge,D_S1,D_S2,D_S3,savepath,readEPS1,fnameEPS1,...
+    readEPS2,fnameEPS2,readEPS3,fnameEPS3,readEPG,fnameEPG)
 %particleConc3D plots a volume slice of the concentration of each particle
 %size over time.
 %   Detailed explanation goes here
 %   
-%   Special functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 2 March 2016
+%   Special functions called: loadTimestep3D; pulsetitle
+%   Last edit: Taryn Black, 17 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -120,23 +121,24 @@ function [ vidPartConc ] = particleConc3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         cd(runpath)
         fclose('all');
         clear fID*;
-        fID_EPS1 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_EPS2 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_EPS3 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_EPG  = fopen(sprintf('EP_t%02d.txt',t));
+        
         cd(postpath)
+        fID_EPS1 = fileReadType(fnameEPS1,readEPS1,t,runpath,postpath);
+        fID_EPS2 = fileReadType(fnameEPS2,readEPS2,t,runpath,postpath);
+        fID_EPS3 = fileReadType(fnameEPS3,readEPS3,t,runpath,postpath);
+        fID_EPG  = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
       
       % Prepare particle vol. fractions for full domain at current timestep
         try
-            EPS1 = varchunk3D(fID_EPS1,EPS1import,IMAX,JMAX,KMAX,ghostcells);
+            EPS1 = loadTimestep3D(fID_EPS1,EPS1import,readEPS1,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',...
+            warning('Error in loadTimestep3D at t=%d s:\n%s\nContinuing to next simulation.',...
                 time(t),ME.identifier)
             break
         end
-        EPS2 = varchunk3D(fID_EPS2,EPS2import,IMAX,JMAX,KMAX,ghostcells);
-        EPS3 = varchunk3D(fID_EPS3,EPS3import,IMAX,JMAX,KMAX,ghostcells);
-        EPG  = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
+        EPS2 = loadTimestep3D(fID_EPS2,EPS2import,readEPS2,IMAX,JMAX,KMAX,ghostcells);
+        EPS3 = loadTimestep3D(fID_EPS3,EPS3import,readEPS3,IMAX,JMAX,KMAX,ghostcells);
+        EPG  = loadTimestep3D(fID_EPG,EGimport,readEPG,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;

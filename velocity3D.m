@@ -2,13 +2,15 @@
      timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
      velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
      ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,...
-     plumeedge,viewaz,viewel,YGRID,vorticity_cmin,vorticity_cmax,zvort_alts,savepath )
+     plumeedge,viewaz,viewel,YGRID,vorticity_cmin,vorticity_cmax,...
+     zvort_alts,savepath,readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,...
+     readWG,fnameWG )
 %velocity3D calculates the magnitude of gas velocity and plots as a slice
 %over time. Also plots vorticity.
 %   Detailed explanation goes here
 %
-%   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 2 March 2016
+%   Functions called: loadTimestep3D; pulsetitle
+%   Last edit: Taryn Black, 17 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)   
@@ -145,23 +147,23 @@
         cd(runpath)
         fclose('all');
         clear fID*;
-        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
-        fID_UG = fopen(sprintf('U_G_t%02d.txt',t));
-        fID_VG = fopen(sprintf('U_G_t%02d.txt',t));
-        fID_WG = fopen(sprintf('U_G_t%02d.txt',t));
+        
         cd(postpath)
+        fID_EPG = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
+        fID_UG = fileReadType(fnameUG,readUG,t,runpath,postpath);
+        fID_VG = fileReadType(fnameVG,readVG,t,runpath,postpath);
+        fID_WG = fileReadType(fnameWG,readWG,t,runpath,postpath);
         
       % Prepare velocities for full domain at current timestep
         try
-            EPG = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
+            EPG = loadTimestep3D(fID_EPG,EGimport,readEPG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',...
-                time(t),ME.identifier)
+            warning('Error in loadTimestep3D at t=%d s:\n',time(t),ME.identifier)
             break
         end
-        U_G = varchunk3D(fID_UG,UGimport,IMAX,JMAX,KMAX,ghostcells);
-        V_G = varchunk3D(fID_VG,VGimport,IMAX,JMAX,KMAX,ghostcells);
-        W_G = varchunk3D(fID_WG,WGimport,IMAX,JMAX,KMAX,ghostcells);
+        U_G = loadTimestep3D(fID_UG,UGimport,readUG,IMAX,JMAX,KMAX,ghostcells);
+        V_G = loadTimestep3D(fID_VG,VGimport,readVG,IMAX,JMAX,KMAX,ghostcells);
+        W_G = loadTimestep3D(fID_WG,WGimport,readWG,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume
         if t==1;

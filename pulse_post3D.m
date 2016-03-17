@@ -11,7 +11,7 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 2 March 2016
+% Last edit: Taryn Black, 17 March 2016
 
 % clear all
 
@@ -38,7 +38,7 @@
 % -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
 % NOTE: must be 'off' when running remotely in -nodisplay mode.
-  vis = 'off';
+  vis = 'on';
 
 % Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;
@@ -131,6 +131,45 @@
   labelZunit = 'km';
 % ----------------------------------------------------------------------- %   
 
+
+% ---------------------- FILE READ TYPES AND NAMES ---------------------- %
+% readtype == 1 :  file was originally written in binary, and was converted
+%   to ascii using convert_Pulse.f90. Name prefix is {*}_t%02d.txt
+% readtype == 2 :  file was originally written in ascii and exists as a
+%   single file instead of pre-separated timesteps. Name is {originalname}.
+% fname* format : fname = {'prefix for readtype=1' 'name for readtype=2'}
+  readEPG  = 1;
+  fnameEPG = {'EP' 'EP_Ga'};
+  
+  readEPS1  = 1;
+  fnameEPS1 = {'EP' ''};
+  readEPS2  = 1;
+  fnameEPS2 = {'EP' ''};
+  readEPS3  = 1;
+  fnameEPS3 = {'EP' ''};
+  
+  readTG   = 1;
+  fnameTG  = {'T_G' 'T_Ga'};
+  
+  readROG  = 1;
+  fnameROG = {'Current_Density' 'RO_Ga'};
+  
+  readUG  = 2;
+  fnameUG = {'U_G' 'U_Ga'};
+  readVG  = 1;
+  fnameVG = {'U_G' 'V_Ga'};
+  readWG  = 2;
+  fnameWG = {'U_G' 'W_Ga'};
+  
+  readVS1  = 1;
+  fnameVS1 = {'V_S' 'V_S1a'};
+  readVS2  = 1;
+  fnameVS2 = {'V_S' 'V_S2a'};
+  readVS3  = 1;
+  fnameVS3 = {'V_S' 'V_S3a'};
+% ----------------------------------------------------------------------- %
+
+
 %%% ============== E N D   U S E R   P A R A M E T E R S ============== %%%
 %%% =================================================================== %%%
 
@@ -194,7 +233,8 @@
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
       plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
       entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-      titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath);
+      titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
+      readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG);
   cd(postpath)
   
 % Particle concentration calculations and figures
@@ -202,7 +242,8 @@
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
       XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
       particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,...
-      FREQ,time,imtype,plumeedge,D_S1,D_S2,D_S3,savepath);
+      FREQ,time,imtype,plumeedge,D_S1,D_S2,D_S3,savepath,readEPS1,...
+      fnameEPS1,readEPS2,fnameEPS2,readEPS3,fnameEPS3,readEPG,fnameEPG);
   cd(postpath)
 
 % Gas temperature calculations and figures
@@ -210,7 +251,7 @@
       labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
       labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,postpath,ATMOS,...
       TROPO,YGRID,BC_TG,gasTemperature_cmin,PULSE,FREQ,time,titlerun,...
-      timesteps,imtype,plumeedge,savepath);
+      timesteps,imtype,plumeedge,savepath,readTG,fnameTG,readEPG,fnameEPG);
   cd(postpath)
  
 % Density and buoyancy calculations and figures  
@@ -219,7 +260,8 @@
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
       XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
       flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
-      timesteps,imtype,savepath);
+      timesteps,imtype,savepath,readEPG,fnameEPG,readROG,fnameROG,...
+      readEPS1,fnameEPS1,readEPS2,fnameEPS2,readEPS3,fnameEPS3);
   cd(postpath)
 
 % Velocity magnitude calculations and figures
@@ -228,7 +270,8 @@
       velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
       ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,...
       imtype,plumeedge,viewaz,viewel,YGRID,vorticity_cmin,...
-      vorticity_cmax,zvort_alts,savepath);
+      vorticity_cmax,zvort_alts,savepath,readEPG,fnameEPG,readUG,fnameUG,...
+      readVG,fnameVG,readWG,fnameWG);
   cd(postpath)
         
 % Mass flux calculations and figures
@@ -236,7 +279,9 @@
       tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
       labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
       massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,...
-      PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath);
+      PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
+      fnameEPG,readROG,fnameROG,readUG,fnameUG,readVG,fnameVG,readWG,...
+      fnameWG,readVS1,fnameVS1,readVS2,fnameVS2,readVS3,fnameVS3);
   cd(postpath)
   
   close all
