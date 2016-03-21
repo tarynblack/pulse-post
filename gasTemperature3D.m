@@ -8,7 +8,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 17 March 2016
+%   Last edit: Taryn Black, 21 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -46,7 +46,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
     
   % Figure and axes properties
     figTemp = figure('Name','Gas Temperature','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.45 1],'PaperPositionMode',...
+        'centimeters','outerposition',[20 0 18 22.5],'PaperPositionMode',...
         'auto','color','w');
     axTemp = axes('Parent',figTemp,'box','on','TickDir','in','FontSize',12);
     hold on

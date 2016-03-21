@@ -9,7 +9,7 @@ function [ vidPartConc ] = particleConc3D( run,runpath,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %   
 %   Special functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 17 March 2016
+%   Last edit: Taryn Black, 21 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -54,8 +54,8 @@ function [ vidPartConc ] = particleConc3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     wd = 0.15;
     
   % Figure and axes properties
-    figPC = figure('Name','Particle Concentrations','units','pixels',...
-        'outerposition',[1 44 1110 780],'visible',vis,'color','w',...
+    figPC = figure('Name','Particle Concentrations','units','centimeters',...
+        'outerposition',[0 1 29 21],'visible',vis,'color','w',...
         'PaperPositionMode','auto');
     cd(postpath)
     axS1 = subtightplot(1,3,1,gap,ht,wd);

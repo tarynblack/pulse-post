@@ -10,7 +10,7 @@
 %   Detailed explanation goes here
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 17 March 2016
+%   Last edit: Taryn Black, 21 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)   
@@ -54,8 +54,8 @@
     end
     
   % Figure and axes properties
-    figVelo = figure('Name','Flow speed','units','normalized',...
-        'outerposition',[0 0 0.4 1],'visible',vis,'PaperPositionMode',...
+    figVelo = figure('Name','Flow speed','units','centimeters',...
+        'outerposition',[0 0 16 22.5],'visible',vis,'PaperPositionMode',...
         'auto','color','w');
     axVelo = axes('Parent',figVelo,'box','on','TickDir','in','FontSize',12);
     hold on
@@ -72,8 +72,8 @@
     cbVelo = colorbar(axVelo,'AxisLocation','in','FontSize',12);
     cbVelo.Label.String = '\bfFlow Speed (m/s)';
 
-    figVort = figure('Name','Vorticity','units','normalized','visible',...
-        vis,'outerposition',[0 0 1 1],'PaperPositionMode','auto',...
+    figVort = figure('Name','Vorticity','units','centimeters','visible',...
+        vis,'outerposition',[0 0 40 22.5],'PaperPositionMode','auto',...
         'color','w');
     cd(postpath)
     axVortX = subtightplot(1,3,1,gap,ht,wd);
