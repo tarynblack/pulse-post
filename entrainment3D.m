@@ -2,12 +2,13 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
     labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
     vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-    titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath )
+    titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,readEPG,...
+    fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
-%   Functions called: varchunk3D; pulsetitle
-%   Last edit: Taryn Black, 22 January 2016
+%   Functions called: loadTimestep3D; pulsetitle
+%   Last edit: Taryn Black, 21 March 2016
     
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -31,7 +32,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
 
   % Gas volume fraction isosurface: figure and axes properties    
     figEP = figure('Name','Gas Volume Fraction','visible',vis,'units',...
-        'normalized','outerposition',[0 0 0.37 1],'PaperPositionMode',...
+        'centimeters','outerposition',[0 0 15 22.5],'PaperPositionMode',...
         'auto','color','w');
     axEP = axes('Parent',figEP,'box','on','TickDir','in','FontSize',12);
     hold on
@@ -48,7 +49,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     
   % Isonormal/velocity quivers: figure and axes properties
     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
-        'units','normalized','outerposition',[0 0 0.75 1],...
+        'units','centimeters','outerposition',[0 0 30 22.5],...
         'PaperPositionMode','auto','color','w');
     cd(postpath)
     axQN = subtightplot(1,2,1,gap,ht,wd);
@@ -78,7 +79,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         
   % Entrainment isosurface: figure and axes properties
     figEn = figure('Name','Entrainment','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.45 1],'color','w',...
+        'centimeters','outerposition',[20 0 18 22.5],'color','w',...
         'PaperPositionMode','auto');
     axEn = axes('Parent',figEn,'box','on','TickDir','in','FontSize',12);
     hold on
@@ -145,23 +146,23 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         cd(runpath)
         fclose('all');
         clear fID*;
-        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
-        fID_UG = fopen(sprintf('U_G_t%02d.txt',t));
-        fID_VG = fopen(sprintf('U_G_t%02d.txt',t));
-        fID_WG = fopen(sprintf('U_G_t%02d.txt',t));
-        cd(postpath)
         
+        cd(postpath)
+        fID_EPG = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
+        fID_UG  = fileReadType(fnameUG,readUG,t,runpath,postpath);
+        fID_VG  = fileReadType(fnameVG,readVG,t,runpath,postpath);
+        fID_WG  = fileReadType(fnameWG,readWG,t,runpath,postpath);
+                
       % Prepare EPG and velocities for full domain at current timestep
         try
-            EPG = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
+            EPG = loadTimestep3D(fID_EPG,EGimport,readEPG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',...
-                time(t),ME.identifier)
+            warning('Error in loadTimestep3D at t=%d s:\n',time(t),ME.identifier)
             break
         end
-        U_G = varchunk3D(fID_UG,UGimport,IMAX,JMAX,KMAX,ghostcells);
-        V_G = varchunk3D(fID_VG,VGimport,IMAX,JMAX,KMAX,ghostcells);
-        W_G = varchunk3D(fID_WG,WGimport,IMAX,JMAX,KMAX,ghostcells);
+        U_G = loadTimestep3D(fID_UG,UGimport,readUG,IMAX,JMAX,KMAX,ghostcells);
+        V_G = loadTimestep3D(fID_VG,VGimport,readVG,IMAX,JMAX,KMAX,ghostcells);
+        W_G = loadTimestep3D(fID_WG,WGimport,readWG,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume
         if t==1;
@@ -403,8 +404,9 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     elseif strcmp(PULSE,'F') == 1
       str = sprintf('%s: Steady flow',titlerun);
     end
-    fig_plumevol = figure('Name','Plume Volume','visible',vis,'units',...
-        'normalized','outerposition',[0 0 1 1],'PaperPositionMode',...
+    
+    figPlumeVol = figure('Name','Plume Volume','visible',vis,'units',...
+        'centimeters','outerposition',[0 0 40 22.5],'PaperPositionMode',...
         'auto','color','w');
     axVol1 = subplot(2,1,1);
       plot(time,plumevolume)
@@ -420,11 +422,11 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
       ylabel(axVol2,{'\DeltaVolume (m^3)'},'FontWeight','bold')
     set([axVol1 axVol2],'box','on','FontSize',12)
     grid(axVol1,'on'); grid(axVol2,'on')
-    saveas(fig_plumevol,fullfile(savepath,sprintf('PlumeVolume_%s.jpg',run)));
+    saveas(figPlumeVol,fullfile(savepath,sprintf('PlumeVolume_%s.jpg',run)));
     
   % Plume-averaged entrainment/expansion
     figCoeff = figure('Name','Entrainment Coefficients','visible',vis,...
-        'units','normalized','outerposition',[0 0 1 1],...
+        'units','centimeters','outerposition',[0 0 40 22.5],...
         'PaperPositionMode','auto','color','w');
     axCoeff = axes('Parent',figCoeff,'box','on','FontSize',12);
     grid(axCoeff,'on');
@@ -460,10 +462,10 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     saveas(figCoeff,fullfile(savepath,sprintf('Coefficients_%s.jpg',run)));
     
   % Comparison conic coefficient
-    fig_Morton = figure('Name','Conic entrainment coefficient','units',...
-        'normalized','outerposition',[0 0.3 1 0.5],'visible',vis,...
+    figMorton = figure('Name','Conic entrainment coefficient','units',...
+        'centimeters','outerposition',[0 7 40 13.5],'visible',vis,...
         'PaperPositionMode','auto','color','w');
-    axMor = axes('Parent',fig_Morton,'box','on','FontSize',12); 
+    axMor = axes('Parent',figMorton,'box','on','FontSize',12); 
     plot(axMor,time,e_Mconic)
     title(axMor,sprintf('%s: Morton conic entrainment coefficient',str),...
         'FontWeight','bold')
@@ -471,7 +473,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     ylabel(axMor,'\bfCoefficient')
     ylim([0 1])
     grid(axMor,'on');
-    saveas(fig_Morton,fullfile(savepath,sprintf('MortonConic_%s.jpg',run)));
+    saveas(figMorton,fullfile(savepath,sprintf('MortonConic_%s.jpg',run)));
   % =================================================================== %
   
   

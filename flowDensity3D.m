@@ -3,13 +3,14 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
     labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
     flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
-    timesteps,imtype,savepath )
+    timesteps,imtype,savepath,readEPG,fnameEPG,readROG,fnameROG,...
+    readEPS1,fnameEPS1,readEPS2,fnameEPS2,readEPS3,fnameEPS3 )
 %flowDensity3D calculates the net density of the flow from gas and particle
 %densities and volume fractions.
 %   Detailed explanation goes here
 %
-%   Special functions called: varchunk3D, pulsetitle
-%   Last edit: Taryn Black, 2 March 2016
+%   Special functions called: loadTimestep3D, pulsetitle
+%   Last edit: Taryn Black, 21 March 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -37,19 +38,19 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     
     if isempty(sdistX) && isempty(sdistY)
         saz = 0;
-        sel = 0;
+        sel = 90;
     elseif isempty(sdistY) && isempty(sdistZ)
         saz = 90;
         sel = 0;
     elseif isempty(sdistX) && isempty(sdistZ)
         saz = 0;
-        sel = 90;
+        sel = 0;
     else [saz,sel] = view(3);
     end
     
   % Flow density slice: figure and axes properties     
     figDens = figure('Name','Plume Density','visible',vis,'units',...
-        'normalized','outerposition',[0 0 0.4 1],'PaperPositionMode',...
+        'centimeters','outerposition',[0 0 16 22.5],'PaperPositionMode',...
         'auto','color','w');
     axDens = axes('Parent',figDens,'box','on','TickDir','in','FontSize',12);
     hold on
@@ -70,7 +71,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     
   % Flow relative density slice: figure and axes properties
     figRelD = figure('Name','Relative density','visible',vis,'units',...
-        'normalized','outerposition',[0.5 0 0.4 1],'PaperPositionMode',...
+        'centimeters','outerposition',[20 0 16 22.5],'PaperPositionMode',...
         'auto','color','w');
     axRelD = axes('Parent',figRelD,'box','on','TickDir','in','FontSize',12);
     hold on
@@ -122,25 +123,26 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         cd(runpath)
         fclose('all');
         clear fID*;
-        fID_EPG = fopen(sprintf('EP_t%02d.txt',t));
-        fID_EPS1 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_EPS2 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_EPS3 = fopen(sprintf('EP_t%02d.txt',t));
-        fID_ROG = fopen(sprintf('Current_Density_t%02d.txt',t));
+        
         cd(postpath)
+        fID_EPG = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
+        fID_EPS1 = fileReadType(fnameEPS1,readEPS1,t,runpath,postpath);
+        fID_EPS2 = fileReadType(fnameEPS2,readEPS2,t,runpath,postpath);
+        fID_EPS3 = fileReadType(fnameEPS3,readEPS3,t,runpath,postpath);
+        fID_ROG = fileReadType(fnameROG,readROG,t,runpath,postpath);
         
       % Prepare vol fracs and gas dens for full domain at current timestep
         try
-            EPG = varchunk3D(fID_EPG,EGimport,IMAX,JMAX,KMAX,ghostcells);
+            EPG = loadTimestep3D(fID_EPG,EGimport,readEPG,IMAX,JMAX,KMAX,ghostcells);
         catch ME
-            warning('Error in varchunk3D at t=%d s:\n%s\nContinuing to next simulation.',...
+            warning('Error in loadTimestep3D at t=%d s:\n%s\nContinuing to next simulation.',...
                 time(t),ME.identifier)
             break
         end
-        ROG  = varchunk3D(fID_ROG,ROGimport,IMAX,JMAX,KMAX,ghostcells);
-        EPS1 = varchunk3D(fID_EPS1,EPS1import,IMAX,JMAX,KMAX,ghostcells);
-        EPS2 = varchunk3D(fID_EPS2,EPS2import,IMAX,JMAX,KMAX,ghostcells);
-        EPS3 = varchunk3D(fID_EPS3,EPS3import,IMAX,JMAX,KMAX,ghostcells);
+        ROG  = loadTimestep3D(fID_ROG,ROGimport,readROG,IMAX,JMAX,KMAX,ghostcells);
+        EPS1 = loadTimestep3D(fID_EPS1,EPS1import,readEPS1,IMAX,JMAX,KMAX,ghostcells);
+        EPS2 = loadTimestep3D(fID_EPS2,EPS2import,readEPS2,IMAX,JMAX,KMAX,ghostcells);
+        EPS3 = loadTimestep3D(fID_EPS3,EPS3import,readEPS3,IMAX,JMAX,KMAX,ghostcells);
         
       % Skip processing for first timestep when there is no plume.
         if t==1;
