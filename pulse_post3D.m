@@ -22,14 +22,15 @@
 % Name of run to be processed.
   run = 'testdata';
   
-% Path for directory containing run data files to be processed.
-%   runpath = '~/data2/rundata/testdata';
+% Directory containing run data files to be processed.
+%   runpath = '~/data2/pulse-post/testdata';
   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
 
-%   savepath = '~/data/ProductionRuns_Storage/testdata';
+% Directory where movies, images, and text files will be saved.
+%   savepath = '~/data2/pulse-post/testdatafigs';
   savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
-% Path for location of post-processing scripts.
+% Directory containing the suite of post-processing scripts.
 %   postpath = '~/data2/pulse-post';
   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
