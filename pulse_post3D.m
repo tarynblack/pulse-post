@@ -20,26 +20,26 @@
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Name of run to be processed.
-  run = 'testdata';
+  run = 'F_01_9955_9999';
   
 % Directory containing run data files to be processed.
-%   runpath = '~/data2/pulse-post/testdata';
-  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
+  runpath = '~/data2/F_01_9955_9999';
+%   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
 
 % Directory where movies, images, and text files will be saved.
-%   savepath = '~/data2/pulse-post/testdatafigs';
-  savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
+  savepath = '~/data2/F_01_9955_9999/Figures';
+%   savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
 % Directory containing the suite of post-processing scripts.
-%   postpath = '~/data2/pulse-post';
-  postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
+  postpath = '~/data2/pulse-post';
+%   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
 
 % -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
 % NOTE: must be 'off' when running remotely in -nodisplay mode.
-  vis = 'on';
+  vis = 'off';
 
 % Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;

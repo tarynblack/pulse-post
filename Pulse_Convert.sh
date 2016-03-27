@@ -6,7 +6,7 @@
 #PBS -k oe
 #PBS -m abe
 
-MYDIR=$HOME/data2/testdata
+MYDIR=$HOME/data2/F_01_9955_9999
 
 EXE=$MYDIR/converter.exe 
 PATH="$MYMPI/bin:$PATH"; export PATH

@@ -1,6 +1,6 @@
 #PBS -N submit_post
 #PBS -l nodes=1:ppn=1
-#PBS -l walltime=30:00:00
+#PBS -l walltime=72:00:00
 #PBS -q atlas-6
 #PBS -k oe
 #PBS -m abe
