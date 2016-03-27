@@ -58,7 +58,7 @@ OPEN(111,FILE='V_S3',form='unformatted')
 
 
 !------------OPEN files-----------!
-initial_vel = 98.02
+initial_vel = 103.1873
 !-------- Boundaries for Gradient Calculations -----------!
 max_dilute  = 6.5
 min_dilute  = 5.5
@@ -78,10 +78,10 @@ rho_p       = 2500.0 !kg/m**3
 !--------------------------- Constants ------------------------------------------!
 
 !-------- Set Size, Timesteps, and write size ------------!
-timesteps=11  !0
-RMAX=54
-ZMAX=104
-YMAX=54
+timesteps=61  !0
+RMAX=164
+ZMAX=204
+YMAX=164
 
 length1 = RMAX*ZMAX*YMAX
 

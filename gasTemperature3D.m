@@ -12,7 +12,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
-    delete('GasTemp_*');
+    delete('GasTemp*');
     
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
@@ -46,7 +46,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
     
   % Figure and axes properties
     figTemp = figure('Name','Gas Temperature','visible',vis,'units',...
-        'centimeters','outerposition',[16.66 0 15 18.75],'PaperPositionMode',...
+        'centimeters','outerposition',[16.66 0 21.5 18.75],'PaperPositionMode',...
         'auto','color','w');
     axTemp = axes('Parent',figTemp,'box','on','TickDir','in','FontSize',12);
     hold on

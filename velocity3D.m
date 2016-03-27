@@ -26,8 +26,8 @@
 
   % Subtightplot properties
     gap = [0.03 0.03];
-    ht = 0.15;
-    wd = 0.15;
+    ht = 0.10;
+    wd = 0.10;
     
   % Ensure that 'no slice' directions are empty and determine figure
   % viewing angle based on slice direction
@@ -55,7 +55,7 @@
     
   % Figure and axes properties
     figVelo = figure('Name','Flow speed','units','centimeters',...
-        'outerposition',[0 0 13.33 18.75],'visible',vis,'PaperPositionMode',...
+        'outerposition',[0 0 18 18.75],'visible',vis,'PaperPositionMode',...
         'auto','color','w');
     axVelo = axes('Parent',figVelo,'box','on','TickDir','in','FontSize',12);
     hold on
@@ -73,7 +73,7 @@
     cbVelo.Label.String = '\bfFlow Speed (m/s)';
 
     figVort = figure('Name','Vorticity','units','centimeters','visible',...
-        vis,'outerposition',[0 0 33.33 18.75],'PaperPositionMode','auto',...
+        vis,'outerposition',[0 0 36 18],'PaperPositionMode','auto',...
         'color','w');
     cd(postpath)
     axVortX = subtightplot(1,3,1,gap,ht,wd);
