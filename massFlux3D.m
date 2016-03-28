@@ -60,6 +60,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     VS2import = '%*f%f%*f';
     VS3import = '%*f%*f%f';
     
+  % Initialize vectors
+    netMF_alts = zeros(length(massflux_alts),timesteps);
+    
   
   % =================== B E G I N   T I M E   L O O P =================== %
     t = 0;
@@ -102,7 +105,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
       % Calculate vertical mass flux (space-varied and net) at specified altitudes
         massflux = ROG.*V_G + RO_S1*V_S1 + RO_S2*V_S2 + RO_S3*V_S3;
         netmassflux = squeeze(sum(sum(massflux)));
-        netMF_alts = zeros(length(massflux_alts),timesteps);
         netMF_alts(:,t) = netmassflux(massflux_alts);
     
       % Save all calculated mass fluxes (incl. net) at each timestep
@@ -189,4 +191,3 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   fprintf('vidMFlux_%s has been saved to %s.\n',run,savepath)
 
 end
-
