@@ -92,7 +92,7 @@
   % Vorticity
     vorticity_crange = [-20 20];
   % Mass flux [kg/m2.s]
-    massflux_crange = [-1E8 1E8];
+    massflux_crange = [-1E6 1E6];
     
 % Altitudes [meters] at which to display z_vorticity (x-y plane)
   zvort_alts = [250 1500 2750 4000];

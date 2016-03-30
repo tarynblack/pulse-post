@@ -9,7 +9,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
 %
 %   Functions called: loadTimestep3D; pulsetitle
 %   Last edit: Taryn Black, 21 March 2016
-%%    
+    
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
     delete('coeff_avg-std*','entr_avg-std*','expn_avg-std*',...
