@@ -20,8 +20,8 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
     varEP = 'Gas volume fraction';
-    varQ1 = 'Plume surface isonormals';
-    varQ2 = 'Velocity magnitudes';
+% %     varQ1 = 'Plume surface isonormals';
+% %     varQ2 = 'Velocity magnitudes';
     varEn = 'Entrainment';
     cd(runpath)
   
@@ -47,35 +47,35 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     ylabel(axEP,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axEP,sprintf('\\bf Altitude (%s)',labelYunit))
     
-  % Isonormal/velocity quivers: figure and axes properties
-    figQ = figure('Name','Isonormals and Velocities','visible',vis,...
-        'units','centimeters','outerposition',[0 0 30 18.75],...
-        'PaperPositionMode','auto','color','w');
-    cd(postpath)
-    axQN = subtightplot(1,2,1,gap,ht,wd);
-        hold on
-        axis(axQN,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
-            JMAX-ghostcells]);
-        set(axQN,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
-            'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
-            'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
-%         xlabel(axQN,sprintf('\\bf Distance_x (%s)',labelXunit))
-        ylabel(axQN,sprintf('\\bf Distance_z (%s)',labelZunit))
-        zlabel(axQN,sprintf('\\bf Altitude (%s)',labelYunit))
-    axQV = subtightplot(1,2,2,gap,ht,wd);
-        hold on
-        axis(axQV,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
-            JMAX-ghostcells]);
-        set(axQV,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
-            'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
-            'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-        xlabel(axQV,sprintf('\\bf Distance_x (%s)',labelXunit))
-%         ylabel(axQV,sprintf('\\bf Distance_z (%s)',labelZunit))
-%         zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
-    set([axQN axQV],'box','on','TickDir','in','FontSize',12)
-    grid(axQN,'on'); grid(axQV,'on');
-    view(axQN,viewaz,viewel); view(axQV,viewaz,viewel);
-    cd(savepath)
+% %   % Isonormal/velocity quivers: figure and axes properties
+% %     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
+% %         'units','centimeters','outerposition',[0 0 30 18.75],...
+% %         'PaperPositionMode','auto','color','w');
+% %     cd(postpath)
+% %     axQN = subtightplot(1,2,1,gap,ht,wd);
+% %         hold on
+% %         axis(axQN,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+% %             JMAX-ghostcells]);
+% %         set(axQN,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+% %             'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+% %             'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+% % %         xlabel(axQN,sprintf('\\bf Distance_x (%s)',labelXunit))
+% %         ylabel(axQN,sprintf('\\bf Distance_z (%s)',labelZunit))
+% %         zlabel(axQN,sprintf('\\bf Altitude (%s)',labelYunit))
+% %     axQV = subtightplot(1,2,2,gap,ht,wd);
+% %         hold on
+% %         axis(axQV,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+% %             JMAX-ghostcells]);
+% %         set(axQV,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+% %             'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+% %             'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+% %         xlabel(axQV,sprintf('\\bf Distance_x (%s)',labelXunit))
+% % %         ylabel(axQV,sprintf('\\bf Distance_z (%s)',labelZunit))
+% % %         zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
+% %     set([axQN axQV],'box','on','TickDir','in','FontSize',12)
+% %     grid(axQN,'on'); grid(axQV,'on');
+% %     view(axQN,viewaz,viewel); view(axQV,viewaz,viewel);
+% %     cd(savepath)
         
   % Entrainment isosurface: figure and axes properties
     figEn = figure('Name','Entrainment','visible',vis,'units',...
@@ -101,12 +101,12 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     open(vidEPG);
     set(gcf,'Visible',vis);
     
-  % Isonormals/velocities quiver: video
-    vidQ = VideoWriter(sprintf('vidQuiver_%s.avi',run));
-    vidQ.Quality = 100;
-    vidQ.FrameRate = 10;
-    open(vidQ)
-    set(gcf,'Visible',vis);
+% %   % Isonormals/velocities quiver: video
+% %     vidQ = VideoWriter(sprintf('vidQuiver_%s.avi',run));
+% %     vidQ.Quality = 100;
+% %     vidQ.FrameRate = 10;
+% %     open(vidQ)
+% %     set(gcf,'Visible',vis);
     
   % Entrainment isosurface: video
     vidEntr = VideoWriter(sprintf('vidEntr_%s.avi',run));
@@ -227,31 +227,31 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
       % ================================================================= %
       
       
-      % --------------- ISONORMAL/VELOCITY QUIVER FIGURES --------------- %  
-      % Quiver plot of isonormals and velocities
-        figure(figQ)
-        cla(axQN);cla(axQV);
-        q = 50; % reducement factor for quiver plot
-        quiver3(axQN,plumeX(1:q:length(plumeX))',...
-            plumeY(1:q:length(plumeY))',plumeZ(1:q:length(plumeZ))',...
-            unitnorm(1,1:q:length(unitnorm)),...
-            unitnorm(2,1:q:length(unitnorm)),...
-            unitnorm(3,1:q:length(unitnorm)),...
-            'MaxHeadSize',10,'AutoScaleFactor',1,'LineWidth',0.1);
-        tLQ1 = pulsetitle(varQ1,PULSE,time,t,titlerun,FREQ);
-        title(axQN,tLQ1,'FontWeight','bold')
-        quiver3(axQV,plumeX(1:q:length(plumeX))',...
-            plumeY(1:q:length(plumeY))',plumeZ(1:q:length(plumeZ))',...
-            PUNV_X(1:q:length(PUNV_X)),PUNV_Y(1:q:length(PUNV_Y)),...
-            PUNV_Z(1:q:length(PUNV_Z)),...
-            'MaxHeadSize',20,'AutoScaleFactor',5,'LineWidth',0.1);
-        tLQ2 = pulsetitle(varQ2,PULSE,time,t,titlerun,FREQ);
-        title(axQV,tLQ2,'FontWeight','bold')
-        PosQN = get(axQN,'position');
-        PosQV = get(axQV,'position');
-        PosQV(3:4) = PosQN(3:4);
-        set(axQV,'position',PosQV);
-      % ================================================================= %
+% %       % --------------- ISONORMAL/VELOCITY QUIVER FIGURES --------------- %  
+% %       % Quiver plot of isonormals and velocities
+% %         figure(figQ)
+% %         cla(axQN);cla(axQV);
+% %         q = 50; % reducement factor for quiver plot
+% %         quiver3(axQN,plumeX(1:q:length(plumeX))',...
+% %             plumeY(1:q:length(plumeY))',plumeZ(1:q:length(plumeZ))',...
+% %             unitnorm(1,1:q:length(unitnorm)),...
+% %             unitnorm(2,1:q:length(unitnorm)),...
+% %             unitnorm(3,1:q:length(unitnorm)),...
+% %             'MaxHeadSize',10,'AutoScaleFactor',1,'LineWidth',0.1);
+% %         tLQ1 = pulsetitle(varQ1,PULSE,time,t,titlerun,FREQ);
+% %         title(axQN,tLQ1,'FontWeight','bold')
+% %         quiver3(axQV,plumeX(1:q:length(plumeX))',...
+% %             plumeY(1:q:length(plumeY))',plumeZ(1:q:length(plumeZ))',...
+% %             PUNV_X(1:q:length(PUNV_X)),PUNV_Y(1:q:length(PUNV_Y)),...
+% %             PUNV_Z(1:q:length(PUNV_Z)),...
+% %             'MaxHeadSize',20,'AutoScaleFactor',5,'LineWidth',0.1);
+% %         tLQ2 = pulsetitle(varQ2,PULSE,time,t,titlerun,FREQ);
+% %         title(axQV,tLQ2,'FontWeight','bold')
+% %         PosQN = get(axQN,'position');
+% %         PosQV = get(axQV,'position');
+% %         PosQV(3:4) = PosQN(3:4);
+% %         set(axQV,'position',PosQV);
+% %       % ================================================================= %
       
       
       % ----------- CALCULATE ENTRAINMENT AND SPATIAL AVG/STD ----------- %
@@ -382,11 +382,11 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         imgEP = imread(vidfigEP);
         writeVideo(vidEPG,imgEP);
 
-      % Append current isonormal/velocity quiver frame to vidQ
-        vidfigQ = 'QuiverCurrent.jpg';
-        saveas(figQ,fullfile(savepath,vidfigQ));
-        imgQ = imread(vidfigQ);
-        writeVideo(vidQ,imgQ);
+% %       % Append current isonormal/velocity quiver frame to vidQ
+% %         vidfigQ = 'QuiverCurrent.jpg';
+% %         saveas(figQ,fullfile(savepath,vidfigQ));
+% %         imgQ = imread(vidfigQ);
+% %         writeVideo(vidQ,imgQ);
         
       % Append current entrainment frame to vidEntr
         vidfigEn = 'EntrCurrent.jpg';
@@ -400,15 +400,15 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(imgEn,fullfile(savepath,sprintf('Entr_tsteps_%s.tif',...
                 run)),'tif','WriteMode','append')
-            imwrite(imgQ,fullfile(savepath,sprintf('Quiver_tsteps_%s.tif',...
-                run)),'tif','WriteMode','append')
+% %             imwrite(imgQ,fullfile(savepath,sprintf('Quiver_tsteps_%s.tif',...
+% %                 run)),'tif','WriteMode','append')
             imwrite(imgEP,fullfile(savepath,sprintf('EPG_tsteps_%s.tif',...
                 run)),'tif','WriteMode','append')
         else
             saveas(figEn,fullfile(savepath,sprintf('Entr_t%03d_%s.%s',...
                 time(t),run,imtype)));
-            saveas(figQ,fullfile(savepath,sprintf('Quiver_t%03d_%s.%s',...
-                time(t),run,imtype)));
+% %             saveas(figQ,fullfile(savepath,sprintf('Quiver_t%03d_%s.%s',...
+% %                 time(t),run,imtype)));
             saveas(figEP,fullfile(savepath,sprintf('EPG_t%03d_%s.%s',...
                 time(t),run,imtype)));
         end
@@ -421,7 +421,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
   % End video write and finish video files
     cd(savepath)
     close(vidEPG);
-    close(vidQ);
+% %     close(vidQ);
     close(vidEntr);
       
       
@@ -463,7 +463,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     for t = 2:length(time)
         coeff_all = load(sprintf('ecoeff_all_t%03d.txt',time(t)));
         hs = scatter(time(t)*ones(1,length(coeff_all)),coeff_all,...
-            'MarkerEdgeColor',[0.5 0.5 0.5]);
+            'MarkerEdgeColor',[0.65 0.65 0.65]);
         hold on
     end
     hs.DisplayName = 'Full plume';
@@ -500,7 +500,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     for t = 2:length(time)
         jcoeff_all = load(sprintf('jcoeff_all_t%03d.txt',time(t)));
         hjs = scatter(time(t)*ones(1,length(jcoeff_all)),jcoeff_all,...
-            'MarkerEdgeColor',[0.5 0.5 0.5]);
+            'MarkerEdgeColor',[0.65 0.65 0.65]);
         hold on
     end
     hjs.DisplayName = 'Jet region';
@@ -545,7 +545,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
   cd(postpath)
   disp('Entrainment processing complete.')
   fprintf('vidEPG_%s has been saved to %s.\n',run,savepath)
-  fprintf('vidQ_%s has been saved to %s.\n',run,savepath)
+% %   fprintf('vidQ_%s has been saved to %s.\n',run,savepath)
   fprintf('vidEntr_%s has been saved to %s.\n',run,savepath)
 
 end
