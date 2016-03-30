@@ -93,9 +93,6 @@
     vorticity_crange = [-20 20];
   % Mass flux [kg/m2.s]
     massflux_crange = [-1E6 1E6];
-    
-% Altitudes [meters] at which to display z_vorticity (x-y plane)
-  zvort_alts = [250 1500 2750 4000];
   
 % Altitudes [meters] at which to calculate vertical mass flux
   massflux_alts = [0 3000 5000];
@@ -267,8 +264,8 @@
       PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
       ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,...
       imtype,plumeedge,viewaz,viewel,YGRID,vorticity_crange,...
-      zvort_alts,savepath,readEPG,fnameEPG,readUG,fnameUG,...
-      readVG,fnameVG,readWG,fnameWG);
+      savepath,readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,...
+      readWG,fnameWG);
   cd(postpath)
         
 % Mass flux calculations and figures
@@ -278,7 +275,8 @@
       massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,...
       PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
       fnameEPG,readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,...
-      fnameVS2,readVS3,fnameVS3);
+      fnameVS2,readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
+      readEPS3,fnameEPS3);
   cd(postpath)
   
   close all
