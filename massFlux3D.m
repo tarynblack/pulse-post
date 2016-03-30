@@ -1,10 +1,11 @@
 function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     IMAX,JMAX,KMAX,tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
     labelXunit,labelYunit,labelZunit,run,timesteps,postpath,massflux_alts,...
-    RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,PULSE,FREQ,...
-    time,titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
+    RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,PULSE,FREQ,time,...
+    titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
     readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,fnameVS2,...
-    readVS3,fnameVS3 )
+    readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
+    readEPS3,fnameEPS3 )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -38,9 +39,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     zlabel(axMFlux,sprintf('\\bfAltitude (%s)',labelYunit))
     cbMFlux = colorbar(axMFlux,'AxisLocation','in','FontSize',12);
     cbMFlux.Label.String = '\bfMass Flux (kg/m^2s)';
-    cbMFlux.Ticks = -log10(abs(massflux_cmin)):log10(massflux_cmax);
+    cbMFlux.Ticks = -log10(abs(massflux_crange(1))):log10(massflux_crange(2));
     cbMFlux.TickLabels = cellstr(num2str([-10.^(abs(-log10(abs...
-        (massflux_cmin)):-1)) 0 10.^(1:log10(massflux_cmax))]','%.0e\n'));
+        (massflux_crange(1))):-1)) 0 10.^(1:log10(massflux_crange(2)))]','%.0e\n'));
     
   % Initialize video
     cd(savepath)
@@ -54,13 +55,16 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   
   % File import specifications: columns to read (%) or skip (%*) for each variable
     EPGimport = '%f%*f%*f%*f%*f%*f%*f';
-    ROGimport = '%*f%f%*f%*f%*f%*f%*f';
-    VGimport  = '%*f%f%*f%*f%*f%*f';
+%     ROGimport = '%*f%f%*f%*f%*f%*f%*f';
+%     VGimport  = '%*f%f%*f%*f%*f%*f';
+    EPS1import = '%*f%f%*f%*f%*f%*f%*f';
+    EPS2import = '%*f%*f%f%*f%*f%*f%*f';
+    EPS3import = '%*f%*f%*f%f%*f%*f%*f';
     VS1import = '%f%*f%*f';
     VS2import = '%*f%f%*f';
     VS3import = '%*f%*f%f';
     
-  % Initialize vectors
+  % Preallocate vectors
     netMF_alts = zeros(length(massflux_alts),timesteps);
     
   
@@ -77,8 +81,11 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 
         cd(postpath)
         fID_EPG = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
-        fID_ROG = fileReadType(fnameROG,readROG,t,runpath,postpath);
-        fID_VG = fileReadType(fnameVG,readVG,t,runpath,postpath);
+%         fID_ROG = fileReadType(fnameROG,readROG,t,runpath,postpath);
+%         fID_VG = fileReadType(fnameVG,readVG,t,runpath,postpath);
+        fID_EPS1 = fileReadType(fnameEPS1,readEPS1,t,runpath,postpath);
+        fID_EPS2 = fileReadType(fnameEPS2,readEPS2,t,runpath,postpath);
+        fID_EPS3 = fileReadType(fnameEPS3,readEPS3,t,runpath,postpath);
         fID_VS1 = fileReadType(fnameVS1,readVS1,t,runpath,postpath);
         fID_VS2 = fileReadType(fnameVS2,readVS2,t,runpath,postpath);
         fID_VS3 = fileReadType(fnameVS3,readVS3,t,runpath,postpath);
@@ -91,8 +98,11 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
                 time(t),ME.identifier)
             break
         end
-        ROG = loadTimestep3D(fID_ROG,ROGimport,readROG,IMAX,JMAX,KMAX,ghostcells);
-        V_G  = loadTimestep3D(fID_VG,VGimport,readVG,IMAX,JMAX,KMAX,ghostcells);
+%         ROG = loadTimestep3D(fID_ROG,ROGimport,readROG,IMAX,JMAX,KMAX,ghostcells);
+%         V_G  = loadTimestep3D(fID_VG,VGimport,readVG,IMAX,JMAX,KMAX,ghostcells);
+        EPS1 = loadTimestep3D(fID_EPS1,EPS1import,readEPS1,IMAX,JMAX,KMAX,ghostcells);
+        EPS2 = loadTimestep3D(fID_EPS2,EPS2import,readEPS2,IMAX,JMAX,KMAX,ghostcells);
+        EPS3 = loadTimestep3D(fID_EPS3,EPS3import,readEPS3,IMAX,JMAX,KMAX,ghostcells);
         V_S1 = loadTimestep3D(fID_VS1,VS1import,readVS1,IMAX,JMAX,KMAX,ghostcells);
         V_S2 = loadTimestep3D(fID_VS2,VS2import,readVS2,IMAX,JMAX,KMAX,ghostcells);
         V_S3 = loadTimestep3D(fID_VS3,VS3import,readVS3,IMAX,JMAX,KMAX,ghostcells);
@@ -103,7 +113,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         end
         
       % Calculate vertical mass flux (space-varied and net) at specified altitudes
-        massflux = ROG.*V_G + RO_S1*V_S1 + RO_S2*V_S2 + RO_S3*V_S3;
+%         massflux = ROG.*V_G + RO_S1*V_S1 + RO_S2*V_S2 + RO_S3*V_S3;
+        massflux = RO_S1*EPS1.*V_S1 + RO_S2*EPS2.*V_S2 + RO_S3*EPS3.*V_S3;
         netmassflux = squeeze(sum(sum(massflux)));
         netMF_alts(:,t) = netmassflux(massflux_alts);
     
@@ -128,7 +139,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         hEPZ = contourslice(axMFlux,EPG,0,0,massflux_alts,...
             [plumeedge plumeedge]);
         set(hEPZ,'EdgeColor',[1 1 1],'LineWidth',0.5);
-        caxis(axMFlux,[-log10(abs(massflux_cmin)) log10(massflux_cmax)]);
+        caxis(axMFlux,[-log10(abs(massflux_crange(1))) log10(massflux_crange(2))]);
         tMF = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
         title(axMFlux,tMF,'FontWeight','bold');
       % ================================================================= %

@@ -20,19 +20,19 @@
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Name of run to be processed.
-  run = 'F_01_9955_9999';
+  run = 'testdata';%'F_01_9955_9999';
   
 % Directory containing run data files to be processed.
-  runpath = '~/data2/F_01_9955_9999';
-%   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
+%   runpath = '~/data2/F_01_9955_9999';
+  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
 
 % Directory where movies, images, and text files will be saved.
-  savepath = '~/data2/F_01_9955_9999/Figures';
-%   savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
+%   savepath = '~/data2/F_01_9955_9999/Figures';
+  savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
 % Directory containing the suite of post-processing scripts.
-  postpath = '~/data2/pulse-post';
-%   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
+%   postpath = '~/data2/pulse-post';
+  postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
 
@@ -60,6 +60,9 @@
   
 % Gas constant
   Rgas = 461.5;
+  
+% Gravitational acceleration [m/s2]
+  g = 9.81;
 % ----------------------------------------------------------------------- %
 
 
@@ -75,31 +78,21 @@
   
 % Colorbar limits
   % Entrainment (must be between -1 and 1)
-    entrainment_cmin = -0.5;
-    entrainment_cmax = 0.5;
-  % Particle concentration
-    particleConc_cmin = -5;
-    particleConc_cmax = -3;
+    entrainment_crange = [-0.5 0.5];
+  % Particle concentration (log scale; must be less than 0)
+    particleConc_crange = [-6 -3];
   % Flow density [kg/m3]
-    flowDensity_cmin = 0;
-    flowDensity_cmax = 8;
+    flowDensity_crange = [0 10];
   % Relative density of flow (atmos_density - flow_density)
-    flowBuoyancy_cmin = -3;
-    flowBuoyancy_cmax = 1;
+    flowBuoyancy_crange = [-1 1];
   % Gas temperature [K] (max is defined by vent inlet temperature)
     gasTemperature_cmin = 300; 
   % Velocity magnitude [m/s]
-    velocity_cmin = 0;
-    velocity_cmax = 300;
+    velocity_crange = [0 300];
   % Vorticity
-    vorticity_cmin = -20;
-    vorticity_cmax = 20;
+    vorticity_crange = [-20 20];
   % Mass flux [kg/m2.s]
-    massflux_cmin = -1E5;
-    massflux_cmax = 1E8;
-    
-% Altitudes [meters] at which to display z_vorticity (x-y plane)
-  zvort_alts = [250 1500 2750 4000];
+    massflux_crange = [-1E6 1E6];
   
 % Altitudes [meters] at which to calculate vertical mass flux
   massflux_alts = [0 3000 5000];
@@ -225,16 +218,17 @@
   massflux_alts = massflux_alts./YRES;
   
 % Calculate characteristic inlet velocity
-  [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,...
-      BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
-      BC_TS1,BC_TS2,BC_TS3,VENT_R);
+  [XG,vel_char,MFR,jetheight] = calc_inletFlow(charEPG,MING,MAXG,PULSE,...
+      BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
+      BC_TS1,BC_TS2,BC_TS3,VENT_R,g);
+  jetheight = jetheight/YRES;
     
 % Entrainment and gas volume fraction calculations and figures
   entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
       plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
-      entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-      titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
+      jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
+      timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
       readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG);
   cd(postpath)
   
@@ -242,9 +236,9 @@
   particleConc3D(run,runpath,vis,IMAX,JMAX,KMAX,ghostcells,tickx,labelx,...
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
       XRES,YRES,ZRES,postpath,sdistX,sdistY,sdistZ,...
-      particleConc_cmin,particleConc_cmax,titlerun,timesteps,PULSE,...
-      FREQ,time,imtype,plumeedge,D_S1,D_S2,D_S3,savepath,readEPS1,...
-      fnameEPS1,readEPS2,fnameEPS2,readEPS3,fnameEPS3,readEPG,fnameEPG);
+      particleConc_crange,titlerun,timesteps,PULSE,FREQ,time,imtype,...
+      plumeedge,D_S1,D_S2,D_S3,savepath,readEPS1,fnameEPS1,...
+      readEPS2,fnameEPS2,readEPS3,fnameEPS3,readEPG,fnameEPG);
   cd(postpath)
 
 % Gas temperature calculations and figures
@@ -259,30 +253,30 @@
   flowDensity3D(run,runpath,vis,IMAX,JMAX,KMAX,ghostcells,postpath,...
       RO_S1,RO_S2,RO_S3,plumeedge,PULSE,FREQ,time,tickx,labelx,...
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
-      XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_cmin,...
-      flowDensity_cmax,titlerun,flowBuoyancy_cmin,flowBuoyancy_cmax,...
-      timesteps,imtype,savepath,readEPG,fnameEPG,readROG,fnameROG,...
-      readEPS1,fnameEPS1,readEPS2,fnameEPS2,readEPS3,fnameEPS3);
+      XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_crange,titlerun,...
+      flowBuoyancy_crange,timesteps,imtype,savepath,readEPG,fnameEPG,...
+      readROG,fnameROG,readEPS1,fnameEPS1,readEPS2,fnameEPS2,readEPS3,fnameEPS3);
   cd(postpath)
 
 % Velocity magnitude calculations and figures
   velocity3D( runpath,sdistX,sdistY,sdistZ,vis,run,...
-      timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
-      velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
+      timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_crange,...
+      PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
       ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,...
-      imtype,plumeedge,viewaz,viewel,YGRID,vorticity_cmin,...
-      vorticity_cmax,zvort_alts,savepath,readEPG,fnameEPG,readUG,fnameUG,...
-      readVG,fnameVG,readWG,fnameWG);
+      imtype,plumeedge,viewaz,viewel,YGRID,vorticity_crange,...
+      savepath,readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,...
+      readWG,fnameWG);
   cd(postpath)
         
 % Mass flux calculations and figures
   massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
       tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
       labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
-      massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_cmin,massflux_cmax,...
+      massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,...
       PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
       fnameEPG,readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,...
-      fnameVS2,readVS3,fnameVS3);
+      fnameVS2,readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
+      readEPS3,fnameEPS3);
   cd(postpath)
   
   close all
