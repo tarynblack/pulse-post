@@ -1,6 +1,6 @@
-function [ XG,vel_char,MFR ] = calc_inletFlow( charEPG,MING,MAXG,PULSE,...
-    BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
-    BC_TS1,BC_TS2,BC_TS3,VENT_R )
+function [ XG,vel_char,MFR,jetheight ] = calc_inletFlow( charEPG,MING,...
+    MAXG,PULSE,BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,...
+    NFR_S3,BC_TS1,BC_TS2,BC_TS3,VENT_R,g )
 %calc_inletFlow calculates the gas mass fraction, choked velocity, and mass
 %flow rate at the inlet (volcanic vent) for a simulation.
 %   If flow is steady, the standard calculations of these values apply. 
@@ -40,6 +40,8 @@ function [ XG,vel_char,MFR ] = calc_inletFlow( charEPG,MING,MAXG,PULSE,...
         vel_char = sqrt((Rgas/XG)*(BC_EPG*BC_TG +((1-BC_EPG)*(BC_TS1*NFR_S1+BC_TS2*NFR_S2+BC_TS3*NFR_S3))))*(XG+((1-XG)*BC_PG/(Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3))));
         MFR = pi*(VENT_R^2)*vel_char*((BC_EPG*BC_PG/(Rgas*BC_TG))+(1-BC_EPG)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3));
     end
+    
+    jetheight = (vel_char^2)/(2*g);
 
 end
 

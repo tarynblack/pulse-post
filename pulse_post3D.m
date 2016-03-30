@@ -20,19 +20,19 @@
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Name of run to be processed.
-  run = 'F_01_9955_9999';
+  run = 'testdata';%'F_01_9955_9999';
   
 % Directory containing run data files to be processed.
-  runpath = '~/data2/F_01_9955_9999';
-%   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
+%   runpath = '~/data2/F_01_9955_9999';
+  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
 
 % Directory where movies, images, and text files will be saved.
-  savepath = '~/data2/F_01_9955_9999/Figures';
-%   savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
+%   savepath = '~/data2/F_01_9955_9999/Figures';
+  savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
 % Directory containing the suite of post-processing scripts.
-  postpath = '~/data2/pulse-post';
-%   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
+%   postpath = '~/data2/pulse-post';
+  postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
 
@@ -60,6 +60,9 @@
   
 % Gas constant
   Rgas = 461.5;
+  
+% Gravitational acceleration [m/s2]
+  g = 9.81;
 % ----------------------------------------------------------------------- %
 
 
@@ -225,15 +228,15 @@
   massflux_alts = massflux_alts./YRES;
   
 % Calculate characteristic inlet velocity
-  [XG,vel_char,MFR] = calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,...
-      BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
-      BC_TS1,BC_TS2,BC_TS3,VENT_R);
+  [XG,vel_char,MFR,jetheight] = calc_inletFlow(charEPG,MING,MAXG,PULSE,...
+      BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
+      BC_TS1,BC_TS2,BC_TS3,VENT_R,g);
     
 % Entrainment and gas volume fraction calculations and figures
   entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
       plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
-      entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
+      jetheight,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
       titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
       readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG);
   cd(postpath)

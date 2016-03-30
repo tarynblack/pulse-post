@@ -1,9 +1,9 @@
 function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
     labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-    vel_char,entrainment_cmin,entrainment_cmax,viewaz,viewel,imtype,...
-    titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,readEPG,...
-    fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG )
+    vel_char,jetheight,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
+    imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
+    readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
@@ -130,6 +130,12 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     std_entr  = zeros(1,timesteps);
     avg_expn  = zeros(1,timesteps);
     std_expn  = zeros(1,timesteps);
+    avg_jcoeff = zeros(1,timesteps);
+    std_jcoeff = zeros(1,timesteps);
+    avg_jentr  = zeros(1,timesteps);
+    std_jentr  = zeros(1,timesteps);
+    avg_jexpn  = zeros(1,timesteps);
+    std_jexpn  = zeros(1,timesteps);
     plumevolume = zeros(1,timesteps);
     plumeheight = zeros(1,timesteps);
     plumetoprad = zeros(1,timesteps);
@@ -213,8 +219,8 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         plumevelocity = [plumeU plumeW plumeV]';
         
       % Calculate magnitudes and directional components of plume unit
-      % normal velocities (PUNV)
-        PUNV_mag = dot(plumevelocity,unitnorm); 
+      % normal velocities (PUNV)      
+        PUNV_mag = dot(plumevelocity,unitnorm);
         PUNV_X = PUNV_mag.*unitnorm(1,:);
         PUNV_Y = PUNV_mag.*unitnorm(2,:);
         PUNV_Z = PUNV_mag.*unitnorm(3,:); 
@@ -263,7 +269,18 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         avg_expn(t) = mean(expn);
         std_expn(t) = std(expn);
         
-      % Save all calculated entrainment values at each timestep
+      % Repeat calculations for jet region only
+        jet_coeff = PUNV_mag(:,plumeZ<=jetheight)/vel_char;
+        jet_entr  = jet_coeff(jet_coeff<0);
+        jet_expn  = jet_coeff(jet_coeff>0);
+        avg_jcoeff(t) = mean(jet_coeff);
+        std_jcoeff(t) = std(jet_coeff);
+        avg_jentr(t) = mean(jet_entr);
+        std_jentr(t) = std(jet_entr);
+        avg_jexpn(t) = mean(jet_expn);
+        std_jexpn(t) = std(jet_expn);
+        
+      % Save all calculated full and jet entrainment values at each timestep
         dlmwrite(fullfile(savepath,sprintf('coeff_avg-std_%s.txt',...
             run)),[avg_coeff(t) std_coeff(t)],'-append','delimiter','\t',...
             'precision','%0.6f');
@@ -277,6 +294,17 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
             run)),time(t)','-append','delimiter','\t','precision','%g');
         dlmwrite(fullfile(savepath,sprintf('ecoeff_all_t%03d.txt',...
             time(t))),e_coeff,'delimiter','\t','precision','%0.6f');
+        dlmwrite(fullfile(savepath,sprintf('jcoeff_avg-std_%s.txt',...
+            run)),[avg_jcoeff(t) std_jcoeff(t)],'-append','delimiter','\t',...
+            'precision','%0.6f');
+        dlmwrite(fullfile(savepath,sprintf('jentr_avg-std_%s.txt',...
+            run)),[avg_jentr(t) std_jentr(t)],'-append','delimiter','\t',...
+            'precision','%0.6f');
+        dlmwrite(fullfile(savepath,sprintf('jexpn_avg-std_%s.txt',...
+            run)),[avg_jexpn(t) std_jexpn(t)],'-append','delimiter','\t',...
+            'precision','%0.6f');
+        dlmwrite(fullfile(savepath,sprintf('jcoeff_all_t%03d.txt',...
+            time(t))),jet_coeff,'delimiter','\t','precision','%0.6f');
       % ================================================================= %
       
       
@@ -302,7 +330,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         emap = [emap; 1:nmap];
         for j = 1:length(e_coeff)
             e_color(j,:) = cmap(emap(2,emap(1,:) == e_round(j)),:);
-        end
+        end        
         colormap(figEn,cmap)
 
       % Plot entrainment on plume surface
@@ -460,6 +488,43 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     hl.FontWeight = 'bold';
     hl.FontSize = 10;
     saveas(figCoeff,fullfile(savepath,sprintf('Coefficients_%s.jpg',run)));
+    
+  % Jet region entrainment/expansion
+    figJCoeff = figure('Name','Jet Region Entrainment Coefficients',...
+        'visible',vis,'units','centimeters','outerposition',...
+        [0 0 33.33 18.75],'PaperPositionMode','auto','color','w');
+    axJCoeff = axes('Parent',figJCoeff,'box','on','FontSize',12);
+    grid(axJCoeff,'on');
+    axJCoeff.YMinorGrid = 'on';
+    hold on
+    for t = 2:length(time)
+        jcoeff_all = load(sprintf('jcoeff_all_t%03d.txt',time(t)));
+        hjs = scatter(time(t)*ones(1,length(jcoeff_all)),jcoeff_all,...
+            'MarkerEdgeColor',[0.5 0.5 0.5]);
+        hold on
+    end
+    hjs.DisplayName = 'Full plume';
+    hje1 = errorbar(time(2:end),avg_jentr(2:end),std_jentr(2:end),'c',...
+        'LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,...
+        'DisplayName','Entrainment');
+    hje2 = errorbar(time(2:end),avg_jexpn(2:end),std_jexpn(2:end),'r',...
+        'LineWidth',6,'LineStyle','none','Marker','+','MarkerSize',10,...
+        'DisplayName','Expansion');
+    hje3 = errorbar(time(2:end),avg_jcoeff(2:end),std_jcoeff(2:end),'k',...
+        'LineWidth',3,'Marker','+','MarkerSize',10,...
+        'DisplayName','Total Coefficient');
+    title(axJCoeff,sprintf('%s: Jet region coefficients',str),...
+        'FontWeight','bold')
+    xlabel(axJCoeff,'\bfTime (s)')
+    ylabel(axJCoeff,'\bfEntrainment/Expansion Coefficient')
+    xlim(axJCoeff,[0 time(end)+DT])
+    ylim(axJCoeff,[-1 1])
+    line(xlim,[0 0],'color',[0.1 0.1 0.1],'LineWidth',0.5);
+    hjl = legend([hjs hje1 hje2 hje3],'Location','EastOutside');
+    hjl.Box = 'on';
+    hjl.FontWeight = 'bold';
+    hjl.FontSize = 10;
+    saveas(figJCoeff,fullfile(savepath,sprintf('JetCoefficients_%s.jpg',run)));
     
   % Comparison conic coefficient
     figMorton = figure('Name','Conic entrainment coefficient','units',...
