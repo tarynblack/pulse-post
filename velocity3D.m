@@ -1,10 +1,9 @@
  function [ vidVelo ] = velocity3D( runpath,sdistX,sdistY,sdistZ,vis,run,...
-     timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_cmin,...
-     velocity_cmax,PULSE,time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,...
-     ticky,YRES,labely,labelYunit,tickz,ZRES,labelz,labelZunit,imtype,...
-     plumeedge,viewaz,viewel,YGRID,vorticity_cmin,vorticity_cmax,...
-     zvort_alts,savepath,readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,...
-     readWG,fnameWG )
+     timesteps,postpath,IMAX,JMAX,KMAX,ghostcells,velocity_crange,PULSE,...
+     time,titlerun,FREQ,tickx,XRES,labelx,labelXunit,ticky,YRES,labely,...
+     labelYunit,tickz,ZRES,labelz,labelZunit,imtype,plumeedge,viewaz,...
+     viewel,YGRID,vorticity_crange,zvort_alts,savepath,readEPG,fnameEPG,...
+     readUG,fnameUG,readVG,fnameVG,readWG,fnameWG )
 %velocity3D calculates the magnitude of gas velocity and plots as a slice
 %over time. Also plots vorticity.
 %   Detailed explanation goes here
@@ -184,7 +183,7 @@
             sdistZ*(JMAX-ghostcells));
         hFS.FaceColor = 'interp';
         hFS.EdgeColor = 'none';
-        caxis(axVelo,[velocity_cmin velocity_cmax]);
+        caxis(axVelo,velocity_crange);
         tFS = pulsetitle(varU,PULSE,time,t,titlerun,FREQ);
         title(tFS,'FontSize',12,'FontWeight','bold');
       % ================================================================= %
@@ -213,7 +212,7 @@
         hVXv = plot3(axVortX,0.5*(IMAX-ghostcells)*ones(1,length(YGRID)),...
             0.5*(KMAX-ghostcells)*ones(1,length(YGRID)),...
             0.5:(JMAX-ghostcells-0.5),'k');
-        caxis(axVortX,[vorticity_cmin vorticity_cmax]);
+        caxis(axVortX,vorticity_crange);
         tVX = pulsetitle(varVX,PULSE,time,t,titlerun,FREQ);
         title(axVortX,tVX,'FontSize',12,'FontWeight','bold');
           
@@ -227,7 +226,7 @@
         hVYv = plot3(axVortY,0.5*(IMAX-ghostcells)*ones(1,length(YGRID)),...
             0.5*(KMAX-ghostcells)*ones(1,length(YGRID)),...
             0.5:(JMAX-ghostcells-0.5),'k');
-        caxis(axVortY,[vorticity_cmin vorticity_cmax]);
+        caxis(axVortY,vorticity_crange);
         tVY = pulsetitle(varVY,PULSE,time,t,titlerun,FREQ);
         title(axVortY,tVY,'FontWeight','bold');
         
@@ -237,7 +236,7 @@
         hEPZ = contourslice(axVortZ,EPG,0,0,zvort_alts,...
             [plumeedge plumeedge]);
         set(hEPZ,'EdgeColor',[1 1 1],'LineWidth',0.5); 
-        caxis(axVortZ,[vorticity_cmin vorticity_cmax]);
+        caxis(axVortZ,vorticity_crange);
         tVZ = pulsetitle(varVZ,PULSE,time,t,titlerun,FREQ);
         title(axVortZ,tVZ,'FontWeight','bold');
         

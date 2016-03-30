@@ -1,15 +1,15 @@
 function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
     labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-    vel_char,jetheight,entrainment_cmin,entrainment_cmax,viewaz,viewel,...
-    imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
+    vel_char,jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
+    timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
     readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Functions called: loadTimestep3D; pulsetitle
 %   Last edit: Taryn Black, 21 March 2016
-    
+%%    
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
     delete('coeff_avg-std*','entr_avg-std*','expn_avg-std*',...
@@ -25,27 +25,27 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     varEn = 'Entrainment';
     cd(runpath)
   
-  % Subtightplot properties    
-    gap = [0.01 0.01];
-    ht = 0.1;
-    wd = 0.1;
+% %   % Subtightplot properties    
+% %     gap = [0.01 0.01];
+% %     ht = 0.1;
+% %     wd = 0.1;
 
   % Gas volume fraction isosurface: figure and axes properties    
     figEP = figure('Name','Gas Volume Fraction','visible',vis,'units',...
         'centimeters','outerposition',[0 0 12.5 18.75],'PaperPositionMode',...
         'auto','color','w');
     axEP = axes('Parent',figEP,'box','on','TickDir','in','FontSize',12);
-    hold on
-    grid(axEP,'on')
-    view(axEP,viewaz,viewel)
+    hold on;
+    grid(axEP,'on');
+    view(axEP,viewaz,viewel);
     axis(axEP,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
         JMAX-ghostcells]);
     set(axEP,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
         'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
-        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-    xlabel(axEP,sprintf('\\bf Distance_x (%s)',labelXunit))
-    ylabel(axEP,sprintf('\\bf Distance_z (%s)',labelZunit))
-    zlabel(axEP,sprintf('\\bf Altitude (%s)',labelYunit))
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+    xlabel(axEP,sprintf('\\bf Distance_x (%s)',labelXunit));
+    ylabel(axEP,sprintf('\\bf Distance_z (%s)',labelZunit));
+    zlabel(axEP,sprintf('\\bf Altitude (%s)',labelYunit));
     
 % %   % Isonormal/velocity quivers: figure and axes properties
 % %     figQ = figure('Name','Isonormals and Velocities','visible',vis,...
@@ -82,16 +82,16 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'centimeters','outerposition',[16 0 20 18.75],'color','w',...
         'PaperPositionMode','auto');
     axEn = axes('Parent',figEn,'box','on','TickDir','in','FontSize',12);
-    hold on
+    hold on;
     grid(axEn,'on');
-    view(axEn,viewaz,viewel)
+    view(axEn,viewaz,viewel);
     axis(axEn,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,JMAX-ghostcells]);
     set(axEn,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
         'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
-        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-    xlabel(axEn,sprintf('\\bf Distance_x (%s)',labelXunit))
-    ylabel(axEn,sprintf('\\bf Distance_z (%s)',labelZunit))
-    zlabel(axEn,sprintf('\\bf Altitude (%s)',labelYunit))
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+    xlabel(axEn,sprintf('\\bf Distance_x (%s)',labelXunit));
+    ylabel(axEn,sprintf('\\bf Distance_z (%s)',labelZunit));
+    zlabel(axEn,sprintf('\\bf Altitude (%s)',labelYunit));
     cbEn = colorbar(axEn,'AxisLocation','out','FontSize',12);
     
   % Gas volume fraction isosurface: video
@@ -178,7 +178,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         
       % ------------ GAS VOLUME FRACTION ISOSURFACES FIGURES ------------ %
       % Find all specified isosurfaces and plot
-        figure(figEP)
+        figure(figEP);
         cla(axEP);
         for j = 1:length(isoEPG)
             surf(j) = patch(isosurface(EPG,isoEPG(j)));
@@ -186,9 +186,9 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
                 'FaceAlpha',trnEPG(j));
             hold on
         end
-        camlight('right')
-        camlight('left')
-        lighting gouraud
+        camlight('right');
+        camlight('left');
+        lighting gouraud;
         tLEP = pulsetitle(varEP,PULSE,time,t,titlerun,FREQ);
         title(tLEP,'FontWeight','bold');
       % ================================================================= %
@@ -311,19 +311,19 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
       % ---------------- ENTRAINMENT ISOSURFACE FIGURES ----------------- %
       % Define concatenated colormap of entrainment so cmaps meet at e=0
         nmap = 256;
-        colormap([winter(round(nmap*-entrainment_cmin/...
-            (entrainment_cmax-entrainment_cmin)));...
-            flipud(autumn(nmap-round(nmap*-entrainment_cmin/...
-            (entrainment_cmax-entrainment_cmin))))]);
-        caxis([entrainment_cmin entrainment_cmax])
+        colormap([winter(round(nmap*-entrainment_crange(1)/...
+            (diff(entrainment_crange))));...
+            flipud(autumn(nmap-round(nmap*-entrainment_crange(1)/...
+            (diff(entrainment_crange)))))]);
+        caxis(entrainment_crange);
         cmap = colormap;
-        emap = linspace(entrainment_cmin,entrainment_cmax,nmap);
+        emap = linspace(entrainment_crange(1),entrainment_crange(2),nmap);
         e_color = zeros(length(e_coeff),3);   
         for k = 1:length(e_coeff)
-            if e_coeff(k) > entrainment_cmax
-                e_coeff(k) = entrainment_cmax;
-            elseif e_coeff(k) < entrainment_cmin
-                e_coeff(k) = entrainment_cmin;
+            if e_coeff(k) > entrainment_crange(2)
+                e_coeff(k) = entrainment_crange(2);
+            elseif e_coeff(k) < entrainment_crange(1)
+                e_coeff(k) = entrainment_crange(1);
             end
         end
         e_round = interp1(emap,emap,e_coeff,'nearest');
@@ -331,15 +331,15 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         for j = 1:length(e_coeff)
             e_color(j,:) = cmap(emap(2,emap(1,:) == e_round(j)),:);
         end        
-        colormap(figEn,cmap)
+        colormap(figEn,cmap);
 
       % Plot entrainment on plume surface
-        figure(figEn)
+        figure(figEn);
         cla(axEn);
         patch('Vertices',[plumeX plumeY plumeZ],'Faces',1:length(plumeX),...
             'FaceVertexCData',e_color,'FaceColor','none','EdgeColor',...
-            'none','Marker','o','MarkerFaceColor','flat')
-        caxis(axEn,[entrainment_cmin entrainment_cmax])
+            'none','Marker','o','MarkerFaceColor','flat');
+        caxis(axEn,entrainment_crange);
         text(1.17,0.3,'\bfEntrainment','Units','normalized',...
             'HorizontalAlignment','right','rotation',90,'FontSize',12);
         text(1.17,0.7,'\bfExpansion','Units','normalized',...
@@ -347,9 +347,9 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         tLEn = pulsetitle(varEn,PULSE,time,t,titlerun,FREQ);
         tlEn2 = sprintf('Characteristic velocity: %g m/s',vel_char);
         title([tLEn;tlEn2],'FontWeight','bold');
-        camlight('right')
-        camlight('left')
-        lighting gouraud
+        camlight('right');
+        camlight('left');
+        lighting gouraud;
       % ================================================================= %
       
       
@@ -399,11 +399,11 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(imgEn,fullfile(savepath,sprintf('Entr_tsteps_%s.tif',...
-                run)),'tif','WriteMode','append')
+                run)),'tif','WriteMode','append');
 % %             imwrite(imgQ,fullfile(savepath,sprintf('Quiver_tsteps_%s.tif',...
 % %                 run)),'tif','WriteMode','append')
             imwrite(imgEP,fullfile(savepath,sprintf('EPG_tsteps_%s.tif',...
-                run)),'tif','WriteMode','append')
+                run)),'tif','WriteMode','append');
         else
             saveas(figEn,fullfile(savepath,sprintf('Entr_t%03d_%s.%s',...
                 time(t),run,imtype)));
