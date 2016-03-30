@@ -20,19 +20,19 @@
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Name of run to be processed.
-  run = 'testdata';%'F_01_9955_9999';
+  run = 'testdata';
   
 % Directory containing run data files to be processed.
-%   runpath = '~/data2/F_01_9955_9999';
-  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
+  runpath = sprintf('~/data2/%s',run);
+%   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
 
 % Directory where movies, images, and text files will be saved.
-%   savepath = '~/data2/F_01_9955_9999/Figures';
-  savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
+  savepath = sprintf('~/data2/%s/Figures',run);
+%   savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
 % Directory containing the suite of post-processing scripts.
-%   postpath = '~/data2/pulse-post';
-  postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
+  postpath = '~/data2/pulse-post';
+%   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
 
@@ -208,10 +208,7 @@
   tickz = linspace(0,WIDTH,Zpoints);
   labelz = tickz(2:end)/Zfact;
   
-% Redefine vorticity and mass flux altitudes as vector indices
-  zvort_alts(zvort_alts==0) = YRES;
-  zvort_alts = zvort_alts./YRES;
-  
+% Redefine mass flux altitudes as vector indices
   massflux_alts(massflux_alts==0) = YRES;
   massflux_legend = strcat(strsplit(num2str(massflux_alts/Yfact)),...
       {' '},cellstr(labelYunit));
