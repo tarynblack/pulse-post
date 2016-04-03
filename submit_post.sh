@@ -6,7 +6,7 @@
 #PBS -k oe
 #PBS -m abe
 
-MYDIR=$HOME/data2/pulse-post
+MYDIR=$HOME/data/pulse-post
 
 EXE=$MYDIR/run_post.sh
 PATH="$MYMPI/bin:$PATH"; export PATH

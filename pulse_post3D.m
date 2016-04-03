@@ -20,18 +20,18 @@
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Name of run to be processed.
-  run = 'testdata';
+%   run = 'testdata';
   
 % Directory containing run data files to be processed.
-  runpath = sprintf('~/data2/%s',run);
+  runpath = sprintf('~/scratch/%s',run);
 %   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
 
 % Directory where movies, images, and text files will be saved.
-  savepath = sprintf('~/data2/%s/Figures',run);
+  savepath = sprintf('~/data/ProductionRuns_Storage/%s/Figures',run);
 %   savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
 % Directory containing the suite of post-processing scripts.
-  postpath = '~/data2/pulse-post';
+  postpath = '~/data/pulse-post';
 %   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
@@ -82,7 +82,7 @@
   % Particle concentration (log scale; must be less than 0)
     particleConc_crange = [-6 -3];
   % Flow density [kg/m3]
-    flowDensity_crange = [0 10];
+    flowDensity_crange = [0 4];
   % Relative density of flow (atmos_density - flow_density)
     flowBuoyancy_crange = [-1 1];
   % Gas temperature [K] (max is defined by vent inlet temperature)
@@ -95,7 +95,7 @@
     massflux_crange = [-1E6 1E6];
   
 % Altitudes [meters] at which to calculate vertical mass flux
-  massflux_alts = [0 3000 5000];
+  massflux_alts = [0 4000 8000];
     
 % Slice distance and direction for 3D-slice figures. sdist* is the fraction
 % along the *axis at which to cut the slice (between 0 and 1).
@@ -220,14 +220,14 @@
       BC_TS1,BC_TS2,BC_TS3,VENT_R,g);
   jetheight = jetheight/YRES;
     
-% Entrainment and gas volume fraction calculations and figures
-  entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
-      labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
-      plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
-      jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
-      timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
-      readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG);
-  cd(postpath)
+%% Entrainment and gas volume fraction calculations and figures
+%  entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
+%      labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
+%      plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
+%      jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
+%      timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
+%      readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG);
+%  cd(postpath)
   
 % Particle concentration calculations and figures
   particleConc3D(run,runpath,vis,IMAX,JMAX,KMAX,ghostcells,tickx,labelx,...
@@ -265,16 +265,16 @@
       readWG,fnameWG);
   cd(postpath)
         
-% Mass flux calculations and figures
-  massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
-      tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
-      labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
-      massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,...
-      PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
-      fnameEPG,readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,...
-      fnameVS2,readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-      readEPS3,fnameEPS3);
-  cd(postpath)
+%% Mass flux calculations and figures
+%  massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
+%      tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
+%      labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
+%      massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,...
+%      PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
+%      fnameEPG,readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,...
+%      fnameVS2,readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
+%      readEPS3,fnameEPS3);
+%  cd(postpath)
   
   close all
 
