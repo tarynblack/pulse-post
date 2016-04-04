@@ -61,6 +61,9 @@
 % Gas constant
   Rgas = 461.5;
   
+% Gas viscosity [Pa.s]
+  MU_G0 = 1E-5;
+  
 % Gravitational acceleration [m/s2]
   g = 9.81;
 % ----------------------------------------------------------------------- %
@@ -214,6 +217,12 @@
       BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
       BC_TS1,BC_TS2,BC_TS3,VENT_R,g);
   jetheight = jetheight/YRES;
+  
+% Calculate particle Stokes numbers
+  [Stokes_S1,Stokes_S2,Stokes_S3] = calcStokes(RO_S1,RO_S2,RO_S3,D_S1,...
+      D_S2,D_S3,vel_char,MU_G0,VENT_R,PULSE,FREQ);
+  dlmwrite(fullfile(savepath,'particleStokes.txt'),[Stokes_S1 Stokes_S2 ...
+      Stokes_S3],'delimiter','\t');
   
 % Redefine mass flux altitudes as vector indices
   massflux_alts(massflux_alts==0) = YRES;
