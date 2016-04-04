@@ -20,26 +20,26 @@
 
 % ------------------- DEFINE SIMULATION IDS AND PATHS ------------------- %
 % Name of run to be processed.
-%   run = 'testdata';
+  run = 'testdata';
   
 % Directory containing run data files to be processed.
-  runpath = sprintf('~/scratch/%s',run);
-%   runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
+%   runpath = sprintf('~/scratch/%s',run);
+  runpath = 'C:/Users/taryn/Documents/GitHub/pulse-post/testdata';
 
 % Directory where movies, images, and text files will be saved.
-  savepath = sprintf('~/data/ProductionRuns_Storage/%s/Figures',run);
-%   savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
+%   savepath = sprintf('~/data/ProductionRuns_Storage/%s/Figures',run);
+  savepath = 'C:/Users/taryn/OneDrive/Documents/testdata_figs';
   
 % Directory containing the suite of post-processing scripts.
-  postpath = '~/data/pulse-post';
-%   postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
+%   postpath = '~/data/pulse-post';
+  postpath = 'C:/Users/taryn/Documents/GitHub/pulse-post';
 % ----------------------------------------------------------------------- %
 
 
 % -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
 % NOTE: must be 'off' when running remotely in -nodisplay mode.
-  vis = 'off';
+  vis = 'on';
 
 % Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;
@@ -95,7 +95,8 @@
     massflux_crange = [-1E6 1E6];
   
 % Altitudes [meters] at which to calculate vertical mass flux
-  massflux_alts = [0 4000 8000];
+% To include script-calculated jet height, include one NaN in vector
+  massflux_alts = [0 2000 4000 NaN];
     
 % Slice distance and direction for 3D-slice figures. sdist* is the fraction
 % along the *axis at which to cut the slice (between 0 and 1).
@@ -208,26 +209,28 @@
   tickz = linspace(0,WIDTH,Zpoints);
   labelz = tickz(2:end)/Zfact;
   
-% Redefine mass flux altitudes as vector indices
-  massflux_alts(massflux_alts==0) = YRES;
-  massflux_legend = strcat(strsplit(num2str(massflux_alts/Yfact)),...
-      {' '},cellstr(labelYunit));
-  massflux_alts = massflux_alts./YRES;
-  
 % Calculate characteristic inlet velocity
   [XG,vel_char,MFR,jetheight] = calc_inletFlow(charEPG,MING,MAXG,PULSE,...
       BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,...
       BC_TS1,BC_TS2,BC_TS3,VENT_R,g);
   jetheight = jetheight/YRES;
+  
+% Redefine mass flux altitudes as vector indices
+  massflux_alts(massflux_alts==0) = YRES;
+  massflux_alts(isnan(massflux_alts)) = round(jetheight)*YRES;
+  massflux_alts = sort(massflux_alts);
+  massflux_legend = strcat(strsplit(num2str(massflux_alts/Yfact)),...
+      {' '},cellstr(labelYunit));
+  massflux_alts = massflux_alts./YRES;
     
-%% Entrainment and gas volume fraction calculations and figures
-%  entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
-%      labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
-%      plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
-%      jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
-%      timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
-%      readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG);
-%  cd(postpath)
+% Entrainment and gas volume fraction calculations and figures
+  entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
+      labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
+      plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
+      jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
+      timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
+     readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG);
+  cd(postpath)
   
 % Particle concentration calculations and figures
   particleConc3D(run,runpath,vis,IMAX,JMAX,KMAX,ghostcells,tickx,labelx,...
@@ -265,16 +268,16 @@
       readWG,fnameWG);
   cd(postpath)
         
-%% Mass flux calculations and figures
-%  massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
-%      tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
-%      labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
-%      massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,...
-%      PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
-%      fnameEPG,readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,...
-%      fnameVS2,readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-%      readEPS3,fnameEPS3);
-%  cd(postpath)
+% Mass flux calculations and figures
+  massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
+      tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
+      labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
+      massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,...
+      PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
+      fnameEPG,readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,...
+      fnameVS2,readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
+      readEPS3,fnameEPS3,jetheight);
+  cd(postpath)
   
   close all
 

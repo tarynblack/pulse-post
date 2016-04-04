@@ -5,7 +5,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
     readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,fnameVS2,...
     readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-    readEPS3,fnameEPS3 )
+    readEPS3,fnameEPS3,jetheight )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -141,7 +141,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         set(hEPZ,'EdgeColor',[1 1 1],'LineWidth',0.5);
         caxis(axMFlux,[-log10(abs(massflux_crange(1))) log10(massflux_crange(2))]);
         tMF = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
-        title(axMFlux,tMF,'FontWeight','bold');
+        tMF2 = sprintf('Jet height: %.3f km',jetheight*YRES/1000);
+        title(axMFlux,[tMF;tMF2],'FontWeight','bold');
       % ================================================================= %
       
       
