@@ -22,7 +22,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     varMF = 'Solid mass flux';
     varMFZ = 'Horizontally averaged solid mass flux';
     
-  % Figure and axes properties
+  % Mass flux slice: figure and axes properties
     figMFlux = figure('Name','Mass flux','units','centimeters',...
         'outerposition',[0 0 22 18.75],'visible',vis,'PaperPositionMode',...
         'auto','color','w');
@@ -44,6 +44,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     cbMFlux.TickLabels = cellstr(num2str([-10.^(abs(-log10(abs...
         (massflux_crange(1))):-1)) 0 10.^(1:log10(massflux_crange(2)))]','%.0e\n'));
     
+  % Average mass flux time series: figure and axes properties
     figAvgMFZ = figure('Name','Spatially averaged mass flux with altitude',...
         'units','centimeters','outerposition',[0 0 33.33 18.75],'visible',...
         vis,'PaperPositionMode','auto','color','w');
@@ -79,6 +80,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     
   % Preallocate vectors
     netMF_alts = zeros(length(massflux_alts),timesteps);
+    collapse_Ongaro = zeros(1,timesteps);
     
   
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -141,6 +143,18 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         logMF = massflux;
         logMF(logMF>0) = log10(logMF(logMF>0));
         logMF(logMF<0) = -log10(abs(logMF(logMF<0)));
+        
+      % Calculate most-negative flux and vent flux for Ongaro criterion
+        negMF  = min(netmassflux);
+        ventMF = netmassflux(1);
+        collapse_Ongaro(t) = negMF/ventMF;
+        
+%       % Calculate gas and solid volume fractions at vent
+%         EPG_ground = EPG(:,:,1);
+%         EPG_vent = EPG_ground((IMAX-ghostcells)/2,(KMAX-ghostcells)/2);
+%         EPS_ground = EPS1(:,:,1) + EPS2(:,:,1) + EPS3(:,:,1);
+%         EPS_vent = EPS_ground((IMAX-ghostcells)/2,(KMAX-ghostcells)/2);
+%         EPS_check = 1-EPG_vent;
         
         
       % --------------------- MASS FLUX SLICE FIGURE -------------------- %
@@ -208,13 +222,13 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     close(vidMFlux);
     
     
-  % ------------------ NET MASS FLUX TIME SERIES PLOTS ------------------ %
     if strcmp(PULSE,'T') == 1
       str = sprintf('%s: Unsteady flow %g Hz',titlerun,FREQ);
     elseif strcmp(PULSE,'F') == 1
       str = sprintf('%s: Steady flow',titlerun);
     end
     
+   % ------------------ NET MASS FLUX TIME SERIES PLOTS ------------------ % 
     figNetMF = figure('Name','Net Mass Flux','visible',vis,'units',...
         'centimeters','outerposition',[0 0 33.33 18.75],'PaperPositionMode',...
         'auto','color','w');
@@ -229,6 +243,23 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     ylabel(axNetMF,'\bfNet mass flux (kg/m^2s)')
     saveas(figNetMF,fullfile(savepath,sprintf('NetMassFlux_tseries_%s.jpg',run)))
   % ===================================================================== %
+  
+%%  
+  % ---------------- COLLAPSE CRITERION TIME SERIES PLOT ---------------- %
+    figCollapse = figure('Name','Collapse criterion','units','centimeters',...
+        'outerposition',[0 0 33.33 18.75],'visible',vis,'PaperPositionMode',...
+        'auto','color','w');
+    axCollapse = axes('Parent',figCollapse,'box','on','TickDir','in',...
+        'FontSize',12);
+    grid(axCollapse,'on');
+    axis(axCollapse,[0,time(end),0,1]);
+    hold on
+    plot(time,collapse_Ongaro,'.-',time,0.9*ones(1,length(time)),'k--',time,...
+        0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
+    xlabel(axCollapse,'Time (s)');
+    ylabel(axCollapse,'Collapse criterion ratio');
+    title('Collapse criterion ratio...');
+    legend('SUPERRATIO!','Near-total collapse','Partial collapse','Incipient collapse');
   
   
   cd(postpath)
