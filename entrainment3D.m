@@ -93,6 +93,13 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     ylabel(axEn,sprintf('\\bf Distance_z (%s)',labelZunit));
     zlabel(axEn,sprintf('\\bf Altitude (%s)',labelYunit));
     cbEn = colorbar(axEn,'AxisLocation','out','FontSize',12);
+    nmap = 256;
+    cmapEn = [winter(round(nmap*-entrainment_crange(1)/...
+        (diff(entrainment_crange))));[0.9 0.9 0.9];...
+        flipud(autumn(nmap-round(nmap*-entrainment_crange(1)/...
+        (diff(entrainment_crange)))))];
+    colormap(axEn,cmapEn)
+    caxis(entrainment_crange);
     
   % Gas volume fraction isosurface: video
     vidEPG = VideoWriter(sprintf('vidEPG_%s.avi',run));
@@ -309,15 +316,8 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
       
       
       % ---------------- ENTRAINMENT ISOSURFACE FIGURES ----------------- %
-      % Define concatenated colormap of entrainment so cmaps meet at e=0
-        nmap = 256;
-        colormap([winter(round(nmap*-entrainment_crange(1)/...
-            (diff(entrainment_crange))));...
-            flipud(autumn(nmap-round(nmap*-entrainment_crange(1)/...
-            (diff(entrainment_crange)))))]);
-        caxis(entrainment_crange);
-        cmap = colormap;
-        emap = linspace(entrainment_crange(1),entrainment_crange(2),nmap);
+      % Alter colormap of entrainment so cmaps meet at e=0
+        emap = linspace(entrainment_crange(1),entrainment_crange(2),nmap+1);
         e_color = zeros(length(e_coeff),3);   
         for k = 1:length(e_coeff)
             if e_coeff(k) > entrainment_crange(2)
@@ -327,11 +327,10 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
             end
         end
         e_round = interp1(emap,emap,e_coeff,'nearest');
-        emap = [emap; 1:nmap];
+        emap = [emap; 1:(nmap+1)];
         for j = 1:length(e_coeff)
             e_color(j,:) = cmap(emap(2,emap(1,:) == e_round(j)),:);
         end        
-        colormap(figEn,cmap);
 
       % Plot entrainment on plume surface
         figure(figEn);
@@ -339,7 +338,6 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         patch('Vertices',[plumeX plumeY plumeZ],'Faces',1:length(plumeX),...
             'FaceVertexCData',e_color,'FaceColor','none','EdgeColor',...
             'none','Marker','o','MarkerFaceColor','flat');
-        caxis(axEn,entrainment_crange);
         text(1.17,0.3,'\bfEntrainment','Units','normalized',...
             'HorizontalAlignment','right','rotation',90,'FontSize',12);
         text(1.17,0.7,'\bfExpansion','Units','normalized',...
