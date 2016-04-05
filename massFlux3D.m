@@ -10,7 +10,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 %   Detailed explanation goes here
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 21 March 2016
+%   Last edit: Taryn Black, 4 April 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -19,7 +19,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
-    varMF = 'Mass flux';
+    varMF = 'Solid mass flux';
+    varMFZ = 'Horizontally averaged solid mass flux';
     
   % Figure and axes properties
     figMFlux = figure('Name','Mass flux','units','centimeters',...
@@ -42,6 +43,18 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     cbMFlux.Ticks = -log10(abs(massflux_crange(1))):log10(massflux_crange(2));
     cbMFlux.TickLabels = cellstr(num2str([-10.^(abs(-log10(abs...
         (massflux_crange(1))):-1)) 0 10.^(1:log10(massflux_crange(2)))]','%.0e\n'));
+    
+    figAvgMFZ = figure('Name','Spatially averaged mass flux with altitude',...
+        'units','centimeters','outerposition',[0 0 33.33 18.75],'visible',...
+        vis,'PaperPositionMode','auto','color','w');
+    axAvgMFZ = axes('Parent',figAvgMFZ,'box','on','TickDir','in','FontSize',12);
+    hold on
+    grid(axAvgMFZ,'on');
+    axis(axAvgMFZ,[massflux_crange(1)/5,massflux_crange(2)/5,0,JMAX-ghostcells]);
+    set(axAvgMFZ,'YTick',ticky(2:end)/YRES,'YTickLabel',labely);
+    xlabel(axAvgMFZ,'\bfNet mass flux (kg/m^2s)')
+    ylabel(axAvgMFZ,sprintf('\\bfAltitude (%s)',labelYunit))
+    hMFZ = plot(0,0);
     
   % Initialize video
     cd(savepath)
@@ -146,6 +159,16 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
       % ================================================================= %
       
       
+      % ----------- SPATIALLY AVERAGED MASS FLUX WITH HEIGHT ------------ %
+        figure(figAvgMFZ)
+        hold on
+        set(hMFZ,'Color',[0.7 0.7 0.7],'LineWidth',0.5);
+        hMFZ = plot(netmassflux,1:length(netmassflux),'k','LineWidth',2);
+        tMFZ = pulsetitle(varMFZ,PULSE,time,t,titlerun,FREQ);
+        title(axAvgMFZ,tMFZ,'FontWeight','bold');
+      % ================================================================= %
+      
+      
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
         cd(savepath)
         
@@ -155,14 +178,23 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         imgMF = imread(vidfigMF);
         writeVideo(vidMFlux,imgMF);
         
+      % Save current frame of average net mass flux figure
+        figMFZ = 'AvgNetMFCurrent.jpg';
+        saveas(figAvgMFZ,fullfile(savepath,figMFZ));
+        imgMFZ = imread(figMFZ);
+        
       % If user-specified image filetype is tif, append current timestep
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(imgMF,fullfile(savepath,sprintf('MFlux_tsteps_%s.tif',...
                 run)),'tif','WriteMode','append')
+            imwrite(imgMFZ,fullfile(savepath,sprintf('AvgNetMF_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
         else
             saveas(figMF,fullfile(savepath,sprintf('MFlux_t%03d_%s.%s',...
+                time(t),run,imtype)));
+            saveas(figMFZ,fullfile(savepath,sprintf('AvgNetMF_t%03d_%s.%s',...
                 time(t),run,imtype)));
         end
       % ================================================================= %
@@ -188,10 +220,11 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         'auto','color','w');
     axNetMF = axes('Parent',figNetMF,'box','on','FontSize',12);
     grid(axNetMF,'on');
+    axis(axNetMF,[0,time(end),massflux_crange(1)/5,massflux_crange(2)/5]);
     hold on
     plot(time,netMF_alts);
     legend(axNetMF,massflux_legend)
-    title(axNetMF,sprintf('%s: Net mass flux through specified altitudes',str))
+    title(axNetMF,sprintf('%s: Net solid mass flux through specified altitudes',str))
     xlabel(axNetMF,'\bfTime (s)')
     ylabel(axNetMF,'\bfNet mass flux (kg/m^2s)')
     saveas(figNetMF,fullfile(savepath,sprintf('NetMassFlux_tseries_%s.jpg',run)))
