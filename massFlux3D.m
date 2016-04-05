@@ -38,6 +38,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     xlabel(axMFlux,sprintf('\\bfDistance_x (%s)',labelXunit))
     ylabel(axMFlux,sprintf('\\bfDistance_z (%s)',labelZunit))
     zlabel(axMFlux,sprintf('\\bfAltitude (%s)',labelYunit))
+    cmapMFlux = [winter;[0.9 0.9 0.9];flipud(autumn)];
+    colormap(axMFlux,cmapMFlux);
     cbMFlux = colorbar(axMFlux,'AxisLocation','in','FontSize',12);
     cbMFlux.Label.String = '\bfMass Flux (kg/m^2s)';
     cbMFlux.Ticks = -log10(abs(massflux_crange(1))):log10(massflux_crange(2));
@@ -55,7 +57,15 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     set(axAvgMFZ,'YTick',ticky(2:end)/YRES,'YTickLabel',labely);
     xlabel(axAvgMFZ,'\bfNet mass flux (kg/m^2s)')
     ylabel(axAvgMFZ,sprintf('\\bfAltitude (%s)',labelYunit))
-    hMFZ = plot(0,0);
+    hMFZ = plot(0,0,'DisplayName','Previous profiles');
+    hBlk = plot(0,0,'k','LineWidth',2,'DisplayName',...
+        'Current profile');
+    hJet = plot(massflux_crange(1)/5:1E3:massflux_crange(2)/5,...
+        jetheight*ones(1,length(massflux_crange(1)/5:1E3:massflux_crange(2)/5)),...
+        '--','Color',[0.2 0.5 0.2],'LineWidth',1.5,'DisplayName',...
+        sprintf('Jet height (%.3f km)',jetheight*YRES/1000));
+    hMFZleg = legend(axAvgMFZ,[hBlk hMFZ hJet]);
+    set(hMFZleg,'FontSize',12,'Location','Northwest')
     
   % Initialize video
     cd(savepath)
@@ -178,8 +188,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
       % ----------- SPATIALLY AVERAGED MASS FLUX WITH HEIGHT ------------ %
         figure(figAvgMFZ)
         hold on
-        set(hMFZ,'Color',[0.7 0.7 0.7],'LineWidth',0.5);
-        hMFZ = plot(netmassflux,1:length(netmassflux),'k','LineWidth',2);
+        set(hMFZ,'Color',[0.55 0.55 0.55],'LineWidth',0.5);
+        hMFZ = plot(netmassflux,1:JMAX-ghostcells,'k','LineWidth',2);        
         tMFZ = pulsetitle(varMFZ,PULSE,time,t,titlerun,FREQ);
         title(axAvgMFZ,tMFZ,'FontWeight','bold');
       % ================================================================= %
@@ -247,6 +257,21 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   % ===================================================================== %
   
   
+  % ---------------- TIME-AVERAGED MASS FLUX WITH HEIGHT ---------------- %
+    figure(figAvgMFZ)
+    hold on
+    set(hMFZ,'Color',[0.55 0.55 0.55],'LineWidth',0.5);
+    allNMF = load(sprintf('netmassflux_%s.txt',run));
+    avgNMF = mean(allNMF(:,2:end),1);
+    hNMF = plot(avgNMF,1:JMAX-ghostcells,'-.','Color',[0.2 0.2 0.6],'LineWidth',3);
+    set(hNMF,'DisplayName','Time-averaged profile')
+    set(hMFZ,'DisplayName','Individual timestep profiles')
+    title(axAvgMFZ,sprintf('%s: Time-averaged mass flux with height',str))
+    hMFZleg = legend(axAvgMFZ,[hNMF hMFZ hJet]);
+    set(hMFZleg,'FontSize',10,'Location','Northwest')
+  % ===================================================================== %
+  
+  
   % ---------------- COLLAPSE CRITERION TIME SERIES PLOT ---------------- %
     figCollapse = figure('Name','Collapse criterion','units','centimeters',...
         'outerposition',[0 0 33.33 18.75],'visible',vis,'PaperPositionMode',...
@@ -260,7 +285,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
     xlabel(axCollapse,'Time (s)');
     ylabel(axCollapse,'Collapse criterion ratio');
-    title('Collapse criterion ratio...');
+    title(axCollapse,sprintf('%s: Collapse criterion ratio...',str));
     legend('SUPERRATIO!','Near-total collapse','Partial collapse','Incipient collapse');
     saveas(figCollapse,fullfile(savepath,sprintf('CollapseCriterion_%s.jpg',run)));
   % ===================================================================== %
