@@ -148,6 +148,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         negMF  = min(netmassflux);
         ventMF = netmassflux(1);
         collapse_Ongaro(t) = negMF/ventMF;
+        dlmwrite(fullfile(savepath,sprintf('collapseOngaro_%s.txt',run)),...
+            [time(t) collapse_Ongaro(t)],'-append','delimiter','\t');
         
 %       % Calculate gas and solid volume fractions at vent
 %         EPG_ground = EPG(:,:,1);
@@ -260,6 +262,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     ylabel(axCollapse,'Collapse criterion ratio');
     title('Collapse criterion ratio...');
     legend('SUPERRATIO!','Near-total collapse','Partial collapse','Incipient collapse');
+    saveas(figCollapse,fullfile(savepath,sprintf('CollapseCriterion_%s.jpg',run)));
+  % ===================================================================== %
   
   
   cd(postpath)
