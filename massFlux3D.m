@@ -5,13 +5,13 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
     readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,fnameVS2,...
     readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-    readEPS3,fnameEPS3,jetheight )
+    readEPS3,fnameEPS3,jetheight,MFR )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 4 April 2016
-
+%   Last edit: Taryn Black, 5 April 2016
+%%
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
     delete('massflux*','netmassflux*','*MFlux*')
@@ -137,13 +137,13 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
             continue
         end
         
-      % Calculate vertical mass flux (space-varied and net) at specified altitudes
+      % Calculate vertical solid mass flux at specified altitudes
 %         massflux = ROG.*V_G + RO_S1*V_S1 + RO_S2*V_S2 + RO_S3*V_S3;
         massflux = RO_S1*EPS1.*V_S1 + RO_S2*EPS2.*V_S2 + RO_S3*EPS3.*V_S3;
         netmassflux = squeeze(sum(sum(massflux)));
         netMF_alts(:,t) = netmassflux(massflux_alts);
     
-      % Save all calculated mass fluxes (incl. net) at each timestep
+      % Save calculated mass fluxes at each timestep
         dlmwrite(fullfile(savepath,sprintf('massflux_all_t%03d.txt',...
             time(t))),massflux,'delimiter','\t');
         dlmwrite(fullfile(savepath,sprintf('netmassflux_%s.txt',...
@@ -155,9 +155,20 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         logMF(logMF<0) = -log10(abs(logMF(logMF<0)));
         
       % Calculate most-negative flux and vent flux for Ongaro criterion
-        negMF  = min(netmassflux);
-        ventMF = netmassflux(1);
-        collapse_Ongaro(t) = negMF/ventMF;
+        ventflux = zeros(IMAX-ghostcells,KMAX-ghostcells);
+        negMF  = abs(min(netmassflux(netmassflux<0)));
+        if isempty(negMF)
+            negMF = 0;
+        end
+        for i = ((IMAX-ghostcells)/2)-(VENT_R/XRES):((IMAX-ghostcells)/2)+(VENT_R/XRES)
+            for k = ((KMAX-ghostcells)/2)-(VENT_R/ZRES):((KMAX-ghostcells)/2)+(VENT_R/ZRES)
+                if (i - ((IMAX-ghostcells)/2))^2 + (k - ((KMAX-ghostcells)/2))^2 <= (VENT_R/XRES)^2
+                    ventflux(i,k) = massflux(i,k,1);
+                end
+            end
+        end
+        netventflux = squeeze(sum(sum(ventflux)));
+        collapse_Ongaro(t) = negMF/netventflux;
         dlmwrite(fullfile(savepath,sprintf('collapseOngaro_%s.txt',run)),...
             [time(t) collapse_Ongaro(t)],'-append','delimiter','\t');
         
@@ -268,7 +279,13 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     set(hMFZ,'DisplayName','Individual timestep profiles')
     title(axAvgMFZ,sprintf('%s: Time-averaged mass flux with height',str))
     hMFZleg = legend(axAvgMFZ,[hNMF hMFZ hJet]);
-    set(hMFZleg,'FontSize',10,'Location','Northwest')
+    set(hMFZleg,'FontSize',12,'Location','Northwest')
+    avgNegMF = abs(min(avgNMF(avgNMF<0)));
+    if isempty(avgNegMF)
+        avgNegMF = 0;
+    end
+    avg_Ongaro = avgNegMF/MFR;
+    dlmwrite(fullfile(savepath,'avgOngaroCrit.txt'),avg_Ongaro,'delimiter','\t');
   % ===================================================================== %
   
   
