@@ -11,7 +11,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 %
 %   Functions called: loadTimestep3D; pulsetitle
 %   Last edit: Taryn Black, 5 April 2016
-%%
+
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
     delete('massflux*','netmassflux*','*MFlux*')
