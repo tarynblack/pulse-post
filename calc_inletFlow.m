@@ -1,6 +1,6 @@
-function [ XG,vel_char,MFR,jetheight ] = calc_inletFlow( charEPG,MING,...
-    MAXG,PULSE,BC_EPG,BC_PG,BC_TG,Rgas,RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,...
-    NFR_S3,BC_TS1,BC_TS2,BC_TS3,VENT_R,g )
+function [ XG,vel_char,MFR,MASSFLUX,MFR_SOL,MASSFLUX_SOL,jetheight ] = ...
+    calc_inletFlow( charEPG,MING,MAXG,PULSE,BC_EPG,BC_PG,BC_TG,Rgas,...
+    RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,BC_TS1,BC_TS2,BC_TS3,VENT_R,g )
 %calc_inletFlow calculates the gas mass fraction, choked velocity, and mass
 %flow rate at the inlet (volcanic vent) for a simulation.
 %   If flow is steady, the standard calculations of these values apply. 
@@ -21,7 +21,7 @@ function [ XG,vel_char,MFR,jetheight ] = calc_inletFlow( charEPG,MING,...
 %   actual simulation. For large MAXG (close to 1) the difference should
 %   not be significant.
 %
-% Last edit: Taryn Black, 2 December 2015
+% Last edit: Taryn Black, 6 April 2016
 
     if strcmp(charEPG,'mingas') == 1
         EPGunst = MING;
@@ -35,10 +35,16 @@ function [ XG,vel_char,MFR,jetheight ] = calc_inletFlow( charEPG,MING,...
         XG = (1 + ((1-EPGunst)*Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3)/(EPGunst*BC_PG)))^(-1);
         vel_char = sqrt((Rgas/XG)*(EPGunst*BC_TG +((1-EPGunst)*(BC_TS1*NFR_S1+BC_TS2*NFR_S2+BC_TS3*NFR_S3))))*(XG+((1-XG)*BC_PG/(Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3))));
         MFR = pi*(VENT_R^2)*vel_char*((EPGunst*BC_PG/(Rgas*BC_TG))+(1-EPGunst)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3));
+        MASSFLUX = MFR/(pi*(VENT_R^2));
+        MFR_SOL = pi*(VENT_R^2)*vel_char*(1-EPGunst)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3);
+        MASSFLUX_SOL = MFR_SOL/(pi*(VENT_R^2));
     elseif strcmp(PULSE,'F') == 1
         XG = (1 + ((1-BC_EPG)*Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3)/(BC_EPG*BC_PG)))^(-1);
         vel_char = sqrt((Rgas/XG)*(BC_EPG*BC_TG +((1-BC_EPG)*(BC_TS1*NFR_S1+BC_TS2*NFR_S2+BC_TS3*NFR_S3))))*(XG+((1-XG)*BC_PG/(Rgas*BC_TG*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3))));
         MFR = pi*(VENT_R^2)*vel_char*((BC_EPG*BC_PG/(Rgas*BC_TG))+(1-BC_EPG)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3));
+        MASSFLUX = MFR/(pi*(VENT_R^2));
+        MFR_SOL = pi*(VENT_R^2)*vel_char*(1-BC_EPG)*(RO_S1*NFR_S1+RO_S2*NFR_S2+RO_S3*NFR_S3);
+        MASSFLUX_SOL = MFR_SOL/(pi*(VENT_R^2));
     end
     
     jetheight = (vel_char^2)/(2*g);
