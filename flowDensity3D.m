@@ -86,7 +86,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     ylabel(axRelD,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axRelD,sprintf('\\bf Altitude (%s)',labelYunit))
     cbRelD = colorbar(axRelD,'AxisLocation','in','FontSize',12);
-    cbRelD.Label.String = '\bfFlow Density relative to Atmosphere (kg/m^3)';
+    cbRelD.Label.String = '\bf\rho_{atmosphere} - \rho_{flow} (kg/m^3)';
   % Define relative density colormap: red = rise, blue = collapse.
     numcolors = 256;
     cmaplims = [1 0 0;    % red
