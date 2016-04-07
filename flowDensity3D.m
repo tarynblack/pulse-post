@@ -87,6 +87,15 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     zlabel(axRelD,sprintf('\\bf Altitude (%s)',labelYunit))
     cbRelD = colorbar(axRelD,'AxisLocation','in','FontSize',12);
     cbRelD.Label.String = '\bfFlow Density relative to Atmosphere (kg/m^3)';
+  % Define relative density colormap: red = rise, blue = collapse.
+    numcolors = 256;
+    cmaplims = [1 0 0;    % red
+                1 1 1;    % white
+                0 0 1];   % blue
+    fixcpts = [numcolors-1 numcolors*(1-(abs(flowBuoyancy_crange(2))/...
+        (abs(flowBuoyancy_crange(1))+abs(flowBuoyancy_crange(2))))) 0];
+    cmapB = interp1(fixcpts/numcolors,cmaplims,linspace(0,1,numcolors));
+    colormap(figRelD,cmapB)
     
   % Flow density slice: video
     cd(savepath)
@@ -206,18 +215,6 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
       
       
       % ----------------- RELATIVE DENSITY SLICE FIGURES ---------------- %
-      % Define relative density colormap: red = rise, blue = collapse.
-        numcolors = 256;
-%         zeropoint = abs(mindens)/(abs(maxdens)+abs(mindens));
-        cmaplims = [1 0 0;    % red
-                    1 1 1;    % white
-                    0 0 1];   % blue
-        fixcpts = [numcolors-1 numcolors*(1-(abs(flowBuoyancy_crange(2))/...
-            (abs(flowBuoyancy_crange(1))+abs(flowBuoyancy_crange(2))))) 0];
-        cmapB = interp1(fixcpts/numcolors,cmaplims,linspace(0,1,numcolors));
-        colormap(figRelD,cmapB)
-          
-      % Plot slice of flow relative density
         figure(figRelD)
         cla(axRelD);
         hB = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
