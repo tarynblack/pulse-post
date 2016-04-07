@@ -4,18 +4,18 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     labelZunit,XRES,YRES,ZRES,sdistX,sdistY,sdistZ,flowDensity_crange,...
     titlerun,flowBuoyancy_crange,timesteps,imtype,savepath,readEPG,...
     fnameEPG,readROG,fnameROG,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-    readEPS3,fnameEPS3 )
+    readEPS3,fnameEPS3,jetheight )
 %flowDensity3D calculates the net density of the flow from gas and particle
 %densities and volume fractions.
 %   Detailed explanation goes here
 %
 %   Special functions called: loadTimestep3D, pulsetitle
-%   Last edit: Taryn Black, 21 March 2016
+%   Last edit: Taryn Black, 6 April 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
     delete('flowdensity_*','atmsdensity_*','flowreldens_*',...
-        'FlowDens*','FlowRelD*');
+        'FlowDens*','FlowRelD*','avgRelDens_*');
     
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
@@ -120,6 +120,10 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     EPS2import = '%*f%*f%f%*f%*f%*f%*f';
     EPS3import = '%*f%*f%*f%f%*f%*f%*f';
     ROGimport  = '%*f%f%*f%*f%*f%*f%*f';
+   
+    
+  % Preallocate vectors
+    avgRDJH = zeros(1,timesteps);
   
     
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -209,8 +213,12 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         avgatmsdens_3D = permute(avgatmsdens_3D,[3 2 1]);
         avgatmsdens_3D_inplume = avgatmsdens_3D.*inplume;
         flowreldens = avgatmsdens_3D_inplume - flowdensity;
-%         mindens = min(flowreldens(flowreldens(:)~=0));
-%         maxdens = max(flowreldens(flowreldens(:)~=0));
+
+      % Calculate average relative density of flow at jet height
+        reldensJH  = flowreldens(:,:,round(jetheight));
+        avgRDJH(t) = mean(reldensJH(:));
+        dlmwrite(fullfile(savepath,sprintf('avgRelDens_JetHeight_%s.txt',...
+            run)),[time(t) avgRDJH(t)],'-append','delimiter','\t');
       % ================================================================= %
       
       
@@ -285,6 +293,34 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     close(vidFlowDens);
     close(vidFlowReld);
     
+    
+    if strcmp(PULSE,'T') == 1
+      str = sprintf('%s: Unsteady flow %g Hz',titlerun,FREQ);
+    elseif strcmp(PULSE,'F') == 1
+      str = sprintf('%s: Steady flow',titlerun);
+    end
+
+  % --------- PLOT TIME SERIES OF RELATIVE DENSITY AT JET HEIGHT -------- %
+    figRDJH = figure('Name','Jet height relative density','visible',vis,...
+        'units','centimeters','outerposition',[0 0 33.33 15],...
+        'PaperPositionMode','auto','color','w');
+    axRDJH = axes('Parent',figRDJH,'box','on','TickDir','in','Fontsize',12);
+    grid(axRDJH,'on');
+    hold on
+    allRDJH = load(sprintf('avgRelDens_JetHeight_%s.txt',run));
+    allRDJH = allRDJH(:,2);
+    negidx = allRDJH<0;
+    negRDJH = NaN(length(allRDJH),1);
+    negRDJH(negidx) = allRDJH(negidx);
+    hRDJH = plot(time(2:end),allRDJH,'r',time(2:end),negRDJH,'b','LineWidth',2);
+    ylim(flowBuoyancy_crange)
+    xlabel('\bfTime (s)')
+    ylabel('\bf\rho_{atmosphere} - \rho_{flow} (kg/m^3)')
+    title(sprintf('%s: Relative density of flow at jet height',str));
+    saveas(figRDJH,fullfile(savepath,sprintf('JetHeightBuoyancy_%s.jpg',run)));
+  % ===================================================================== %
+
+  
     cd(postpath)
     disp('Flow density processing complete.')
     fprintf('vidFlowDens_%s has been saved to %s.\n',run,savepath)
