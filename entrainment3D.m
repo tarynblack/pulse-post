@@ -475,7 +475,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'LineWidth',3,'Marker','+','MarkerSize',10,...
         'DisplayName','Total Coefficient');
     tlCoeff1 = 'Plume-averaged entrainment/expansion efficiencies';
-    tlCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_entr(2:end)));
+    tlCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_coeff(2:end)));
     title(axCoeff,{tlCoeff1;tlCoeff2},'FontWeight','bold')
     xlabel(axCoeff,'\bfTime (s)')
     ylabel(axCoeff,'\bfEfficiency Coefficient')
@@ -517,7 +517,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'LineWidth',3,'Marker','+','MarkerSize',10,...
         'DisplayName','Total Coefficient');
     tlJCoeff1 = 'Jet region entrainment/expansion efficiencies';
-    tlJCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_jentr(2:end)));
+    tlJCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_jcoeff(2:end)));
     title(axJCoeff,{tlJCoeff1;tlJCoeff2},'FontWeight','bold')
     xlabel(axJCoeff,'\bfTime (s)')
     ylabel(axJCoeff,'\bfEntrainment/Expansion Coefficient')
