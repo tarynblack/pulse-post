@@ -5,7 +5,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
     readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,fnameVS2,...
     readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-    readEPS3,fnameEPS3,jetheight,MFR )
+    readEPS3,fnameEPS3,jetheight,MASSFLUX_SOL,VENT_R,MING )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -14,7 +14,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
-    delete('massflux*','netmassflux*','*MFlux*')
+    delete('*massflux*','*MFlux*','*AvgNetMF*','Collapse*','*Ongaro*',...
+        'NetMassFlux_*','EP*vent')
 
 
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
@@ -180,20 +181,20 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         logMF(logMF<0) = -log10(abs(logMF(logMF<0)));
         
       % Calculate most-negative flux and vent flux for Ongaro criterion
-        ventflux = zeros(IMAX-ghostcells,KMAX-ghostcells);
+%         ventflux = zeros(IMAX-ghostcells,KMAX-ghostcells);
         negMF  = abs(min(netmassflux(netmassflux<0)));
         if isempty(negMF)
             negMF = 0;
         end
-        for i = ((IMAX-ghostcells)/2)-(VENT_R/XRES):((IMAX-ghostcells)/2)+(VENT_R/XRES)
-            for k = ((KMAX-ghostcells)/2)-(VENT_R/ZRES):((KMAX-ghostcells)/2)+(VENT_R/ZRES)
-                if (i - ((IMAX-ghostcells)/2))^2 + (k - ((KMAX-ghostcells)/2))^2 <= (VENT_R/XRES)^2
-                    ventflux(i,k) = massflux(i,k,1);
-                end
-            end
-        end
-        netventflux = squeeze(sum(sum(ventflux)));
-        collapse_Ongaro(t) = negMF/netventflux;
+%         for i = ((IMAX-ghostcells)/2)-(VENT_R/XRES):((IMAX-ghostcells)/2)+(VENT_R/XRES)
+%             for k = ((KMAX-ghostcells)/2)-(VENT_R/ZRES):((KMAX-ghostcells)/2)+(VENT_R/ZRES)
+%                 if (i - ((IMAX-ghostcells)/2))^2 + (k - ((KMAX-ghostcells)/2))^2 <= (VENT_R/XRES)^2
+%                     ventflux(i,k) = massflux(i,k,1);
+%                 end
+%             end
+%         end
+%         netventflux = squeeze(sum(sum(ventflux)));
+        collapse_Ongaro(t) = negMF/MASSFLUX_SOL;%netventflux;
         dlmwrite(fullfile(savepath,sprintf('collapseOngaro_%s.txt',run)),...
             [time(t) collapse_Ongaro(t)],'-append','delimiter','\t');
         
@@ -317,18 +318,21 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     set(hMFZ,'Color',[0.55 0.55 0.55],'LineWidth',0.5);
     allNMF = load(sprintf('netmassflux_%s.txt',run));
     avgNMF = mean(allNMF(:,2:end),1);
-    hNMF = plot(avgNMF,1:JMAX-ghostcells,'-.','Color',[0.2 0.2 0.6],'LineWidth',3);
+    hNMF = plot(avgNMF,1:JMAX-ghostcells,'-.','Color',[0 0.4 0.7],'LineWidth',3);
     set(hNMF,'DisplayName','Time-averaged profile')
     set(hMFZ,'DisplayName','Individual timestep profiles')
     title(axAvgMFZ,sprintf('%s: Time-averaged mass flux with height',str))
     hMFZleg = legend(axAvgMFZ,[hNMF hMFZ hJet]);
     set(hMFZleg,'FontSize',12,'Location','Northwest')
+    saveas(figAvgMFZ,fullfile(savepath,sprintf('TimeAvgNetMF_%s.jpg',run)));
+    
     avgNegMF = abs(min(avgNMF(avgNMF<0)));
     if isempty(avgNegMF)
         avgNegMF = 0;
     end
-    avg_Ongaro = avgNegMF/MFR;
-    dlmwrite(fullfile(savepath,'avgOngaroCrit.txt'),avg_Ongaro,'delimiter','\t');
+    avg_Ongaro = avgNegMF/MASSFLUX_SOL;
+    dlmwrite(fullfile(savepath,sprintf('avgOngaroCrit_%s.txt',run)),...
+        avg_Ongaro,'delimiter','\t');
   % ===================================================================== %
   
   
@@ -343,8 +347,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     hold on
     plot(time,collapse_Ongaro,'.-',time,0.9*ones(1,length(time)),'k--',time,...
         0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
-    xlabel(axCollapse,'Time (s)');
-    ylabel(axCollapse,'Collapse criterion ratio');
+    xlabel(axCollapse,'\bfTime (s)');
+    ylabel(axCollapse,'\bfCollapse criterion ratio');
     title(axCollapse,sprintf('%s: Collapse criterion ratio...',str));
     legend('SUPERRATIO!','Near-total collapse','Partial collapse','Incipient collapse');
     saveas(figCollapse,fullfile(savepath,sprintf('CollapseCriterion_%s.jpg',run)));
