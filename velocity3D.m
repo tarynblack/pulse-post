@@ -9,7 +9,7 @@
 %   Detailed explanation goes here
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 21 March 2016
+%   Last edit: Taryn Black, 6 April 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)   
@@ -96,7 +96,7 @@
 %         zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
         cbVort = colorbar(axVortY,'Location','eastoutside','AxisLocation',...
            'out','FontSize',12);
-        cbVort.Label.String = '\bfFlow Vorticity';
+        cbVort.Label.String = '\bfFlow Vorticity (s^{-1})';
     set([axVortX axVortY],'box','on','TickDir','in','FontSize',12)
     grid(axVortX,'on'); grid(axVortY,'on');
     view(axVortX,viewaz,viewel); view(axVortY,viewaz,viewel); 
