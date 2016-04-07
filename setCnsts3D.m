@@ -21,6 +21,8 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
 %   PULSE:  describes whether flow is pulsing (T) or steady (F)
 %   FREQ:   frequency of pulsing, for PULSE=T
 %       *** NOTE: FREQ returns a value for PULSE=F that is not used.
+%       *** NOTE: multiplied by 2 because MFIX frequency uses an absolute
+%                 value function such that there end up being two pulses
 %   MING:   minimum gas volume fraction (unsteady flow)
 %   MAXG:   maximum gas volume fraction (unsteady flow)
 %   VENT_R: radius of vent [m]
@@ -61,7 +63,7 @@ function [ IMAX,JMAX,KMAX,LENGTH,HEIGHT,WIDTH,RO_S1,RO_S2,RO_S3,NFR_S1,...
     NFR_S2 = str2double(Cnsts.data(11));
     NFR_S3 = str2double(Cnsts.data(12));
     PULSE  = char(Cnsts.data(13));
-    FREQ   = str2double(Cnsts.data(14));
+    FREQ   = 2*str2double(Cnsts.data(14));
     MING   = str2double(Cnsts.data(15));
     MAXG   = str2double(Cnsts.data(16));
     VENT_R = str2double(Cnsts.data(17));
