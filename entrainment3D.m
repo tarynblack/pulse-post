@@ -329,7 +329,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         e_round = interp1(emap,emap,e_coeff,'nearest');
         emap = [emap; 1:(nmap+1)];
         for j = 1:length(e_coeff)
-            e_color(j,:) = cmap(emap(2,emap(1,:) == e_round(j)),:);
+            e_color(j,:) = cmapEn(emap(2,emap(1,:) == e_round(j)),:);
         end        
 
       % Plot entrainment on plume surface
