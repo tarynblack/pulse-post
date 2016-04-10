@@ -69,25 +69,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     hMFZleg = legend(axAvgMFZ,[hBlk hMFZ hJet]);
     set(hMFZleg,'FontSize',12,'Location','Northwest')
     
-  % Gas/solid volume fraction evolution: figure and axes properties
-    figVolFrac = figure('Name','Volume fraction evolution','units',...
-        'centimeters','outerposition',[0 0 33.33 18.75],'visible',vis,...
-        'PaperPositionMode','auto','color','w');
-    axVolFrac = axes('Parent',figVolFrac,'box','on','TickDir','in','FontSize',12);
-    hold on
-    grid(axVolFrac,'on');
-    [axVolFrac,gasFrac,solFrac] = plotyy(0,0,0,0);
-    hold on
-    set(axVolFrac(1),'Parent',figVolFrac,'box','on','TickDir','in',...
-        'FontSize',12,'YLim',[0.995 1],'YTick',0.995:0.001:1,...
-        'XLim',[0 time(end)]);
-    set(axVolFrac(2),'Parent',figVolFrac,'TickDir','in',...
-        'FontSize',12,'YLim',[0 0.005],'YTick',0:0.001:0.005,...
-        'YTickLabel',{'0';'0.001';'0.002';'0.003';'0.004';'0.005'},...
-        'XLim',[0 time(end)]);
-    xlabel(axVolFrac(1),'\bfTime (s)');
-    ylabel(axVolFrac(1),'\bfGas volume fraction');
-    ylabel(axVolFrac(2),'\bfSolid volume fraction');
         
   % Initialize video
     cd(savepath)
@@ -113,10 +94,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   % Preallocate vectors
     netMF_alts = zeros(length(massflux_alts),timesteps);
     collapse_Ongaro = zeros(1,timesteps);
-    EPG_vent = zeros(1,timesteps);
-    EPG_vent(1) = MING;
-    EPS_vent = zeros(1,timesteps);
-    EPS_vent(1) = 1-MING;
     
   
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -198,12 +175,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         dlmwrite(fullfile(savepath,sprintf('collapseOngaro_%s.txt',run)),...
             [time(t) collapse_Ongaro(t)],'-append','delimiter','\t');
         
-      % Calculate gas and solid volume fractions at vent
-        EPG_vent(t) = EPG((IMAX-ghostcells)/2,(KMAX-ghostcells)/2,1);
-        EPS_vent(t) = EPS1((IMAX-ghostcells)/2,(KMAX-ghostcells)/2,1) + ...
-                      EPS2((IMAX-ghostcells)/2,(KMAX-ghostcells)/2,1) + ...
-                      EPS3((IMAX-ghostcells)/2,(KMAX-ghostcells)/2,1);
-        
         
       % --------------------- MASS FLUX SLICE FIGURE -------------------- %
         figure(figMFlux)
@@ -231,16 +202,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
       % ================================================================= %
       
       
-      % ------------------- VOLUME FRACTION EVOLUTION ------------------- %
-        figure(figVolFrac)
-%         hold on
-        set(gasFrac,'XData',time(1:t),'YData',EPG_vent(1:t),'LineWidth',3);
-        set(solFrac,'XData',time(1:t),'YData',EPS_vent(1:t),'LineWidth',3);
-        tVFE = pulsetitle(varVFE,PULSE,time,t,titlerun,FREQ);
-        title(axVolFrac(1),tVFE,'FontWeight','bold');
-      % ================================================================= %
-      
-      
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
         cd(savepath)
         
@@ -255,11 +216,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         saveas(figAvgMFZ,fullfile(savepath,figMFZ));
         imgMFZ = imread(figMFZ);
         
-      % Save current frame of volume fraction evolution figure
-        figVF = 'GasSolFracCurrent.jpg';
-        saveas(figVolFrac,fullfile(savepath,figVF));
-        imgVF = imread(figVF);
-        
       % If user-specified image filetype is tif, append current timestep
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
@@ -268,14 +224,10 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
                 run)),'tif','WriteMode','append');
             imwrite(imgMFZ,fullfile(savepath,sprintf('AvgNetMF_tsteps_%s.tif',...
                 run)),'tif','WriteMode','append');
-            imwrite(imgVF,fullfile(savepath,sprintf('GasSolFrac_tsteps_%s.tif',...
-                run)),'tif','WriteMode','append');
         else
             saveas(figMF,fullfile(savepath,sprintf('MFlux_t%03d_%s.%s',...
                 time(t),run,imtype)));
             saveas(figMFZ,fullfile(savepath,sprintf('AvgNetMF_t%03d_%s.%s',...
-                time(t),run,imtype)));
-            saveas(figVF,fullfile(savepath,sprintf('GasSolFrac_t%03d_%s.%s',...
                 time(t),run,imtype)));
         end
       % ================================================================= %
