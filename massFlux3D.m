@@ -5,23 +5,26 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
     readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,fnameVS2,...
     readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-    readEPS3,fnameEPS3 )
+    readEPS3,fnameEPS3,jetheight,MASSFLUX_SOL,VENT_R,MING )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 21 March 2016
+%   Last edit: Taryn Black, 6 April 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
-    delete('massflux*','netmassflux*','*MFlux*')
+    delete('*massflux*','*MFlux*','*AvgNetMF*','Collapse*','*Ongaro*',...
+        'NetMassFlux_*','EP*vent')
 
 
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
-    varMF = 'Mass flux';
+    varMF = 'Solid mass flux';
+    varMFZ = 'Horizontally averaged solid mass flux';
+    varVFE = 'Volume fraction of gas and solids';
     
-  % Figure and axes properties
+  % Mass flux slice: figure and axes properties
     figMFlux = figure('Name','Mass flux','units','centimeters',...
         'outerposition',[0 0 22 18.75],'visible',vis,'PaperPositionMode',...
         'auto','color','w');
@@ -37,12 +40,36 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     xlabel(axMFlux,sprintf('\\bfDistance_x (%s)',labelXunit))
     ylabel(axMFlux,sprintf('\\bfDistance_z (%s)',labelZunit))
     zlabel(axMFlux,sprintf('\\bfAltitude (%s)',labelYunit))
+    cmapMFlux = [winter;[0.9 0.9 0.9];flipud(autumn)];
+    colormap(axMFlux,cmapMFlux);
     cbMFlux = colorbar(axMFlux,'AxisLocation','in','FontSize',12);
     cbMFlux.Label.String = '\bfMass Flux (kg/m^2s)';
     cbMFlux.Ticks = -log10(abs(massflux_crange(1))):log10(massflux_crange(2));
     cbMFlux.TickLabels = cellstr(num2str([-10.^(abs(-log10(abs...
         (massflux_crange(1))):-1)) 0 10.^(1:log10(massflux_crange(2)))]','%.0e\n'));
     
+  % Average mass flux time series: figure and axes properties
+    figAvgMFZ = figure('Name','Spatially averaged mass flux with altitude',...
+        'units','centimeters','outerposition',[0 0 33.33 18.75],'visible',...
+        vis,'PaperPositionMode','auto','color','w');
+    axAvgMFZ = axes('Parent',figAvgMFZ,'box','on','TickDir','in','FontSize',12);
+    hold on
+    grid(axAvgMFZ,'on');
+    axis(axAvgMFZ,[massflux_crange(1)/5,massflux_crange(2)/5,0,JMAX-ghostcells]);
+    set(axAvgMFZ,'YTick',ticky(2:end)/YRES,'YTickLabel',labely);
+    xlabel(axAvgMFZ,'\bfNet mass flux (kg/m^2s)')
+    ylabel(axAvgMFZ,sprintf('\\bfAltitude (%s)',labelYunit))
+    hMFZ = plot(0,0,'DisplayName','Previous profiles');
+    hBlk = plot(0,0,'k','LineWidth',2,'DisplayName',...
+        'Current profile');
+    hJet = plot(massflux_crange(1)/5:1E3:massflux_crange(2)/5,...
+        jetheight*ones(1,length(massflux_crange(1)/5:1E3:massflux_crange(2)/5)),...
+        '--','Color',[0.2 0.5 0.2],'LineWidth',1.5,'DisplayName',...
+        sprintf('Jet height (%.3f km)',jetheight*YRES/1000));
+    hMFZleg = legend(axAvgMFZ,[hBlk hMFZ hJet]);
+    set(hMFZleg,'FontSize',12,'Location','Northwest')
+    
+        
   % Initialize video
     cd(savepath)
     vidMFlux = VideoWriter(sprintf('vidMFlux_%s.avi',run));
@@ -66,6 +93,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     
   % Preallocate vectors
     netMF_alts = zeros(length(massflux_alts),timesteps);
+    collapse_Ongaro = zeros(1,timesteps);
     
   
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -112,13 +140,13 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
             continue
         end
         
-      % Calculate vertical mass flux (space-varied and net) at specified altitudes
+      % Calculate vertical solid mass flux at specified altitudes
 %         massflux = ROG.*V_G + RO_S1*V_S1 + RO_S2*V_S2 + RO_S3*V_S3;
         massflux = RO_S1*EPS1.*V_S1 + RO_S2*EPS2.*V_S2 + RO_S3*EPS3.*V_S3;
         netmassflux = squeeze(sum(sum(massflux)));
         netMF_alts(:,t) = netmassflux(massflux_alts);
     
-      % Save all calculated mass fluxes (incl. net) at each timestep
+      % Save calculated mass fluxes at each timestep
         dlmwrite(fullfile(savepath,sprintf('massflux_all_t%03d.txt',...
             time(t))),massflux,'delimiter','\t');
         dlmwrite(fullfile(savepath,sprintf('netmassflux_%s.txt',...
@@ -128,6 +156,24 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         logMF = massflux;
         logMF(logMF>0) = log10(logMF(logMF>0));
         logMF(logMF<0) = -log10(abs(logMF(logMF<0)));
+        
+      % Calculate most-negative flux and vent flux for Ongaro criterion
+%         ventflux = zeros(IMAX-ghostcells,KMAX-ghostcells);
+        negMF  = abs(min(netmassflux(netmassflux<0)));
+        if isempty(negMF)
+            negMF = 0;
+        end
+%         for i = ((IMAX-ghostcells)/2)-(VENT_R/XRES):((IMAX-ghostcells)/2)+(VENT_R/XRES)
+%             for k = ((KMAX-ghostcells)/2)-(VENT_R/ZRES):((KMAX-ghostcells)/2)+(VENT_R/ZRES)
+%                 if (i - ((IMAX-ghostcells)/2))^2 + (k - ((KMAX-ghostcells)/2))^2 <= (VENT_R/XRES)^2
+%                     ventflux(i,k) = massflux(i,k,1);
+%                 end
+%             end
+%         end
+%         netventflux = squeeze(sum(sum(ventflux)));
+        collapse_Ongaro(t) = negMF/MASSFLUX_SOL;%netventflux;
+        dlmwrite(fullfile(savepath,sprintf('collapseOngaro_%s.txt',run)),...
+            [time(t) collapse_Ongaro(t)],'-append','delimiter','\t');
         
         
       % --------------------- MASS FLUX SLICE FIGURE -------------------- %
@@ -141,7 +187,18 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         set(hEPZ,'EdgeColor',[1 1 1],'LineWidth',0.5);
         caxis(axMFlux,[-log10(abs(massflux_crange(1))) log10(massflux_crange(2))]);
         tMF = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
-        title(axMFlux,tMF,'FontWeight','bold');
+        tMF2 = sprintf('Jet height: %.3f km',jetheight*YRES/1000);
+        title(axMFlux,[tMF;tMF2],'FontWeight','bold');
+      % ================================================================= %
+      
+      
+      % ----------- SPATIALLY AVERAGED MASS FLUX WITH HEIGHT ------------ %
+        figure(figAvgMFZ)
+        hold on
+        set(hMFZ,'Color',[0.55 0.55 0.55],'LineWidth',0.5);
+        hMFZ = plot(netmassflux,1:JMAX-ghostcells,'k','LineWidth',2);        
+        tMFZ = pulsetitle(varMFZ,PULSE,time,t,titlerun,FREQ);
+        title(axAvgMFZ,tMFZ,'FontWeight','bold');
       % ================================================================= %
       
       
@@ -154,14 +211,23 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         imgMF = imread(vidfigMF);
         writeVideo(vidMFlux,imgMF);
         
+      % Save current frame of average net mass flux figure
+        figMFZ = 'AvgNetMFCurrent.jpg';
+        saveas(figAvgMFZ,fullfile(savepath,figMFZ));
+        imgMFZ = imread(figMFZ);
+        
       % If user-specified image filetype is tif, append current timestep
       % frame to multipage tif file. Otherwise, save frame as independent
       % image named by timestep.
         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
             imwrite(imgMF,fullfile(savepath,sprintf('MFlux_tsteps_%s.tif',...
-                run)),'tif','WriteMode','append')
+                run)),'tif','WriteMode','append');
+            imwrite(imgMFZ,fullfile(savepath,sprintf('AvgNetMF_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append');
         else
             saveas(figMF,fullfile(savepath,sprintf('MFlux_t%03d_%s.%s',...
+                time(t),run,imtype)));
+            saveas(figMFZ,fullfile(savepath,sprintf('AvgNetMF_t%03d_%s.%s',...
                 time(t),run,imtype)));
         end
       % ================================================================= %
@@ -175,25 +241,69 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     close(vidMFlux);
     
     
-  % ------------------ NET MASS FLUX TIME SERIES PLOTS ------------------ %
     if strcmp(PULSE,'T') == 1
       str = sprintf('%s: Unsteady flow %g Hz',titlerun,FREQ);
     elseif strcmp(PULSE,'F') == 1
       str = sprintf('%s: Steady flow',titlerun);
     end
     
+   % ------------------ NET MASS FLUX TIME SERIES PLOTS ------------------ % 
     figNetMF = figure('Name','Net Mass Flux','visible',vis,'units',...
         'centimeters','outerposition',[0 0 33.33 18.75],'PaperPositionMode',...
         'auto','color','w');
     axNetMF = axes('Parent',figNetMF,'box','on','FontSize',12);
     grid(axNetMF,'on');
+    axis(axNetMF,[0,time(end),massflux_crange(1)/5,massflux_crange(2)/5]);
     hold on
     plot(time,netMF_alts);
     legend(axNetMF,massflux_legend)
-    title(axNetMF,sprintf('%s: Net mass flux through specified altitudes',str))
+    title(axNetMF,sprintf('%s: Net solid mass flux through specified altitudes',str))
     xlabel(axNetMF,'\bfTime (s)')
     ylabel(axNetMF,'\bfNet mass flux (kg/m^2s)')
     saveas(figNetMF,fullfile(savepath,sprintf('NetMassFlux_tseries_%s.jpg',run)))
+  % ===================================================================== %
+  
+  
+  % ---------------- TIME-AVERAGED MASS FLUX WITH HEIGHT ---------------- %
+    figure(figAvgMFZ)
+    hold on
+    set(hMFZ,'Color',[0.55 0.55 0.55],'LineWidth',0.5);
+    allNMF = load(sprintf('netmassflux_%s.txt',run));
+    avgNMF = mean(allNMF(:,2:end),1);
+    hNMF = plot(avgNMF,1:JMAX-ghostcells,'-.','Color',[0 0.4 0.7],'LineWidth',3);
+    set(hNMF,'DisplayName','Time-averaged profile')
+    set(hMFZ,'DisplayName','Individual timestep profiles')
+    title(axAvgMFZ,sprintf('%s: Time-averaged mass flux with height',str))
+    hMFZleg = legend(axAvgMFZ,[hNMF hMFZ hJet]);
+    set(hMFZleg,'FontSize',12,'Location','Northwest')
+    saveas(figAvgMFZ,fullfile(savepath,sprintf('TimeAvgNetMF_%s.jpg',run)));
+    
+    avgNegMF = abs(min(avgNMF(avgNMF<0)));
+    if isempty(avgNegMF)
+        avgNegMF = 0;
+    end
+    avg_Ongaro = avgNegMF/MASSFLUX_SOL;
+    dlmwrite(fullfile(savepath,sprintf('avgOngaroCrit_%s.txt',run)),...
+        avg_Ongaro,'delimiter','\t');
+  % ===================================================================== %
+  
+  
+  % ---------------- COLLAPSE CRITERION TIME SERIES PLOT ---------------- %
+    figCollapse = figure('Name','Collapse criterion','units','centimeters',...
+        'outerposition',[0 0 33.33 18.75],'visible',vis,'PaperPositionMode',...
+        'auto','color','w');
+    axCollapse = axes('Parent',figCollapse,'box','on','TickDir','in',...
+        'FontSize',12);
+    grid(axCollapse,'on');
+    axis(axCollapse,[0,time(end),0,1]);
+    hold on
+    plot(time,collapse_Ongaro,'.-',time,0.9*ones(1,length(time)),'k--',time,...
+        0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
+    xlabel(axCollapse,'\bfTime (s)');
+    ylabel(axCollapse,'\bfCollapse criterion ratio');
+    title(axCollapse,sprintf('%s: Collapse criterion ratio...',str));
+    legend('SUPERRATIO!','Near-total collapse','Partial collapse','Incipient collapse');
+    saveas(figCollapse,fullfile(savepath,sprintf('CollapseCriterion_%s.jpg',run)));
   % ===================================================================== %
   
   

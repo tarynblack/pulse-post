@@ -9,7 +9,7 @@
 %   Detailed explanation goes here
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 21 March 2016
+%   Last edit: Taryn Black, 6 April 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)   
@@ -25,7 +25,7 @@
   % Subtightplot properties
     gap = [0.03 0.03];
     ht = 0.10;
-    wd = 0.10;
+    wd = 0.15;
     
   % Ensure that 'no slice' directions are empty and determine figure
   % viewing angle based on slice direction
@@ -71,7 +71,7 @@
     cbVelo.Label.String = '\bfFlow Speed (m/s)';
 
     figVort = figure('Name','Vorticity','units','centimeters','visible',...
-        vis,'outerposition',[0 0 28 18],'PaperPositionMode','auto',...
+        vis,'outerposition',[0 0 30 18],'PaperPositionMode','auto',...
         'color','w');
     cd(postpath)
     axVortX = subtightplot(1,2,1,gap,ht,wd);
@@ -96,7 +96,7 @@
 %         zlabel(axQV,sprintf('\\bf Altitude (%s)',labelYunit))
         cbVort = colorbar(axVortY,'Location','eastoutside','AxisLocation',...
            'out','FontSize',12);
-        cbVort.Label.String = '\bfFlow Vorticity';
+        cbVort.Label.String = '\bfFlow Vorticity (s^{-1})';
     set([axVortX axVortY],'box','on','TickDir','in','FontSize',12)
     grid(axVortX,'on'); grid(axVortY,'on');
     view(axVortX,viewaz,viewel); view(axVortY,viewaz,viewel); 

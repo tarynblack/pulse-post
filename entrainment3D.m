@@ -8,13 +8,14 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
 %   entrainment3D ---does things---
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 21 March 2016
-    
+%   Last edit: Taryn Black, 6 April 2016 
+  
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
-    delete('coeff_avg-std*','entr_avg-std*','expn_avg-std*',...
-        'plot_time*','ecoeff_all*','plumevolume_*','plumeheight_*',...
-        'e_MortonConic_*','Entr_t*','EPG_t*','Quiver_t*');
+    delete('coeff_avg-std*','entr_avg-std*','expn_avg-std*','ecoeff_all*',...
+        'jcoeff_avg-std*','jentr_avg-std*','jexpn_avg-std*','jcoeff_all*',...
+        'plot_time*','plumevolume_*','plumeheight_*','e_MortonConic_*',...
+        'Entr_t*','EPG_t*','Quiver_t*','*Coefficients*');
     
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
@@ -93,6 +94,13 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     ylabel(axEn,sprintf('\\bf Distance_z (%s)',labelZunit));
     zlabel(axEn,sprintf('\\bf Altitude (%s)',labelYunit));
     cbEn = colorbar(axEn,'AxisLocation','out','FontSize',12);
+    nmap = 256;
+    cmapEn = [winter(round(nmap*-entrainment_crange(1)/...
+        (diff(entrainment_crange))));[0.9 0.9 0.9];...
+        flipud(autumn(nmap-round(nmap*-entrainment_crange(1)/...
+        (diff(entrainment_crange)))))];
+    colormap(axEn,cmapEn)
+    caxis(entrainment_crange);
     
   % Gas volume fraction isosurface: video
     vidEPG = VideoWriter(sprintf('vidEPG_%s.avi',run));
@@ -309,15 +317,8 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
       
       
       % ---------------- ENTRAINMENT ISOSURFACE FIGURES ----------------- %
-      % Define concatenated colormap of entrainment so cmaps meet at e=0
-        nmap = 256;
-        colormap([winter(round(nmap*-entrainment_crange(1)/...
-            (diff(entrainment_crange))));...
-            flipud(autumn(nmap-round(nmap*-entrainment_crange(1)/...
-            (diff(entrainment_crange)))))]);
-        caxis(entrainment_crange);
-        cmap = colormap;
-        emap = linspace(entrainment_crange(1),entrainment_crange(2),nmap);
+      % Alter colormap of entrainment so cmaps meet at e=0
+        emap = linspace(entrainment_crange(1),entrainment_crange(2),nmap+1);
         e_color = zeros(length(e_coeff),3);   
         for k = 1:length(e_coeff)
             if e_coeff(k) > entrainment_crange(2)
@@ -327,11 +328,10 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
             end
         end
         e_round = interp1(emap,emap,e_coeff,'nearest');
-        emap = [emap; 1:nmap];
+        emap = [emap; 1:(nmap+1)];
         for j = 1:length(e_coeff)
-            e_color(j,:) = cmap(emap(2,emap(1,:) == e_round(j)),:);
+            e_color(j,:) = cmapEn(emap(2,emap(1,:) == e_round(j)),:);
         end        
-        colormap(figEn,cmap);
 
       % Plot entrainment on plume surface
         figure(figEn);
@@ -339,7 +339,6 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         patch('Vertices',[plumeX plumeY plumeZ],'Faces',1:length(plumeX),...
             'FaceVertexCData',e_color,'FaceColor','none','EdgeColor',...
             'none','Marker','o','MarkerFaceColor','flat');
-        caxis(axEn,entrainment_crange);
         text(1.17,0.3,'\bfEntrainment','Units','normalized',...
             'HorizontalAlignment','right','rotation',90,'FontSize',12);
         text(1.17,0.7,'\bfExpansion','Units','normalized',...
@@ -476,10 +475,11 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     he3 = errorbar(time(2:end),avg_coeff(2:end),std_coeff(2:end),'k',...
         'LineWidth',3,'Marker','+','MarkerSize',10,...
         'DisplayName','Total Coefficient');
-    title(axCoeff,sprintf('%s: Plume-averaged coefficients',str),...
-        'FontWeight','bold')
+    tlCoeff1 = 'Plume-averaged entrainment/expansion efficiencies';
+    tlCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_coeff(2:end)));
+    title(axCoeff,{tlCoeff1;tlCoeff2},'FontWeight','bold')
     xlabel(axCoeff,'\bfTime (s)')
-    ylabel(axCoeff,'\bfEntrainment/Expansion Coefficient')
+    ylabel(axCoeff,'\bfEfficiency Coefficient')
     xlim(axCoeff,[0 time(end)+DT])
     ylim(axCoeff,[-1 1])
     line(xlim,[0 0],'color',[0.1 0.1 0.1],'LineWidth',0.5);
@@ -488,6 +488,10 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     hl.FontWeight = 'bold';
     hl.FontSize = 10;
     saveas(figCoeff,fullfile(savepath,sprintf('Coefficients_%s.jpg',run)));
+    
+  % Plume-averaged entrainment/expansion, zoomed to show detail
+    ylim(axCoeff,[-0.2 0.2])
+    saveas(figCoeff,fullfile(savepath,sprintf('CoefficientsDetail_%s.jpg',run)));
     
   % Jet region entrainment/expansion
     figJCoeff = figure('Name','Jet Region Entrainment Coefficients',...
@@ -513,8 +517,9 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     hje3 = errorbar(time(2:end),avg_jcoeff(2:end),std_jcoeff(2:end),'k',...
         'LineWidth',3,'Marker','+','MarkerSize',10,...
         'DisplayName','Total Coefficient');
-    title(axJCoeff,sprintf('%s: Jet region coefficients',str),...
-        'FontWeight','bold')
+    tlJCoeff1 = 'Jet region entrainment/expansion efficiencies';
+    tlJCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_jcoeff(2:end)));
+    title(axJCoeff,{tlJCoeff1;tlJCoeff2},'FontWeight','bold')
     xlabel(axJCoeff,'\bfTime (s)')
     ylabel(axJCoeff,'\bfEntrainment/Expansion Coefficient')
     xlim(axJCoeff,[0 time(end)+DT])
@@ -525,6 +530,10 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     hjl.FontWeight = 'bold';
     hjl.FontSize = 10;
     saveas(figJCoeff,fullfile(savepath,sprintf('JetCoefficients_%s.jpg',run)));
+    
+  % Jet region entrainment/expansion, zoomed to show detail
+    ylim(axJCoeff,[-0.2 0.2])
+    saveas(figJCoeff,fullfile(savepath,sprintf('JetCoefficientsDetail_%s.jpg',run)));
     
   % Comparison conic coefficient
     figMorton = figure('Name','Conic entrainment coefficient','units',...
