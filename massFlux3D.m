@@ -5,7 +5,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
     readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,fnameVS2,...
     readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-    readEPS3,fnameEPS3,jetheight,MASSFLUX_SOL,VENT_R,MING )
+    readEPS3,fnameEPS3,jetheight,MASSFLUX_SOL,VENT_R,MING,sdistX,sdistY,...
+    sdistZ )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -16,6 +17,36 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     cd(savepath)
     delete('*massflux*','*MFlux*','*AvgNetMF*','Collapse*','*Ongaro*',...
         'NetMassFlux_*','EP*vent')
+    
+    
+  % Ensure that 'no slice' directions are empty and determine figure
+  % viewing angle based on slice direction
+    if sdistX==0
+        sdistX = [];
+    end
+    if sdistY==0
+        sdistY = [];
+    end
+    if sdistZ==0
+        sdistZ = [];
+    end
+    
+    if isempty(sdistX) && isempty(sdistY)
+        saz = 0;
+        sel = 90;
+    elseif isempty(sdistY) && isempty(sdistZ)
+        saz = 90;
+        sel = 0;
+    elseif isempty(sdistX) && isempty(sdistZ)
+        saz = 0;
+        sel = 0;
+    else [saz,sel] = view(3);
+    end
+    
+  % Subtightplot properties
+    gap = [0.01 0.01];
+    ht = 0.15;
+    wd = 0.15;
 
 
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
@@ -23,26 +54,40 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     varMF = 'Solid mass flux';
     varMFZ = 'Horizontally averaged solid mass flux';
     varVFE = 'Volume fraction of gas and solids';
+    cd(runpath)
     
   % Mass flux slice: figure and axes properties
     figMFlux = figure('Name','Mass flux','units','centimeters',...
-        'outerposition',[0 0 22 18.75],'visible',vis,'PaperPositionMode',...
+        'outerposition',[0 0 28 18.75],'visible',vis,'PaperPositionMode',...
         'auto','color','w');
-    axMFlux = axes('Parent',figMFlux,'box','on','TickDir','in','FontSize',12);
-    hold on
-    grid(axMFlux,'on');axMFlux.Layer = 'top';
-    view(axMFlux,viewaz,viewel)
-    axis(axMFlux,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
-        JMAX-ghostcells]);
-    set(axMFlux,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
-        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
-        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
-    xlabel(axMFlux,sprintf('\\bfDistance_x (%s)',labelXunit))
-    ylabel(axMFlux,sprintf('\\bfDistance_z (%s)',labelZunit))
-    zlabel(axMFlux,sprintf('\\bfAltitude (%s)',labelYunit))
+    cd(postpath)
+    axMFlux1 = subtightplot(1,2,1,gap,ht,wd);
+        hold on
+        axis(axMFlux1,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+            JMAX-ghostcells]);
+        set(axMFlux1,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+            'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+            'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely);
+        xlabel(axMFlux1,sprintf('\\bfDistance_x (%s)',labelXunit))
+        ylabel(axMFlux1,sprintf('\\bfDistance_z (%s)',labelZunit))
+        zlabel(axMFlux1,sprintf('\\bfAltitude (%s)',labelYunit))
+    axMFlux2 = subtightplot(1,2,2,gap,ht,wd);
+        hold on
+        axis(axMFlux2,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+            JMAX-ghostcells]);
+        set(axMFlux2,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+          'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+          'ZTick',ticky(2:end)/YRES,'ZTickLabel','')
+        xlabel(axMFlux2,sprintf('\\bf Distance_x (%s)',labelXunit))
+        ylabel(axMFlux2,sprintf('\\bf Distance_z (%s)',labelZunit))
+%         zlabel(axMFlux2,sprintf('\\bfAltitude (%s)',labelYunit))
+    set([axMFlux1 axMFlux2],'box','on','TickDir','in','FontSize',12)
+    grid(axMFlux1,'on');grid(axMFlux2,'on');
+    axMFlux1.Layer = 'top';axMFlux2.Layer = 'top';
+    view(axMFlux1,saz,sel);view(axMFlux2,viewaz,viewel);
     cmapMFlux = [winter;[0.9 0.9 0.9];flipud(autumn)];
-    colormap(axMFlux,cmapMFlux);
-    cbMFlux = colorbar(axMFlux,'AxisLocation','in','FontSize',12);
+    colormap(axMFlux1,cmapMFlux);colormap(axMFlux2,cmapMFlux);
+    cbMFlux = colorbar(axMFlux2,'AxisLocation','in','FontSize',12);
     cbMFlux.Label.String = '\bfMass Flux (kg/m^2s)';
     cbMFlux.Ticks = -log10(abs(massflux_crange(1))):log10(massflux_crange(2));
     cbMFlux.TickLabels = cellstr(num2str([-10.^(abs(-log10(abs...
@@ -55,15 +100,15 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     axAvgMFZ = axes('Parent',figAvgMFZ,'box','on','TickDir','in','FontSize',12);
     hold on
     grid(axAvgMFZ,'on');
-    axis(axAvgMFZ,[massflux_crange(1)/5,massflux_crange(2)/5,0,JMAX-ghostcells]);
+    axis(axAvgMFZ,[2*massflux_crange(1),2*massflux_crange(2),0,JMAX-ghostcells]);
     set(axAvgMFZ,'YTick',ticky(2:end)/YRES,'YTickLabel',labely);
     xlabel(axAvgMFZ,'\bfNet mass flux (kg/m^2s)')
     ylabel(axAvgMFZ,sprintf('\\bfAltitude (%s)',labelYunit))
     hMFZ = plot(0,0,'DisplayName','Previous profiles');
     hBlk = plot(0,0,'k','LineWidth',2,'DisplayName',...
         'Current profile');
-    hJet = plot(massflux_crange(1)/5:1E3:massflux_crange(2)/5,...
-        jetheight*ones(1,length(massflux_crange(1)/5:1E3:massflux_crange(2)/5)),...
+    hJet = plot(2*massflux_crange(1):1E3:2*massflux_crange(2),...
+        jetheight*ones(1,length(2*massflux_crange(1):1E3:2*massflux_crange(2))),...
         '--','Color',[0.2 0.5 0.2],'LineWidth',1.5,'DisplayName',...
         sprintf('Jet height (%.3f km)',jetheight*YRES/1000));
     hMFZleg = legend(axAvgMFZ,[hBlk hMFZ hJet]);
@@ -180,17 +225,32 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         
       % --------------------- MASS FLUX SLICE FIGURE -------------------- %
         figure(figMFlux)
-        cla(axMFlux);
-        hMF = slice(axMFlux,1:IMAX-ghostcells,1:KMAX-ghostcells,...
+        cla(axMFlux1);cla(axMFlux2);
+        hMF1 = slice(axMFlux1,0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),logMF,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),sdistZ*(JMAX-ghostcells));
+          hMF1.FaceColor = 'interp';
+          hMF1.EdgeColor = 'none';
+          hEPZ1 = contourslice(axMFlux1,EPG,sdistX*(IMAX-ghostcells),...
+              sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
+          set(hEPZ1,'EdgeColor',[1 1 1],'LineWidth',0.5);
+          tMF1 = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
+          title(axMFlux1,tMF1,'FontWeight','bold');
+          caxis(axMFlux1,[-log10(abs(massflux_crange(1))) log10(massflux_crange(2))]);
+        hMF2 = slice(axMFlux2,1:IMAX-ghostcells,1:KMAX-ghostcells,...
             1:JMAX-ghostcells,logMF,[],[],massflux_alts);
-        set(hMF,'FaceColor','interp','EdgeColor','none')
-        hEPZ = contourslice(axMFlux,EPG,0,0,massflux_alts,...
-            [plumeedge plumeedge]);
-        set(hEPZ,'EdgeColor',[1 1 1],'LineWidth',0.5);
-        caxis(axMFlux,[-log10(abs(massflux_crange(1))) log10(massflux_crange(2))]);
-        tMF = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
+          set(hMF2,'FaceColor','interp','EdgeColor','none')
+          hEPZ2 = contourslice(axMFlux2,EPG,0,0,massflux_alts,...
+              [plumeedge plumeedge]);
+          set(hEPZ2,'EdgeColor',[1 1 1],'LineWidth',0.5);
+          caxis(axMFlux2,[-log10(abs(massflux_crange(1))) log10(massflux_crange(2))]);
+%         tMF = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
         tMF2 = sprintf('Jet height: %.3f km',jetheight*YRES/1000);
-        title(axMFlux,[tMF;tMF2],'FontWeight','bold');
+        title(axMFlux2,[tMF2],'FontWeight','bold');
+        PosMF1 = get(axMFlux1,'position');
+        PosMF2 = get(axMFlux2,'position');
+        PosMF2(3:4) = PosMF1(3:4);
+        set(axMFlux2,'position',PosMF2);
       % ================================================================= %
       
       
@@ -255,7 +315,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         'auto','color','w');
     axNetMF = axes('Parent',figNetMF,'box','on','FontSize',12);
     grid(axNetMF,'on');
-    axis(axNetMF,[0,time(end),massflux_crange(1)/5,massflux_crange(2)/5]);
+    axis(axNetMF,[0,time(end),2*massflux_crange(1),2*massflux_crange(2)]);
     hold on
     plot(time,netMF_alts);
     legend(axNetMF,massflux_legend)
