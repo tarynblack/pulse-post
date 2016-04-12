@@ -173,7 +173,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 %         netventflux = squeeze(sum(sum(ventflux)));
         collapse_Ongaro(t) = negMF/MASSFLUX_SOL;%netventflux;
         dlmwrite(fullfile(savepath,sprintf('collapseOngaro_%s.txt',run)),...
-            [time(t) collapse_Ongaro(t)],'-append','delimiter','\t');
+            [time(t) negMF MASSFLUX_SOL collapse_Ongaro(t)],...
+            '-append','delimiter','\t');
+
         
         
       % --------------------- MASS FLUX SLICE FIGURE -------------------- %
