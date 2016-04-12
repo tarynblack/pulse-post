@@ -286,7 +286,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     end
     avg_Ongaro = avgNegMF/MASSFLUX_SOL;
     dlmwrite(fullfile(savepath,sprintf('avgOngaroCrit_%s.txt',run)),...
-        avg_Ongaro,'delimiter','\t');
+        [avgNegMF MASSFLUX_SOL avg_Ongaro],'delimiter','\t');
   % ===================================================================== %
   
   
