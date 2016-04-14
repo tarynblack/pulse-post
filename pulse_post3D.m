@@ -11,7 +11,7 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 17 March 2016
+% Last edit: Taryn Black, 11 April 2016
 
 % clear all
 
@@ -95,7 +95,7 @@
   % Vorticity
     vorticity_crange = [-20 20];
   % Mass flux [kg/m2.s]
-    massflux_crange = [-1E6 1E6];
+    massflux_crange = [-1E5 1E5];
   
 % Altitudes [meters] at which to calculate vertical mass flux
 % To include script-calculated jet height, include one NaN in vector
@@ -290,7 +290,8 @@
       PULSE,FREQ,time,titlerun,massflux_legend,imtype,savepath,readEPG,...
       fnameEPG,readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,...
       fnameVS2,readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-      readEPS3,fnameEPS3,jetheight,MASSFLUX_SOL,VENT_R,MING);
+      readEPS3,fnameEPS3,jetheight,MASSFLUX_SOL,VENT_R,MING,sdistX,...
+      sdistY,sdistZ);
   cd(postpath)
   
   close all

@@ -10,7 +10,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
 %   Detailed explanation goes here
 %
 %   Special functions called: loadTimestep3D, pulsetitle
-%   Last edit: Taryn Black, 6 April 2016
+%   Last edit: Taryn Black, 14 April 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -20,8 +20,8 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
   % Define variable names for figures
-    varD = 'Flow density';
-    varB = 'Relative density';
+    varD = 'Bulk density';
+    varB = 'Density contrast';
     cd(runpath)
 
   % Ensure that 'no slice' directions are empty and determine figure
@@ -48,8 +48,8 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     else [saz,sel] = view(3);
     end
     
-  % Flow density slice: figure and axes properties     
-    figDens = figure('Name','Plume Density','visible',vis,'units',...
+  % Bulk density slice: figure and axes properties     
+    figDens = figure('Name','Bulk density','visible',vis,'units',...
         'centimeters','outerposition',[0 0 19 18.75],'PaperPositionMode',...
         'auto','color','w');
     axDens = axes('Parent',figDens,'box','on','TickDir','in','FontSize',12);
@@ -66,11 +66,11 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     zlabel(axDens,sprintf('\\bf Altitude (%s)',labelYunit))
     colormap(figDens,'default')
     cbDens = colorbar(axDens,'AxisLocation','in','FontSize',12);
-    cbDens.Label.String = '\bfFlow Density (kg/m^3)';
+    cbDens.Label.String = '\bfBulk density (kg/m^3)';
         
     
-  % Flow relative density slice: figure and axes properties
-    figRelD = figure('Name','Relative density','visible',vis,'units',...
+  % Density contrast slice: figure and axes properties
+    figRelD = figure('Name','Density contrast','visible',vis,'units',...
         'centimeters','outerposition',[16.66 0 19 18.75],'PaperPositionMode',...
         'auto','color','w');
     axRelD = axes('Parent',figRelD,'box','on','TickDir','in','FontSize',12);
@@ -86,7 +86,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     ylabel(axRelD,sprintf('\\bf Distance_z (%s)',labelZunit))
     zlabel(axRelD,sprintf('\\bf Altitude (%s)',labelYunit))
     cbRelD = colorbar(axRelD,'AxisLocation','in','FontSize',12);
-    cbRelD.Label.String = '\bf\rho_{atmosphere} - \rho_{flow} (kg/m^3)';
+    cbRelD.Label.String = '\bf\rho_{atmosphere} - \rho_{mixture} (kg/m^3)';
   % Define relative density colormap: red = rise, blue = collapse.
     numcolors = 256;
     cmaplims = [1 0 0;    % red
@@ -97,7 +97,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     cmapB = interp1(fixcpts/numcolors,cmaplims,linspace(0,1,numcolors));
     colormap(figRelD,cmapB)
     
-  % Flow density slice: video
+  % Bulk density slice: video
     cd(savepath)
     vidFlowDens = VideoWriter(sprintf('vidFlowDens_%s.avi',run));
     vidFlowDens.Quality = 100;
@@ -163,11 +163,11 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         end        
         cla;
         
-      % Calculate flow density at every point in domain
+      % Calculate bulk density at every point in domain
         domaindensity = (EPG.*ROG)+(EPS1*RO_S1)+(EPS2*RO_S2)+(EPS3*RO_S3);
         
         
-      % ------------------- FLOW DENSITY SLICE FIGURE ------------------- %
+      % ------------------- BULK DENSITY SLICE FIGURE ------------------- %
         figure(figDens)
         cla(axDens);
         hD = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
@@ -248,7 +248,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
         cd(savepath)
         
-      % Append current flow density frame to vidFlowDens
+      % Append current bulk density frame to vidFlowDens
         vidfigD = 'FlowDensity.jpg';
         saveas(figDens,fullfile(savepath,vidfigD))
         imgD = imread(vidfigD);
@@ -309,20 +309,21 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     hold on
     allRDJH = load(sprintf('avgRelDens_JetHeight_%s.txt',run));
     allRDJH = allRDJH(:,2);
-    negidx = allRDJH<0;
+    negidx = allRDJH<=0;
     negRDJH = NaN(length(allRDJH),1);
     negRDJH(negidx) = allRDJH(negidx);
     hRDJH = plot(time(2:end),allRDJH,'r',time(2:end),negRDJH,'b','LineWidth',2);
     ylim(flowBuoyancy_crange)
     xlabel('\bfTime (s)')
-    ylabel('\bf\rho_{atmosphere} - \rho_{flow} (kg/m^3)')
-    title(sprintf('%s: Relative density of flow at jet height',str));
+    ylabel('\bf\rho_{atmosphere} - \rho_{mixture} (kg/m^3)')
+    title(axRDJH,{sprintf('Mixture density contrast at jet height (%.3f km)',...
+        jetheight*YRES/1000);sprintf('%s',str)});
     saveas(figRDJH,fullfile(savepath,sprintf('JetHeightBuoyancy_%s.jpg',run)));
   % ===================================================================== %
 
   
     cd(postpath)
-    disp('Flow density processing complete.')
+    disp('Bulk density processing complete.')
     fprintf('vidFlowDens_%s has been saved to %s.\n',run,savepath)
     fprintf('vidFlowRelD_%s has been saved to %s.\n',run,savepath)
   
