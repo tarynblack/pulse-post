@@ -3,10 +3,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     labelXunit,labelYunit,labelZunit,run,timesteps,postpath,massflux_alts,...
     RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,PULSE,FREQ,time,...
     titlerun,massflux_legend,imtype,savepath,readEPG,fnameEPG,...
-    readROG,fnameROG,readVG,fnameVG,readVS1,fnameVS1,readVS2,fnameVS2,...
-    readVS3,fnameVS3,readEPS1,fnameEPS1,readEPS2,fnameEPS2,...
-    readEPS3,fnameEPS3,jetheight,MASSFLUX_SOL,VENT_R,MING,sdistX,sdistY,...
-    sdistZ )
+    readVS1,fnameVS1,readVS2,fnameVS2,readVS3,fnameVS3,readEPS1,...
+    fnameEPS1,readEPS2,fnameEPS2,readEPS3,fnameEPS3,jetheight,...
+    MASSFLUX_SOL,sdistX,sdistY,sdistZ )
 %massFlux3D Summary of this function goes here
 %   Detailed explanation goes here
 %
@@ -53,7 +52,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   % Define variable names for figures
     varMF = 'Solid mass flux';
     varMFZ = 'Horizontally averaged solid mass flux';
-    varVFE = 'Volume fraction of gas and solids';
     cd(runpath)
     
   % Mass flux slice: figure and axes properties
@@ -124,11 +122,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     set(gcf,'Visible',vis);
   % ===================================================================== %
   
-  
+
   % File import specifications: columns to read (%) or skip (%*) for each variable
     EPGimport = '%f%*f%*f%*f%*f%*f%*f';
-%     ROGimport = '%*f%f%*f%*f%*f%*f%*f';
-%     VGimport  = '%*f%f%*f%*f%*f%*f';
     EPS1import = '%*f%f%*f%*f%*f%*f%*f';
     EPS2import = '%*f%*f%f%*f%*f%*f%*f';
     EPS3import = '%*f%*f%*f%f%*f%*f%*f';
@@ -138,9 +134,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     
   % Preallocate vectors
     netMF_alts = zeros(length(massflux_alts),timesteps);
-    collapse_Ongaro = zeros(1,timesteps);
+    collapse_crit = zeros(1,timesteps);
     
-  
+ 
   % =================== B E G I N   T I M E   L O O P =================== %
     t = 0;
     while t <= timesteps
@@ -154,8 +150,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 
         cd(postpath)
         fID_EPG = fileReadType(fnameEPG,readEPG,t,runpath,postpath);
-%         fID_ROG = fileReadType(fnameROG,readROG,t,runpath,postpath);
-%         fID_VG = fileReadType(fnameVG,readVG,t,runpath,postpath);
         fID_EPS1 = fileReadType(fnameEPS1,readEPS1,t,runpath,postpath);
         fID_EPS2 = fileReadType(fnameEPS2,readEPS2,t,runpath,postpath);
         fID_EPS3 = fileReadType(fnameEPS3,readEPS3,t,runpath,postpath);
@@ -171,8 +165,6 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
                 time(t),ME.identifier)
             break
         end
-%         ROG = loadTimestep3D(fID_ROG,ROGimport,readROG,IMAX,JMAX,KMAX,ghostcells);
-%         V_G  = loadTimestep3D(fID_VG,VGimport,readVG,IMAX,JMAX,KMAX,ghostcells);
         EPS1 = loadTimestep3D(fID_EPS1,EPS1import,readEPS1,IMAX,JMAX,KMAX,ghostcells);
         EPS2 = loadTimestep3D(fID_EPS2,EPS2import,readEPS2,IMAX,JMAX,KMAX,ghostcells);
         EPS3 = loadTimestep3D(fID_EPS3,EPS3import,readEPS3,IMAX,JMAX,KMAX,ghostcells);
@@ -186,11 +178,9 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         end
         
       % Calculate vertical solid mass flux at specified altitudes
-%         massflux = ROG.*V_G + RO_S1*V_S1 + RO_S2*V_S2 + RO_S3*V_S3;
         massflux = RO_S1*EPS1.*V_S1 + RO_S2*EPS2.*V_S2 + RO_S3*EPS3.*V_S3;
         netmassflux = squeeze(sum(sum(massflux)));
-        netMF_alts(:,t) = netmassflux(massflux_alts);
-    
+        netMF_alts(:,t) = netmassflux(massflux_alts);   
       % Save calculated mass fluxes at each timestep
         dlmwrite(fullfile(savepath,sprintf('massflux_all_t%03d.txt',...
             time(t))),massflux,'delimiter','\t');
@@ -203,22 +193,15 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         logMF(logMF<0) = -log10(abs(logMF(logMF<0)));
         
       % Calculate most-negative flux and vent flux for Ongaro criterion
-%         ventflux = zeros(IMAX-ghostcells,KMAX-ghostcells);
-        negMF  = abs(min(netmassflux(netmassflux<0)));
-        if isempty(negMF)
-            negMF = 0;
+        massflux_jetheight = massflux(:,:,round(jetheight));        
+        netnegmassflux_JH = sum(massflux_jetheight(massflux_jetheight<0));
+%         negMF  = abs(min(netmassflux(netmassflux<0)));
+        if isempty(netnegmassflux_JH)
+            netnegmassflux_JH = 0;
         end
-%         for i = ((IMAX-ghostcells)/2)-(VENT_R/XRES):((IMAX-ghostcells)/2)+(VENT_R/XRES)
-%             for k = ((KMAX-ghostcells)/2)-(VENT_R/ZRES):((KMAX-ghostcells)/2)+(VENT_R/ZRES)
-%                 if (i - ((IMAX-ghostcells)/2))^2 + (k - ((KMAX-ghostcells)/2))^2 <= (VENT_R/XRES)^2
-%                     ventflux(i,k) = massflux(i,k,1);
-%                 end
-%             end
-%         end
-%         netventflux = squeeze(sum(sum(ventflux)));
-        collapse_Ongaro(t) = negMF/MASSFLUX_SOL;%netventflux;
-        dlmwrite(fullfile(savepath,sprintf('collapseOngaro_%s.txt',run)),...
-            [time(t) negMF MASSFLUX_SOL collapse_Ongaro(t)],...
+        collapse_crit(t) = -netnegmassflux_JH/MASSFLUX_SOL;
+        dlmwrite(fullfile(savepath,sprintf('collapseRatio_%s.txt',run)),...
+            [time(t) netnegmassflux_JH MASSFLUX_SOL collapse_crit(t)],...
             '-append','delimiter','\t');
 
         
@@ -359,8 +342,8 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     grid(axCollapse,'on');
     axis(axCollapse,[0,time(end),0,1]);
     hold on
-    plot(time,collapse_Ongaro,'.-',time,0.9*ones(1,length(time)),'k--',time,...
-        0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
+    plot(time,collapse_crit,'.-');%,time,0.9*ones(1,length(time)),'k--',time,...
+%         0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
     xlabel(axCollapse,'\bfTime (s)');
     ylabel(axCollapse,'\bfCollapse criterion ratio');
     title(axCollapse,sprintf('%s: Collapse criterion ratio...',str));
