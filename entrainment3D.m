@@ -8,7 +8,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
 %   entrainment3D ---does things---
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 11 April 2016 
+%   Last edit: Taryn Black, 15 April 2016 
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -437,13 +437,13 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'auto','color','w');
     axVol1 = subplot(2,1,1);
       plot(time,plumevolume)
-      title(axVol1,{sprintf('%s: Total plume volume',str)},...
+      title(axVol1,{sprintf('Total plume volume\n%s',str)},...
           'FontWeight','bold')
       xlabel(axVol1,{'Time (s)'},'FontWeight','bold')
       ylabel(axVol1,{'Volume (m^3)'},'FontWeight','bold')
     axVol2 = subplot(2,1,2);
       plot(time(2:length(plumevolume)),diff(plumevolume))
-      title(axVol2,{sprintf('%s: Change in plume volume',str)},...
+      title(axVol2,{sprintf('Change in plume volume\n%s',str)},...
           'FontWeight','bold')
       xlabel(axVol2,{'Time (s)'},'FontWeight','bold')
       ylabel(axVol2,{'\DeltaVolume (m^3)'},'FontWeight','bold')
@@ -474,12 +474,13 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'DisplayName','Entrainment');
     he3 = errorbar(time(2:end),avg_coeff(2:end),std_coeff(2:end),'k',...
         'LineWidth',3,'Marker','+','MarkerSize',10,...
-        'DisplayName','Total Coefficient');
-    tlCoeff1 = 'Plume-averaged entrainment/expansion efficiencies';
-    tlCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_entr(2:end)));
-    title(axCoeff,{tlCoeff1;tlCoeff2},'FontWeight','bold')
+        'DisplayName','Combined');
+    tlCoeff1 = 'EEE averaged over full plume surface';
+    tlCoeff2 = sprintf('%s',str); 
+    tlCoeff3 = sprintf('Spatiotemporally averaged entrainment = %.4f',mean(avg_entr(2:end)));
+    title(axCoeff,{tlCoeff1;tlCoeff2;tlCoeff3},'FontWeight','bold')
     xlabel(axCoeff,'\bfTime (s)')
-    ylabel(axCoeff,'\bfEfficiency Coefficient')
+    ylabel(axCoeff,'\bfEEE')
     xlim(axCoeff,[0 time(end)+DT])
     ylim(axCoeff,[-1 1])
     line(xlim,[0 0],'color',[0.1 0.1 0.1],'LineWidth',0.5);
@@ -516,12 +517,13 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'DisplayName','Entrainment');
     hje3 = errorbar(time(2:end),avg_jcoeff(2:end),std_jcoeff(2:end),'k',...
         'LineWidth',3,'Marker','+','MarkerSize',10,...
-        'DisplayName','Total Coefficient');
-    tlJCoeff1 = 'Jet region entrainment/expansion efficiencies';
-    tlJCoeff2 = sprintf('%s, overall average entrainment = %.4f',str,mean(avg_jentr(2:end)));
-    title(axJCoeff,{tlJCoeff1;tlJCoeff2},'FontWeight','bold')
+        'DisplayName','Combined');
+    tlJCoeff1 = 'EEE averaged over jet region';
+    tlJCoeff2 = sprintf('%s',str); 
+    tlJCoeff3 = sprintf('Spatiotemporally averaged entrainment = %.4f',mean(avg_jentr(2:end)));
+    title(axJCoeff,{tlJCoeff1;tlJCoeff2;tlJCoeff3},'FontWeight','bold')
     xlabel(axJCoeff,'\bfTime (s)')
-    ylabel(axJCoeff,'\bfEntrainment/Expansion Coefficient')
+    ylabel(axJCoeff,'\bfEEE')
     xlim(axJCoeff,[0 time(end)+DT])
     ylim(axJCoeff,[-1 1])
     line(xlim,[0 0],'color',[0.1 0.1 0.1],'LineWidth',0.5);
@@ -541,7 +543,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'PaperPositionMode','auto','color','w');
     axMor = axes('Parent',figMorton,'box','on','FontSize',12); 
     plot(axMor,time,e_Mconic)
-    title(axMor,sprintf('%s: Morton conic entrainment coefficient',str),...
+    title(axMor,sprintf('Morton entrainment coefficient\n%s',str),...
         'FontWeight','bold')
     xlabel(axMor,'\bfTime (s)')
     ylabel(axMor,'\bfCoefficient')
