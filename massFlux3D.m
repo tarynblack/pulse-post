@@ -45,7 +45,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   % Subtightplot properties
     gap = [0.01 0.01];
     ht = 0.15;
-    wd = 0.15;
+    wd = 0.10;
 
 
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
@@ -56,7 +56,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     
   % Mass flux slice: figure and axes properties
     figMFlux = figure('Name','Mass flux','units','centimeters',...
-        'outerposition',[0 0 33 18.75],'visible',vis,'PaperPositionMode',...
+        'outerposition',[0 0 30 18.75],'visible',vis,'PaperPositionMode',...
         'auto','color','w');
     cd(postpath)
     axMFlux1 = subtightplot(1,2,1,gap,ht,wd);
