@@ -215,8 +215,9 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         flowreldens = avgatmsdens_3D_inplume - flowdensity;
 
       % Calculate average relative density of flow at jet height
+        inplumeJH  = inplume(:,:,round(jetheight));
         reldensJH  = flowreldens(:,:,round(jetheight));
-        avgRDJH(t) = mean(reldensJH(:));
+        avgRDJH(t) = mean(reldensJH(inplumeJH));
         dlmwrite(fullfile(savepath,sprintf('avgRelDens_JetHeight_%s.txt',...
             run)),[time(t) avgRDJH(t)],'-append','delimiter','\t');
       % ================================================================= %
@@ -313,6 +314,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     negRDJH = NaN(length(allRDJH),1);
     negRDJH(negidx) = allRDJH(negidx);
     hRDJH = plot(time(2:end),allRDJH,'r',time(2:end),negRDJH,'b','LineWidth',2);
+    xlim([0 time(end)])
     ylim(flowBuoyancy_crange)
     xlabel('\bfTime (s)')
     ylabel('\bf\rho_{atmosphere} - \rho_{mixture} (kg/m^3)')
