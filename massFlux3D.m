@@ -231,6 +231,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         PosMF2 = get(axMFlux2,'position');
         PosMF2(3:4) = PosMF1(3:4);
         set(axMFlux2,'position',PosMF2);
+        set(figMFlux,'Visible',vis);
       % ================================================================= %
       
       
@@ -241,6 +242,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         hMFZ = plot(netmassflux,1:JMAX-ghostcells,'k','LineWidth',2);        
         tMFZ = pulsetitle(varMFZ,PULSE,time,t,titlerun,FREQ);
         title(axAvgMFZ,tMFZ,'FontWeight','bold');
+        set(figAvgMFZ,'Visible',vis);
       % ================================================================= %
       
       

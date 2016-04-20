@@ -140,6 +140,7 @@ function [ vidGasTemp ] = gasTemperature3D( run,runpath,vis,ghostcells,IMAX,...
         tL = pulsetitle(varTG,PULSE,time,t,titlerun,FREQ);
         title(tL,'FontSize',12,'FontWeight','bold');
         hold on
+        set(figTemp,'Visible',vis);
       % ================================================================= %
       
       

@@ -47,6 +47,7 @@ function [ EPG_vent,EPS_vent ] = evolveVolumeFraction( MING,MAXG,FREQ,...
             cd(postpath)
             tVFE = pulsetitle(varVFE,PULSE,time,t,titlerun,FREQ);
             title(axVolFrac(1),tVFE,'FontWeight','bold');
+            set(figVolFrac,'Visible',vis);
            
           % Save current timestep
             cd(savepath)

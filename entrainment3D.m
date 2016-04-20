@@ -8,7 +8,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
 %   entrainment3D ---does things---
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 15 April 2016 
+%   Last edit: Taryn Black, 19 April 2016 
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -199,6 +199,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         lighting gouraud;
         tLEP = pulsetitle(varEP,PULSE,time,t,titlerun,FREQ);
         title(tLEP,'FontWeight','bold');
+        set(figEP,'Visible',vis);
       % ================================================================= %
 
       
@@ -349,6 +350,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         camlight('right');
         camlight('left');
         lighting gouraud;
+        set(figEn,'Visible',vis);
       % ================================================================= %
       
       

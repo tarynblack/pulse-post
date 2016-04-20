@@ -175,6 +175,7 @@
         caxis(axVelo,velocity_crange);
         tFS = pulsetitle(varU,PULSE,time,t,titlerun,FREQ);
         title(tFS,'FontSize',12,'FontWeight','bold');
+        set(figVelo,'Visible',vis);
       % ================================================================= %
       
       
@@ -223,6 +224,8 @@
         PosS2 = get(axVortY,'position');
         PosS2(3:4) = PosS1(3:4);
         set(axVortY,'position',PosS2);
+        
+        set(figVort,'Visible',vis);
       % ================================================================= %
       
       

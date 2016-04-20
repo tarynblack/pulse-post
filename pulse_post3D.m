@@ -11,7 +11,7 @@
 % Functions called: setCnsts3D; calc_inletFlow; entrainment3D;
 % particleConc3D; gasTemperature3D; flowDensity3D; velocity3D
 %
-% Last edit: Taryn Black, 11 April 2016
+% Last edit: Taryn Black, 19 April 2016
 
 % clear all
 
@@ -39,7 +39,7 @@
 % -------------- POST-PROCESSING DISPLAY AND SAVE SETTINGS -------------- %
 % Choose whether to display ('on') or suppress ('off') figures.
 % NOTE: must be 'off' when running remotely in -nodisplay mode.
-  vis = 'on';
+  vis = 'off';
 
 % Set end time (seconds) for movies. Use [] to process all timesteps.
   tstop = 300;
@@ -212,8 +212,8 @@
   tickz = linspace(0,WIDTH,Zpoints);
   labelz = tickz(2:end)/Zfact;
   
-% Calculate characteristic inlet velocity
-  [XG,vel_char,MFR,MASSFLUX,MFR_SOL,MASSFLUX_SOL,jetheight] = ...
+% Calculate characteristic values at vent
+  [XG,vel_char,MFR,MASSFLUX,MFR_SOL,MASSFLUX_SOL,jetheight,avgEPG] = ...
       calc_inletFlow(charEPG,MING,MAXG,PULSE,BC_EPG,BC_PG,BC_TG,Rgas,...
       RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,BC_TS1,BC_TS2,BC_TS3,VENT_R,g);
   jetheight = jetheight/YRES;
