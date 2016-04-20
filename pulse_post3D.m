@@ -237,7 +237,7 @@
       TSTOP,vis,titlerun,imtype,time,savepath,postpath,run);
    
 % Entrainment and gas volume fraction calculations and figures
-  entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
+  [STavg_entr,STavg_jentr] = entrainment3D(run,runpath,vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,...
       labelXunit,ticky,labely,labelYunit,tickz,labelz,labelZunit,...
       plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,vel_char,...
       jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
@@ -283,7 +283,7 @@
   cd(postpath)
         
 % Mass flux calculations and figures
-  massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
+  massratio = massFlux3D(runpath,vis,viewaz,viewel,ghostcells,IMAX,JMAX,KMAX,...
       tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
       labelXunit,labelYunit,labelZunit,run,timesteps,postpath,...
       massflux_alts,RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,...
@@ -294,6 +294,26 @@
   cd(postpath)
   
   close all
+  
+% Save key output parameters to file
+  keyParams = { PULSE           % T if pulsing, F if steady
+                FREQ            % pulse frequency
+                MING            % minimum gas volume fraction
+                MAXG            % maximum gas volume fraction
+                Stokes_S1       % pulsed Stokes for solid phase 1
+                Stokes_S2       % pulsed Stokes for solid phase 2
+                Stokes_S3       % pulsed Stokes for solid phase 3
+                avgEPG          % average gas volume fraction
+                MFR_SOL         % solid mass flow rate
+                MASSFLUX_SOL    % solid mass flux
+                STavg_entr      % spatiotemporally averaged plume entrainment
+                STavg_jentr     % spatiotemporally averaged jet entrainment
+                massratio }';     % ratio of collapsed to erupted mass
+  keyParams = cell2table(keyParams,'VariableNames',{'Pulse','Frequency',...
+        'MinEPG','MaxEPG','StokesS1','StokesS2','StokesS3',...
+        'AvgEPG','AvgMFR','AvgMFlux','AvgEntr','AvgJEntr',...
+        'MassRatio'});
+  writetable(keyParams,fullfile(savepath,'keyParameters.txt'));
 
   disp('* ================================================= *')
   disp('   P O S T - P R O C E S S I N G   C O M P L E T E')
