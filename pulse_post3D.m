@@ -299,7 +299,10 @@
   keyParams = { PULSE           % T if pulsing, F if steady
                 FREQ            % pulse frequency
                 MING            % minimum gas volume fraction
-                MAXG            % maximum gas volume fraction
+                MAXG            % maximum gas volume 
+                D_S1            % diameter of solid phase 1
+                D_S2            % diameter of solid phase 2
+                D_S3            % diameter of solid phase 3
                 Stokes_S1       % pulsed Stokes for solid phase 1
                 Stokes_S2       % pulsed Stokes for solid phase 2
                 Stokes_S3       % pulsed Stokes for solid phase 3
