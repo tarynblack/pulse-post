@@ -313,7 +313,7 @@
         'MinEPG','MaxEPG','StokesS1','StokesS2','StokesS3',...
         'AvgEPG','AvgMFR','AvgMFlux','AvgEntr','AvgJEntr',...
         'MassRatio'});
-  writetable(keyParams,fullfile(savepath,'keyParameters.txt'));
+  writetable(keyParams,fullfile(savepath,sprintf('keyParameters_%s.txt',run)));
 
   disp('* ================================================= *')
   disp('   P O S T - P R O C E S S I N G   C O M P L E T E')
