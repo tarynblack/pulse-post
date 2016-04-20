@@ -45,7 +45,7 @@ function [ massratio ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   % Subtightplot properties
     gap = [0.01 0.01];
     ht = 0.15;
-    wd = 0.15;
+    wd = 0.10;
 
 
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
