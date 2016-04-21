@@ -14,103 +14,103 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
-    delete('flowdensity_*','atmsdensity_*','flowreldens_*','avgRelDens_*');
-%         'FlowDens*','FlowRelD*','avgRelDens_*');
-%     
-%     
-%   % ----------------------- FIGURE INITIALIZATION ----------------------- %
-%   % Define variable names for figures
-%     varD = 'Bulk density';
-%     varB = 'Density contrast';
-%     cd(runpath)
-% 
-%   % Ensure that 'no slice' directions are empty and determine figure
-%   % viewing angle based on slice direction
-%     if sdistX==0
-%         sdistX = [];
-%     end
-%     if sdistY==0
-%         sdistY = [];
-%     end
-%     if sdistZ==0
-%         sdistZ = [];
-%     end
-%     
-%     if isempty(sdistX) && isempty(sdistY)
-%         saz = 0;
-%         sel = 90;
-%     elseif isempty(sdistY) && isempty(sdistZ)
-%         saz = 90;
-%         sel = 0;
-%     elseif isempty(sdistX) && isempty(sdistZ)
-%         saz = 0;
-%         sel = 0;
-%     else [saz,sel] = view(3);
-%     end
-%     
-%   % Bulk density slice: figure and axes properties     
-%     figDens = figure('Name','Bulk density','visible',vis,'units',...
-%         'centimeters','outerposition',[0 0 19 18.75],'PaperPositionMode',...
-%         'auto','color','w');
-%     axDens = axes('Parent',figDens,'box','on','TickDir','in','FontSize',12);
-%     hold on
-%     grid(axDens,'on');axDens.Layer = 'top';
-%     view(axDens,saz,sel)
-%     axis(axDens,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
-%         JMAX-ghostcells]);
-%     set(axDens,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
-%         'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
-%         'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-%     xlabel(axDens,sprintf('\\bf Distance_x (%s)',labelXunit))
-%     ylabel(axDens,sprintf('\\bf Distance_z (%s)',labelZunit))
-%     zlabel(axDens,sprintf('\\bf Altitude (%s)',labelYunit))
-%     colormap(figDens,'default')
-%     cbDens = colorbar(axDens,'AxisLocation','in','FontSize',12);
-%     cbDens.Label.String = '\bfBulk density (kg/m^3)';
-%         
-%     
-%   % Density contrast slice: figure and axes properties
-%     figRelD = figure('Name','Density contrast','visible',vis,'units',...
-%         'centimeters','outerposition',[16.66 0 19 18.75],'PaperPositionMode',...
-%         'auto','color','w');
-%     axRelD = axes('Parent',figRelD,'box','on','TickDir','in','FontSize',12);
-%     hold on
-%     grid(axRelD,'on');axRelD.Layer = 'top';
-%     view(axRelD,saz,sel)
-%     axis(axRelD,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
-%         JMAX-ghostcells]);
-%     set(axRelD,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
-%         'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
-%         'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
-%     xlabel(axRelD,sprintf('\\bf Distance_x (%s)',labelXunit))
-%     ylabel(axRelD,sprintf('\\bf Distance_z (%s)',labelZunit))
-%     zlabel(axRelD,sprintf('\\bf Altitude (%s)',labelYunit))
-%     cbRelD = colorbar(axRelD,'AxisLocation','in','FontSize',12);
-%     cbRelD.Label.String = '\bf\rho_{atmosphere} - \rho_{mixture} (kg/m^3)';
-%   % Define relative density colormap: red = rise, blue = collapse.
-%     numcolors = 256;
-%     cmaplims = [1 0 0;    % red
-%                 1 1 1;    % white
-%                 0 0 1];   % blue
-%     fixcpts = [numcolors-1 numcolors*(1-(abs(flowBuoyancy_crange(2))/...
-%         (abs(flowBuoyancy_crange(1))+abs(flowBuoyancy_crange(2))))) 0];
-%     cmapB = interp1(fixcpts/numcolors,cmaplims,linspace(0,1,numcolors));
-%     colormap(figRelD,cmapB)
-%     
-%   % Bulk density slice: video
-%     cd(savepath)
-%     vidFlowDens = VideoWriter(sprintf('vidFlowDens_%s.avi',run));
-%     vidFlowDens.Quality = 100;
-%     vidFlowDens.FrameRate = 10;
-%     open(vidFlowDens);
-%     set(gcf,'Visible',vis);
-%     
-%   % Flow relative density: video
-%     vidFlowReld = VideoWriter(sprintf('vidFlowRelD_%s.avi',run));
-%     vidFlowReld.Quality = 100;
-%     vidFlowReld.FrameRate = 10;
-%     open(vidFlowReld);
-%     set(gcf,'Visible',vis);
+    delete('flowdensity_*','atmsdensity_*','flowreldens_*',...
+        'FlowDens*','FlowRelD*','avgRelDens_*');
+    
+    
+  % ----------------------- FIGURE INITIALIZATION ----------------------- %
+  % Define variable names for figures
+    varD = 'Bulk density';
+    varB = 'Density contrast';
+    cd(runpath)
+
+  % Ensure that 'no slice' directions are empty and determine figure
+  % viewing angle based on slice direction
+    if sdistX==0
+        sdistX = [];
+    end
+    if sdistY==0
+        sdistY = [];
+    end
+    if sdistZ==0
+        sdistZ = [];
+    end
+    
+    if isempty(sdistX) && isempty(sdistY)
+        saz = 0;
+        sel = 90;
+    elseif isempty(sdistY) && isempty(sdistZ)
+        saz = 90;
+        sel = 0;
+    elseif isempty(sdistX) && isempty(sdistZ)
+        saz = 0;
+        sel = 0;
+    else [saz,sel] = view(3);
+    end
+    
+  % Bulk density slice: figure and axes properties     
+    figDens = figure('Name','Bulk density','visible',vis,'units',...
+        'centimeters','outerposition',[0 0 19 18.75],'PaperPositionMode',...
+        'auto','color','w');
+    axDens = axes('Parent',figDens,'box','on','TickDir','in','FontSize',12);
+    hold on
+    grid(axDens,'on');axDens.Layer = 'top';
+    view(axDens,saz,sel)
+    axis(axDens,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+        JMAX-ghostcells]);
+    set(axDens,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+    xlabel(axDens,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axDens,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axDens,sprintf('\\bf Altitude (%s)',labelYunit))
+    colormap(figDens,'default')
+    cbDens = colorbar(axDens,'AxisLocation','in','FontSize',12);
+    cbDens.Label.String = '\bfBulk density (kg/m^3)';
+        
+    
+  % Density contrast slice: figure and axes properties
+    figRelD = figure('Name','Density contrast','visible',vis,'units',...
+        'centimeters','outerposition',[16.66 0 19 18.75],'PaperPositionMode',...
+        'auto','color','w');
+    axRelD = axes('Parent',figRelD,'box','on','TickDir','in','FontSize',12);
+    hold on
+    grid(axRelD,'on');axRelD.Layer = 'top';
+    view(axRelD,saz,sel)
+    axis(axRelD,'equal',[0,IMAX-ghostcells,0,KMAX-ghostcells,0,...
+        JMAX-ghostcells]);
+    set(axRelD,'XTick',tickx(2:end)/XRES,'XTickLabel',labelx,...
+        'YTick',tickz(2:end)/ZRES,'YTickLabel',labelz,...
+        'ZTick',ticky(2:end)/YRES,'ZTickLabel',labely)
+    xlabel(axRelD,sprintf('\\bf Distance_x (%s)',labelXunit))
+    ylabel(axRelD,sprintf('\\bf Distance_z (%s)',labelZunit))
+    zlabel(axRelD,sprintf('\\bf Altitude (%s)',labelYunit))
+    cbRelD = colorbar(axRelD,'AxisLocation','in','FontSize',12);
+    cbRelD.Label.String = '\bf\rho_{atmosphere} - \rho_{mixture} (kg/m^3)';
+  % Define relative density colormap: red = rise, blue = collapse.
+    numcolors = 256;
+    cmaplims = [1 0 0;    % red
+                1 1 1;    % white
+                0 0 1];   % blue
+    fixcpts = [numcolors-1 numcolors*(1-(abs(flowBuoyancy_crange(2))/...
+        (abs(flowBuoyancy_crange(1))+abs(flowBuoyancy_crange(2))))) 0];
+    cmapB = interp1(fixcpts/numcolors,cmaplims,linspace(0,1,numcolors));
+    colormap(figRelD,cmapB)
+    
+  % Bulk density slice: video
+    cd(savepath)
+    vidFlowDens = VideoWriter(sprintf('vidFlowDens_%s.avi',run));
+    vidFlowDens.Quality = 100;
+    vidFlowDens.FrameRate = 10;
+    open(vidFlowDens);
+    set(gcf,'Visible',vis);
+    
+  % Flow relative density: video
+    vidFlowReld = VideoWriter(sprintf('vidFlowRelD_%s.avi',run));
+    vidFlowReld.Quality = 100;
+    vidFlowReld.FrameRate = 10;
+    open(vidFlowReld);
+    set(gcf,'Visible',vis);
   % ===================================================================== %
 
   
@@ -168,21 +168,21 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         
         
       % ------------------- BULK DENSITY SLICE FIGURE ------------------- %
-%         figure(figDens)
-%         cla(axDens);
-%         hD = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
-%             0.5:(JMAX-ghostcells-0.5),domaindensity,...
-%             sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
-%             sdistZ*(JMAX-ghostcells));
-%         hD.FaceColor = 'interp';
-%         hD.EdgeColor = 'none';
-%         caxis(axDens,flowDensity_crange);
-%         tLD = pulsetitle(varD,PULSE,time,t,titlerun,FREQ);
-%         title(tLD,'FontSize',12,'FontWeight','bold');
-%         hEPD = contourslice(EPG,sdistX*(IMAX-ghostcells),...
-%             sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
-%         set(hEPD,'EdgeColor',[1 1 1],'LineWidth',0.5);
-%         set(figDens,'Visible',vis);
+        figure(figDens)
+        cla(axDens);
+        hD = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),domaindensity,...
+            sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
+            sdistZ*(JMAX-ghostcells));
+        hD.FaceColor = 'interp';
+        hD.EdgeColor = 'none';
+        caxis(axDens,flowDensity_crange);
+        tLD = pulsetitle(varD,PULSE,time,t,titlerun,FREQ);
+        title(tLD,'FontSize',12,'FontWeight','bold');
+        hEPD = contourslice(EPG,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
+        set(hEPD,'EdgeColor',[1 1 1],'LineWidth',0.5);
+        set(figDens,'Visible',vis);
       % ================================================================= %
         
       
@@ -220,61 +220,61 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
       
       
       % ----------------- RELATIVE DENSITY SLICE FIGURES ---------------- %
-%         figure(figRelD)
-%         cla(axRelD);
-%         hB = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
-%             0.5:(JMAX-ghostcells-0.5),flowreldens,...
-%             sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
-%             sdistZ*(JMAX-ghostcells));
-%         hB.FaceColor = 'interp';
-%         hB.EdgeColor = 'none';
-%         caxis(axRelD,flowBuoyancy_crange);
-%         tLB = pulsetitle(varB,PULSE,time,t,titlerun,FREQ);
-%         title(tLB,'FontSize',12,'FontWeight','bold');
-%         hEPB = contourslice(EPG,sdistX*(IMAX-ghostcells),...
-%             sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
-%         set(hEPB,'EdgeColor',[0 0 0],'LineWidth',0.5);
-%         set(figRelD,'Visible',vis);
+        figure(figRelD)
+        cla(axRelD);
+        hB = slice(0.5:(IMAX-ghostcells-0.5),0.5:(KMAX-ghostcells-0.5),...
+            0.5:(JMAX-ghostcells-0.5),flowreldens,...
+            sdistX*(IMAX-ghostcells),sdistY*(KMAX-ghostcells),...
+            sdistZ*(JMAX-ghostcells));
+        hB.FaceColor = 'interp';
+        hB.EdgeColor = 'none';
+        caxis(axRelD,flowBuoyancy_crange);
+        tLB = pulsetitle(varB,PULSE,time,t,titlerun,FREQ);
+        title(tLB,'FontSize',12,'FontWeight','bold');
+        hEPB = contourslice(EPG,sdistX*(IMAX-ghostcells),...
+            sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
+        set(hEPB,'EdgeColor',[0 0 0],'LineWidth',0.5);
+        set(figRelD,'Visible',vis);
       % ================================================================= %
         
         
       % --------- SAVE CURRENT FRAMES TO VIDEOS AND IMAGE FILES --------- %
         cd(savepath)
         
-%       % Append current bulk density frame to vidFlowDens
-%         vidfigD = 'FlowDensity.jpg';
-%         saveas(figDens,fullfile(savepath,vidfigD))
-%         imgD = imread(vidfigD);
-%         writeVideo(vidFlowDens,imgD);
-%           
-%       % Append current flow relative density frame to vidFlowRelD
-%         vidfigRD = 'FlowRelDensity.jpg';
-%         saveas(figRelD,fullfile(savepath,vidfigRD))
-%         imgRD = imread(vidfigRD);
-%         writeVideo(vidFlowReld,imgRD);
-%           
-%       % Save density and relative density calculations at each timestep
-%         dlmwrite(fullfile(savepath,sprintf('flowdensity_t%03d.txt',...
-%             time(t))),flowdensity,'delimiter','\t','precision','%g');
-%         dlmwrite(fullfile(savepath,sprintf('atmsdensity_t%03d.txt',...
-%             time(t))),atmsdensity,'delimiter','\t','precision','%g');
-%         dlmwrite(fullfile(savepath,sprintf('flowreldens_t%03d.txt',...
-%             time(t))),flowreldens,'delimiter','\t','precision','%g');
-%           
-%       % If user-specified image filetype is tif, append current timestep
-%       % frame to multipage tif file. Otherwise, save frame as independent
-%       % image named by timestep.
-%         if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
-%             imwrite(imgD,fullfile(savepath,sprintf('FlowDens_tsteps_%s.tif',...
-%                 run)),'tif','WriteMode','append')
-%             imwrite(imgRD,fullfile(savepath,sprintf('FlowRelD_tsteps_%s.tif',...
-%                 run)),'tif','WriteMode','append')
-%         else
-%             saveas(figDens,fullfile(savepath,...
-%                 sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype)));
-%             saveas(figRelD,fullfile(savepath,...
-%                 sprintf('FlowRelD_%03ds_%s.%s',time(t),run,imtype)));
-%         end
+      % Append current bulk density frame to vidFlowDens
+        vidfigD = 'FlowDensity.jpg';
+        saveas(figDens,fullfile(savepath,vidfigD))
+        imgD = imread(vidfigD);
+        writeVideo(vidFlowDens,imgD);
+          
+      % Append current flow relative density frame to vidFlowRelD
+        vidfigRD = 'FlowRelDensity.jpg';
+        saveas(figRelD,fullfile(savepath,vidfigRD))
+        imgRD = imread(vidfigRD);
+        writeVideo(vidFlowReld,imgRD);
+          
+      % Save density and relative density calculations at each timestep
+        dlmwrite(fullfile(savepath,sprintf('flowdensity_t%03d.txt',...
+            time(t))),flowdensity,'delimiter','\t','precision','%g');
+        dlmwrite(fullfile(savepath,sprintf('atmsdensity_t%03d.txt',...
+            time(t))),atmsdensity,'delimiter','\t','precision','%g');
+        dlmwrite(fullfile(savepath,sprintf('flowreldens_t%03d.txt',...
+            time(t))),flowreldens,'delimiter','\t','precision','%g');
+          
+      % If user-specified image filetype is tif, append current timestep
+      % frame to multipage tif file. Otherwise, save frame as independent
+      % image named by timestep.
+        if strcmp(imtype,'tif') == 1 || strcmp(imtype,'tiff') == 1
+            imwrite(imgD,fullfile(savepath,sprintf('FlowDens_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
+            imwrite(imgRD,fullfile(savepath,sprintf('FlowRelD_tsteps_%s.tif',...
+                run)),'tif','WriteMode','append')
+        else
+            saveas(figDens,fullfile(savepath,...
+                sprintf('FlowDens_%03ds_%s.%s',time(t),run,imtype)));
+            saveas(figRelD,fullfile(savepath,...
+                sprintf('FlowRelD_%03ds_%s.%s',time(t),run,imtype)));
+        end
       % ================================================================= %
 
     end
@@ -283,8 +283,8 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
   
   % End video write and finish video files
     cd(savepath)
-%     close(vidFlowDens);
-%     close(vidFlowReld);
+    close(vidFlowDens);
+    close(vidFlowReld);
     
     
     if strcmp(PULSE,'T') == 1
