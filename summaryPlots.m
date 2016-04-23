@@ -2,6 +2,7 @@
 % makes summary plots of different parameters.
 
 postpath = '~/scratch/pulse-post';
+% Path to directory containing summaryPlots.m
 
 % Path to directory containing subdirectories with keyParameter files
   savepath = '~/data2/ProductionRuns_Storage/';
@@ -16,8 +17,8 @@ postpath = '~/scratch/pulse-post';
                   0.90 0.50 0.00];  % orange
             
 % Define mass ratio values for transitions between buoyant/partial/collapse
-  collapse2partial = 0.2;
-  partial2buoyant  = 0.6;
+  collapse2partial = 0.5;
+  partial2buoyant  = 0.2;
   
 % Define scatter symbology for buoyant/partial/collapse
   plumeStatSymbols = 'osv';
@@ -205,9 +206,15 @@ cd(savepath)
   ylim([min(KPT.MinEPG) 1])
   hFvEPG = gscatter(KPT.Frequency,KPT.AvgEPG,KPT.PlumeStatus,...
       myColorOrder,plumeStatSymbols);
-    set(hFvEPG(1),'MarkerFaceColor',myColorOrder(1,:));
-    set(hFvEPG(2),'MarkerFaceColor',myColorOrder(2,:));
-    set(hFvEPG(3),'MarkerFaceColor',myColorOrder(3,:));
+  for i = 1:length(hFvEPG)
+      if strcmp(hFvEPG(i).DisplayName,'Collapse') == 1
+          set(hFvEPG(i),'MarkerFaceColor',myColorOrder(1,:));
+      elseif strcmp(hFvEPG(i).DisplayName,'Partial') == 1
+          set(hFvEPG(i),'MarkerFaceColor',myColorOrder(2,:));
+      elseif strcmp(hFvEPG(i).DisplayName,'Buoyant') == 1
+          set(hFvEPG(i),'MarkerFaceColor',myColorOrder(3,:));
+      end
+  end
   xlabel('Pulse frequency (Hz)');
   ylabel('Average gas volume fraction');
   saveas(fFREQvEPG,fullfile(savepath,'Freq_AvgEPG.jpg'));
@@ -223,9 +230,15 @@ cd(savepath)
   axFvMF.XTickLabel{1} = 'Steady';
   hFvMF = gscatter(KPT.Frequency,KPT.AvgMFlux,KPT.PlumeStatus,...
       myColorOrder,plumeStatSymbols);
-    set(hFvMF(1),'MarkerFaceColor',myColorOrder(1,:));
-    set(hFvMF(2),'MarkerFaceColor',myColorOrder(2,:));
-    set(hFvMF(3),'MarkerFaceColor',myColorOrder(3,:));
+  for i = 1:length(hFvEPG)
+      if strcmp(hFvMF(i).DisplayName,'Collapse') == 1
+          set(hFvMF(i),'MarkerFaceColor',myColorOrder(1,:));
+      elseif strcmp(hFvMF(i).DisplayName,'Partial') == 1
+          set(hFvMF(i),'MarkerFaceColor',myColorOrder(2,:));
+      elseif strcmp(hFvMF(i).DisplayName,'Buoyant') == 1
+          set(hFvMF(i),'MarkerFaceColor',myColorOrder(3,:));
+      end
+  end
   xlabel('Pulse frequency (Hz)');
   ylabel('Average mass flux (kg/m^2s)');
   saveas(fFREQvMFLUX,fullfile(savepath,'Freq_AvgMFlux.jpg'));
