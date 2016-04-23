@@ -128,8 +128,9 @@ cd(savepath)
   end
   PST = cell2table(plumeStatus,'VariableNames',{'PlumeStatus'});
           
-% Combine key parameters, frequency index, and plume status
+% Combine key parameters, frequency index, and plume status and save table
   KPT = [KPT IDX PST];
+  writetable(KPT,fullfile(savepath,'SummaryTable.txt'));
   
   
 %%% ---------------- CREATE PARAMETRIZED SUMMARY PLOTS ---------------- %%%
