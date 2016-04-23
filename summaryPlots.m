@@ -3,7 +3,7 @@
 
 postpath = '~/scratch/pulse-post';
 
-% savepath must contain subdirectories where keyParameter files are saved
+% Path to directory containing subdirectories with keyParameter files
   savepath = '~/data2/ProductionRuns_Storage/';
   numKeyParams = 16;      % number of elements in keyParameters_*.txt files
                           % that are written in pulse_post3D
@@ -12,7 +12,8 @@ postpath = '~/scratch/pulse-post';
   myColorOrder = [0.25 0.35 0.80    % blue
                   0.00 0.75 0.30    % green
                   0.85 0.00 0.20    % red
-                  0.65 0.00 0.75];  % purple
+                  0.65 0.00 0.75    % purple
+                  0.90 0.50 0.00];  % orange
             
 % Define mass ratio values for transitions between buoyant/partial/collapse
   collapse2partial = 0.2;
@@ -38,18 +39,31 @@ cd(savepath)
 % Loop through each subdirectory and load parameters into cell array
   for k = 1:N
       
+      cd(savepath)
       dirName = dirList(k).name;
       cd(dirName)
       
-      keyParams = importdata(sprintf('keyParameters_%s.txt',dirName));
+    % Load keyParameters.txt, or move on to next directory if no keyParams
+      if exist(sprintf('keyParameters_%s.txt',dirName),'file') ~= 2
+          warning('Excluding %s: no keyParameters file exists.',dirName);
+          continue
+      else
+          keyParams = importdata(sprintf('keyParameters_%s.txt',dirName));
+      end
+      
       allKeyParams{k,1} = k;
       allKeyParams{k,2} = keyParams.textdata{2,1};
       allKeyParams(k,3:end) = num2cell(keyParams.data);
-      
-      cd(savepath)
-      
+            
   end
+  
+  cd(savepath)
 
+% Find and delete empty rows from cell array (empty rows occur if a
+% directory did not contain the keyParameters file)
+  emptyRows = cellfun('isempty',allKeyParams);
+  allKeyParams(all(emptyRows,2),:) = [];
+ 
 % Create table of key parameters for all simulations
   KPT = cell2table(allKeyParams,'VariableNames',...
       {'RunID'          % Unique number for each simulation
@@ -69,6 +83,10 @@ cd(savepath)
        'AvgEntr'        % Spatiotemporally averaged plume entrainment
        'AvgJEntr'       % Spatiotemporally averaged jet entrainment
        'MassRatio'});   % Ratio of total collapsed to erupted mass
+   
+% Delete empty rows (from if directory didn't contain keyParameters file)
+  blankKPT = ismissing(KPT);
+  KPT = KPT(~any(blankKPT,2),:);
 
 % Replace steady 'frequencies' with fake value for plotting
   steadyFreq = min(KPT.Frequency)/10;
@@ -119,6 +137,7 @@ cd(savepath)
 % Set figure default values
   set(0,'DefaultFigurePaperPositionMode','auto',...
         'DefaultFigureColor','w',...
+        'DefaultFigureVisible','off',...
         'DefaultFigureColorMap',myColorOrder,...
         'DefaultFigureUnits','normalized',...
         'DefaultFigurePosition',[0 0 1 1],...
@@ -233,13 +252,14 @@ cd(savepath)
   xlabel('Average mass flux (kg/m^2s)');
   ylabel('Average plume entrainment');
   legMFvAE = legend(axMFvAE,hFreqLeg);
-  saveas(fSTOKESvAVGENTR,fullfile(savepath,'AvgMFlux_AvgPEntr.jpg'));
+  saveas(fMFLUXvAVGENTR,fullfile(savepath,'AvgMFlux_AvgPEntr.jpg'));
 
 % Average jet entrainment vs. average mass flux
   set(hMFvAE,'YData',-KPT.AvgJEntr);
   ylabel('Average jet entrainment');
-  saveas(fSTOKESvAVGENTR,fullfile(savepath,'AvgMFlux_AvgJEntr.jpg'));
+  saveas(fMFLUXvAVGENTR,fullfile(savepath,'AvgMFlux_AvgJEntr.jpg'));
 
 %%% =================================================================== %%%
 
+close all
 cd(postpath)
