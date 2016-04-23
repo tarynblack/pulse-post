@@ -111,7 +111,7 @@ cd(savepath)
             colorRow = size(myColorOrder,1);
         end
       hFreqLeg(i) = scatter(fakeAx,0,0,[],myColorOrder(colorRow,:),'o','filled',...
-          'MarkerEdgeColor','off','DisplayName',sprintf('%g Hz',allFrequencies(i)));
+          'MarkerEdgeColor','none','DisplayName',sprintf('%g Hz',allFrequencies(i)));
   end
   hFreqLeg(1).DisplayName = 'Steady';
   IDX = array2table(FreqIndex,'VariableNames',{'FreqIndex'});
@@ -216,7 +216,7 @@ cd(savepath)
           set(hFvEPG(i),'MarkerFaceColor',myColorOrder(3,:));
       end
   end
-  set(hFvEPG,'MarkerEdgeColor','off');
+  set(hFvEPG,'MarkerEdgeColor','none');
   xlabel('Pulse frequency (Hz)');
   ylabel('Average gas volume fraction');
   saveas(fFREQvEPG,fullfile(savepath,'Freq_AvgEPG.jpg'));
@@ -241,7 +241,7 @@ cd(savepath)
           set(hFvMF(i),'MarkerFaceColor',myColorOrder(3,:));
       end
   end
-  set(hFvMF,'MarkerEdgeColor','off');
+  set(hFvMF,'MarkerEdgeColor','none');
   xlabel('Pulse frequency (Hz)');
   ylabel('Average mass flux (kg/m^2s)');
   saveas(fFREQvMFLUX,fullfile(savepath,'Freq_AvgMFlux.jpg'));
