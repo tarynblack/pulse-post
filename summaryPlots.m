@@ -119,9 +119,9 @@ cd(savepath)
 % Define plume status based on mass ratio relative to defined transitions
   plumeStatus = cell(size(KPT,1),1);
   for i = 1:size(KPT,1)
-      if KPT.MassRatio(i) < collapse2partial
+      if KPT.MassRatio(i) > collapse2partial
           plumeStatus{i} = 'Collapse';
-      elseif KPT.MassRatio(i) > partial2buoyant
+      elseif KPT.MassRatio(i) < partial2buoyant
           plumeStatus{i} = 'Buoyant';
       else plumeStatus{i} = 'Partial';
       end
@@ -130,7 +130,7 @@ cd(savepath)
           
 % Combine key parameters, frequency index, and plume status and save table
   KPT = [KPT IDX PST];
-  writetable(KPT,fullfile(savepath,'SummaryTable.txt'));
+  writetable(KPT,fullfile(savepath,'SummaryTable.txt'),'Delimiter','tab');
   
   
 %%% ---------------- CREATE PARAMETRIZED SUMMARY PLOTS ---------------- %%%
