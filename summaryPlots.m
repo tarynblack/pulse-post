@@ -6,6 +6,7 @@ postpath = '~/scratch/pulse-post';
 
 % Path to directory containing subdirectories with keyParameter files
   savepath = '~/data2/ProductionRuns_Storage/';
+  savepath = 'C:/Users/taryn/OneDrive/Documents/SUMMARYTEST';%'~/data2/ProductionRuns_Storage/';
   numKeyParams = 16;      % number of elements in keyParameters_*.txt files
                           % that are written in pulse_post3D
                         
@@ -257,7 +258,7 @@ cd(savepath)
   axFvMR.XScale = 'log';
   axFvMR.XLim = [min(allFrequencies) max(allFrequencies)];
   axFvMR.XTickLabel{1} = 'Steady';
-  hFvMR = gscatter(KPT.Frequency,KPT.AvgMFlux,KPT.PlumeStatus,...
+  hFvMR = gscatter(KPT.Frequency,KPT.MassRatio,KPT.PlumeStatus,...
       myColorOrder,plumeStatSymbols);
   for i = 1:length(hFvMR)
       if strcmp(hFvMR(i).DisplayName,'Collapse') == 1
