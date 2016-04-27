@@ -175,6 +175,7 @@ cd(savepath)
   set(hSvAE2,'YData',-KPT.AvgJEntr);
   set(hSvAE3,'YData',-KPT.AvgJEntr);
   ylabel('Average jet entrainment');
+  ylim([0 0.1])
   saveas(fSTOKESvAVGENTR,fullfile(savepath,'Stokes_AvgJEntr.jpg'));
 
   
@@ -182,7 +183,7 @@ cd(savepath)
   fSTOKESvMRATIO = figure;
   axSvMR = axes('Parent',fSTOKESvMRATIO);
   hold on
-  ylim([0 1])
+  ylim([0 0.5])
   axSvMR.XScale = 'log';
   hSvMR1 = scatter(KPT.StokesS1,KPT.MassRatio,[],'o','filled',...
       'DisplayName',sprintf('Solid1 (d=%g mm)',KPT.DiamS1(1)*1E3));
@@ -249,9 +250,9 @@ cd(savepath)
   
 % Pulse frequency vs. mass ratio
   fFREQvMRATIO = figure;
-  axFvMR = axes('Parent',fMFREQvMRATIO);
+  axFvMR = axes('Parent',fFREQvMRATIO);
   hold on
-  ylim([0 1])
+  ylim([0 0.5])
   axFvMR.XTick = allFrequencies;
   axFvMR.XScale = 'log';
   axFvMR.XLim = [min(allFrequencies) max(allFrequencies)];
@@ -277,7 +278,7 @@ cd(savepath)
   fMFLUXvMRATIO = figure;
   axMFvMR = axes('Parent',fMFLUXvMRATIO);
   hold on
-  ylim([0 1])
+  ylim([0 0.5])
   hMFvMR = scatter(KPT.AvgMFlux,KPT.MassRatio,[],KPT.FreqIndex,'o','filled');
   xlabel('Average mass flux (kg/m^2s)')
   ylabel('Ratio of collapsed to erupted mass')
@@ -299,6 +300,7 @@ cd(savepath)
 % Average jet entrainment vs. average mass flux
   set(hMFvAE,'YData',-KPT.AvgJEntr);
   ylabel('Average jet entrainment');
+  ylim([0 0.1])
   saveas(fMFLUXvAVGENTR,fullfile(savepath,'AvgMFlux_AvgJEntr.jpg'));
 
 %%% =================================================================== %%%
