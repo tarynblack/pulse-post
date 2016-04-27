@@ -179,14 +179,10 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         caxis(axDens,flowDensity_crange);
         tLD = pulsetitle(varD,PULSE,time,t,titlerun,FREQ);
         title(tLD,'FontSize',12,'FontWeight','bold');
-      % ================================================================= %
-      
-      
-      % --------------------- OVERLAY PLUME OUTLINE --------------------- %
-        figure(figDens)
         hEPD = contourslice(EPG,sdistX*(IMAX-ghostcells),...
             sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
         set(hEPD,'EdgeColor',[1 1 1],'LineWidth',0.5);
+        set(figDens,'Visible',vis);
       % ================================================================= %
         
       
@@ -215,8 +211,9 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         flowreldens = avgatmsdens_3D_inplume - flowdensity;
 
       % Calculate average relative density of flow at jet height
+        inplumeJH  = inplume(:,:,round(jetheight));
         reldensJH  = flowreldens(:,:,round(jetheight));
-        avgRDJH(t) = mean(reldensJH(:));
+        avgRDJH(t) = mean(reldensJH(inplumeJH));
         dlmwrite(fullfile(savepath,sprintf('avgRelDens_JetHeight_%s.txt',...
             run)),[time(t) avgRDJH(t)],'-append','delimiter','\t');
       % ================================================================= %
@@ -234,14 +231,10 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
         caxis(axRelD,flowBuoyancy_crange);
         tLB = pulsetitle(varB,PULSE,time,t,titlerun,FREQ);
         title(tLB,'FontSize',12,'FontWeight','bold');
-      % ================================================================= %
-      
-      
-      % --------------------- OVERLAY PLUME OUTLINE --------------------- %
-        figure(figRelD)
         hEPB = contourslice(EPG,sdistX*(IMAX-ghostcells),...
             sdistY*(KMAX-ghostcells),0,[plumeedge plumeedge]);
         set(hEPB,'EdgeColor',[0 0 0],'LineWidth',0.5);
+        set(figRelD,'Visible',vis);
       % ================================================================= %
         
         
@@ -313,6 +306,7 @@ function [ vidFlowDens ] = flowDensity3D( run,runpath,vis,IMAX,JMAX,KMAX,...
     negRDJH = NaN(length(allRDJH),1);
     negRDJH(negidx) = allRDJH(negidx);
     hRDJH = plot(time(2:end),allRDJH,'r',time(2:end),negRDJH,'b','LineWidth',2);
+    xlim([0 time(end)]);
     ylim(flowBuoyancy_crange)
     xlabel('\bfTime (s)')
     ylabel('\bf\rho_{atmosphere} - \rho_{mixture} (kg/m^3)')

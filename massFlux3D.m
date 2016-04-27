@@ -1,4 +1,4 @@
-function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
+function [ massratio ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     IMAX,JMAX,KMAX,tickx,ticky,tickz,XRES,YRES,ZRES,labelx,labely,labelz,...
     labelXunit,labelYunit,labelZunit,run,timesteps,postpath,massflux_alts,...
     RO_S1,RO_S2,RO_S3,plumeedge,massflux_crange,PULSE,FREQ,time,...
@@ -10,7 +10,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
 %   Detailed explanation goes here
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 15 April 2016
+%   Last edit: Taryn Black, 19 April 2016
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -45,7 +45,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   % Subtightplot properties
     gap = [0.01 0.01];
     ht = 0.15;
-    wd = 0.15;
+    wd = 0.10;
 
 
   % ----------------------- FIGURE INITIALIZATION ----------------------- %
@@ -56,7 +56,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     
   % Mass flux slice: figure and axes properties
     figMFlux = figure('Name','Mass flux','units','centimeters',...
-        'outerposition',[0 0 28 18.75],'visible',vis,'PaperPositionMode',...
+        'outerposition',[0 0 33 18.75],'visible',vis,'PaperPositionMode',...
         'auto','color','w');
     cd(postpath)
     axMFlux1 = subtightplot(1,2,1,gap,ht,wd);
@@ -134,7 +134,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     
   % Preallocate vectors
     netMF_alts = zeros(length(massflux_alts),timesteps);
-    collapse_crit = zeros(1,timesteps);
+%     collapse_crit = zeros(1,timesteps);
     
  
   % =================== B E G I N   T I M E   L O O P =================== %
@@ -192,18 +192,16 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         logMF(logMF>0) = log10(logMF(logMF>0));
         logMF(logMF<0) = -log10(abs(logMF(logMF<0)));
         
-      % Calculate most-negative flux and vent flux for Ongaro criterion
-        massflux_jetheight = massflux(:,:,round(jetheight));        
-        netnegmassflux_JH = sum(massflux_jetheight(massflux_jetheight<0));
-%         negMF  = abs(min(netmassflux(netmassflux<0)));
-        if isempty(netnegmassflux_JH)
-            netnegmassflux_JH = 0;
-        end
-        collapse_crit(t) = -netnegmassflux_JH/MASSFLUX_SOL;
-        dlmwrite(fullfile(savepath,sprintf('collapseRatio_%s.txt',run)),...
-            [time(t) netnegmassflux_JH MASSFLUX_SOL collapse_crit(t)],...
-            '-append','delimiter','\t');
-
+%       % Calculate net negative flux and collapse criterion
+%         massflux_jetheight = massflux(:,:,round(jetheight));        
+%         netnegmassflux_JH = sum(massflux_jetheight(massflux_jetheight<0));
+%         if isempty(netnegmassflux_JH)
+%             netnegmassflux_JH = 0;
+%         end
+%         collapse_crit(t) = -netnegmassflux_JH/MASSFLUX_SOL;
+%         dlmwrite(fullfile(savepath,sprintf('collapseRatio_%s.txt',run)),...
+%             [time(t) netnegmassflux_JH MASSFLUX_SOL collapse_crit(t)],...
+%             '-append','delimiter','\t');
         
         
       % --------------------- MASS FLUX SLICE FIGURE -------------------- %
@@ -227,13 +225,13 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
               [plumeedge plumeedge]);
           set(hEPZ2,'EdgeColor',[1 1 1],'LineWidth',0.5);
           caxis(axMFlux2,[-log10(abs(massflux_crange(1))) log10(massflux_crange(2))]);
-%         tMF = pulsetitle(varMF,PULSE,time,t,titlerun,FREQ);
-        tMF2 = sprintf('Jet height: %.3f km',jetheight*YRES/1000);
-        title(axMFlux2,[tMF2],'FontWeight','bold');
+          tMF2 = sprintf('Jet height: %.3f km',jetheight*YRES/1000);
+          title(axMFlux2,tMF2,'FontWeight','bold');
         PosMF1 = get(axMFlux1,'position');
         PosMF2 = get(axMFlux2,'position');
         PosMF2(3:4) = PosMF1(3:4);
         set(axMFlux2,'position',PosMF2);
+        set(figMFlux,'Visible',vis);
       % ================================================================= %
       
       
@@ -244,6 +242,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
         hMFZ = plot(netmassflux,1:JMAX-ghostcells,'k','LineWidth',2);        
         tMFZ = pulsetitle(varMFZ,PULSE,time,t,titlerun,FREQ);
         title(axAvgMFZ,tMFZ,'FontWeight','bold');
+        set(figAvgMFZ,'Visible',vis);
       % ================================================================= %
       
       
@@ -284,6 +283,16 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
   % End video write and finish video files
     cd(savepath)
     close(vidMFlux);
+   
+  % Calculate ratio of mass below jet height to total mass erupted at end
+  % of simulation
+    totalmass    = RO_S1*EPS1 + RO_S2*EPS2 + RO_S3*EPS3;
+    massbelowJH  = totalmass(:,:,1:round(jetheight));
+    collapsemass = sum(massbelowJH(:));
+    eruptedmass  = MASSFLUX_SOL*time(end);
+    massratio    = collapsemass/eruptedmass;
+    dlmwrite(fullfile(savepath,sprintf('finalMassRatio_%s.txt',run)),...
+        [collapsemass eruptedmass massratio],'delimiter','\t');
     
     
     if strcmp(PULSE,'T') == 1
@@ -302,7 +311,7 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     hold on
     plot(time,netMF_alts);
     legend(axNetMF,massflux_legend)
-    title(axNetMF,sprintf('%s: Net solid mass flux through specified altitudes',str))
+    title(axNetMF,sprintf('Net solid mass flux\n%s',str))
     xlabel(axNetMF,'\bfTime (s)')
     ylabel(axNetMF,'\bfNet mass flux (kg/m^2s)')
     saveas(figNetMF,fullfile(savepath,sprintf('NetMassFlux_tseries_%s.jpg',run)))
@@ -318,38 +327,37 @@ function [ vidMFlux ] = massFlux3D( runpath,vis,viewaz,viewel,ghostcells,...
     hNMF = plot(avgNMF,1:JMAX-ghostcells,'-.','Color',[0 0.4 0.7],'LineWidth',3);
     set(hNMF,'DisplayName','Time-averaged profile')
     set(hMFZ,'DisplayName','Individual timestep profiles')
-    title(axAvgMFZ,sprintf('%s: Time-averaged mass flux with height',str))
+    title(axAvgMFZ,sprintf('Time-averaged solid mass flux\n%s',str))
     hMFZleg = legend(axAvgMFZ,[hNMF hMFZ hJet]);
     set(hMFZleg,'FontSize',12,'Location','Northwest')
     saveas(figAvgMFZ,fullfile(savepath,sprintf('TimeAvgNetMF_%s.jpg',run)));
     
-    avgNegMF = abs(min(avgNMF(avgNMF<0)));
-    if isempty(avgNegMF)
-        avgNegMF = 0;
-    end
-    avg_Ongaro = avgNegMF/MASSFLUX_SOL;
-    dlmwrite(fullfile(savepath,sprintf('avgOngaroCrit_%s.txt',run)),...
-        [avgNegMF MASSFLUX_SOL avg_Ongaro],'delimiter','\t');
+%     avgNegMF = abs(min(avgNMF(avgNMF<0)));
+%     if isempty(avgNegMF)
+%         avgNegMF = 0;
+%     end
+%     avg_Ongaro = avgNegMF/MASSFLUX_SOL;
+%     dlmwrite(fullfile(savepath,sprintf('avgOngaroCrit_%s.txt',run)),...
+%         [avgNegMF MASSFLUX_SOL avg_Ongaro],'delimiter','\t');
   % ===================================================================== %
   
   
-  % ---------------- COLLAPSE CRITERION TIME SERIES PLOT ---------------- %
-    figCollapse = figure('Name','Collapse criterion','units','centimeters',...
-        'outerposition',[0 0 33.33 18.75],'visible',vis,'PaperPositionMode',...
-        'auto','color','w');
-    axCollapse = axes('Parent',figCollapse,'box','on','TickDir','in',...
-        'FontSize',12);
-    grid(axCollapse,'on');
-    axis(axCollapse,[0,time(end),0,1]);
-    hold on
-    plot(time,collapse_crit,'.-');%,time,0.9*ones(1,length(time)),'k--',time,...
-%         0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
-    xlabel(axCollapse,'\bfTime (s)');
-    ylabel(axCollapse,'\bfCollapse criterion ratio');
-    title(axCollapse,sprintf('%s: Collapse criterion ratio...',str));
-    legend('SUPERRATIO!','Near-total collapse','Partial collapse','Incipient collapse');
-    saveas(figCollapse,fullfile(savepath,sprintf('CollapseCriterion_%s.jpg',run)));
-  % ===================================================================== %
+%   % ---------------- COLLAPSE CRITERION TIME SERIES PLOT ---------------- %
+%     figCollapse = figure('Name','Collapse criterion','units','centimeters',...
+%         'outerposition',[0 0 33.33 18.75],'visible',vis,'PaperPositionMode',...
+%         'auto','color','w');
+%     axCollapse = axes('Parent',figCollapse,'box','on','TickDir','in',...
+%         'FontSize',12);
+%     grid(axCollapse,'on');
+%     xlim(axCollapse,[0,time(end)]);
+%     hold on
+%     plot(time,collapse_crit,'LineWidth',2);%,time,0.9*ones(1,length(time)),'k--',time,...
+% %         0.65*ones(1,length(time)),'k-.',time,0.5*ones(1,length(time)),'k:');
+%     xlabel(axCollapse,'\bfTime (s)');
+%     ylabel(axCollapse,'\bfSolid mass flux ratio');
+%     title(axCollapse,sprintf('Collapse criterion\n%s',str));
+%     saveas(figCollapse,fullfile(savepath,sprintf('CollapseCriterion_%s.jpg',run)));
+%   % ===================================================================== %
   
   
   cd(postpath)

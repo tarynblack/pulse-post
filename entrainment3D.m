@@ -1,14 +1,14 @@
-function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
-    KMAX,tickx,labelx,labelXunit,ticky,labely,labelYunit,tickz,labelz,...
-    labelZunit,plumeedge,XRES,YRES,ZRES,postpath,PULSE,FREQ,time,...
-    vel_char,jetheight,entrainment_crange,viewaz,viewel,imtype,titlerun,...
-    timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
+function [ STavg_entr,STavg_jentr ] = entrainment3D( run,runpath,...
+    vis,ghostcells,IMAX,JMAX,KMAX,tickx,labelx,labelXunit,ticky,labely,...
+    labelYunit,tickz,labelz,labelZunit,plumeedge,XRES,YRES,ZRES,postpath,...
+    PULSE,FREQ,time,vel_char,jetheight,entrainment_crange,viewaz,viewel,...
+    imtype,titlerun,timesteps,isoEPG,colEPG,trnEPG,DT,VENT_R,savepath,...
     readEPG,fnameEPG,readUG,fnameUG,readVG,fnameVG,readWG,fnameWG )
 %entrainment3D Summary of this function goes here
 %   entrainment3D ---does things---
 %
 %   Functions called: loadTimestep3D; pulsetitle
-%   Last edit: Taryn Black, 15 April 2016 
+%   Last edit: Taryn Black, 19 April 2016 
 
   % Clear directory of appending files from previous processing attempts
     cd(savepath)
@@ -199,6 +199,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         lighting gouraud;
         tLEP = pulsetitle(varEP,PULSE,time,t,titlerun,FREQ);
         title(tLEP,'FontWeight','bold');
+        set(figEP,'Visible',vis);
       % ================================================================= %
 
       
@@ -349,6 +350,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         camlight('right');
         camlight('left');
         lighting gouraud;
+        set(figEn,'Visible',vis);
       % ================================================================= %
       
       
@@ -422,6 +424,10 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
     close(vidEPG);
 % %     close(vidQ);
     close(vidEntr);
+    
+  % Calculate spatio-temporally averaged entrainment for plume and jet
+    STavg_entr  = mean(avg_entr(2:end));
+    STavg_jentr = mean(avg_jentr(2:end));
       
       
   % ------------------- ENTRAINMENT TIME SERIES PLOTS ------------------- %
@@ -477,7 +483,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'DisplayName','Combined');
     tlCoeff1 = 'EEE averaged over full plume surface';
     tlCoeff2 = sprintf('%s',str); 
-    tlCoeff3 = sprintf('Spatiotemporally averaged entrainment = %.4f',mean(avg_entr(2:end)));
+    tlCoeff3 = sprintf('Spatiotemporally averaged entrainment = %.4f',STavg_entr);
     title(axCoeff,{tlCoeff1;tlCoeff2;tlCoeff3},'FontWeight','bold')
     xlabel(axCoeff,'\bfTime (s)')
     ylabel(axCoeff,'\bfEEE')
@@ -520,7 +526,7 @@ function [ vidEntr ] = entrainment3D( run,runpath,vis,ghostcells,IMAX,JMAX,...
         'DisplayName','Combined');
     tlJCoeff1 = 'EEE averaged over jet region';
     tlJCoeff2 = sprintf('%s',str); 
-    tlJCoeff3 = sprintf('Spatiotemporally averaged entrainment = %.4f',mean(avg_jentr(2:end)));
+    tlJCoeff3 = sprintf('Spatiotemporally averaged entrainment = %.4f',STavg_jentr);
     title(axJCoeff,{tlJCoeff1;tlJCoeff2;tlJCoeff3},'FontWeight','bold')
     xlabel(axJCoeff,'\bfTime (s)')
     ylabel(axJCoeff,'\bfEEE')

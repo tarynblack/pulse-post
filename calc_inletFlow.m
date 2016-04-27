@@ -1,4 +1,4 @@
-function [ XG,vel_char,MFR,MASSFLUX,MFR_SOL,MASSFLUX_SOL,jetheight ] = ...
+function [ XG,vel_char,MFR,MASSFLUX,MFR_SOL,MASSFLUX_SOL,jetheight,avgEPG ] = ...
     calc_inletFlow( charEPG,MING,MAXG,PULSE,BC_EPG,BC_PG,BC_TG,Rgas,...
     RO_S1,RO_S2,RO_S3,NFR_S1,NFR_S2,NFR_S3,BC_TS1,BC_TS2,BC_TS3,VENT_R,g )
 %calc_inletFlow calculates the gas mass fraction, choked velocity, and mass
@@ -23,12 +23,15 @@ function [ XG,vel_char,MFR,MASSFLUX,MFR_SOL,MASSFLUX_SOL,jetheight ] = ...
 %
 % Last edit: Taryn Black, 6 April 2016
 
+    beta = asin((MAXG-MING)/(MING*(1-MING)));
+    avgEPG = 1 + ((2/pi)*(1-MING)*(MING - (MING*cos(beta)) - beta));
+
     if strcmp(charEPG,'mingas') == 1
         EPGunst = MING;
     elseif strcmp(charEPG,'maxgas') == 1
         EPGunst = MAXG;
     elseif strcmp(charEPG,'avggas') == 1
-        EPGunst = (2*MING*(1-MING)/pi)+MING;
+        EPGunst = avgEPG;
     end
 
     if strcmp(PULSE,'T') == 1
