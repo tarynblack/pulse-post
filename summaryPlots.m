@@ -17,8 +17,8 @@ postpath = '~/scratch/pulse-post';
                   0.90 0.50 0.00];  % orange
             
 % Define mass ratio values for transitions between buoyant/partial/collapse
-  collapse2partial = 0.5;
-  partial2buoyant  = 0.2;
+  collapse2partial = 0.04;
+  partial2buoyant  = 0.02;
   
 % Define scatter symbology for buoyant/partial/collapse
   plumeStatSymbols = 'osv';
@@ -130,7 +130,7 @@ cd(savepath)
           
 % Combine key parameters, frequency index, and plume status and save table
   KPT = [KPT IDX PST];
-  writetable(KPT,fullfile(savepath,'SummaryTable.txt'),'Delimiter','tab');
+  writetable(KPT,fullfile(savepath,'SummaryTable.txt'),'WriteVariableNames',1);
   
   
 %%% ---------------- CREATE PARAMETRIZED SUMMARY PLOTS ---------------- %%%
@@ -232,7 +232,7 @@ cd(savepath)
   axFvMF.XTickLabel{1} = 'Steady';
   hFvMF = gscatter(KPT.Frequency,KPT.AvgMFlux,KPT.PlumeStatus,...
       myColorOrder,plumeStatSymbols);
-  for i = 1:length(hFvEPG)
+  for i = 1:length(hFvMF)
       if strcmp(hFvMF(i).DisplayName,'Collapse') == 1
           set(hFvMF(i),'MarkerFaceColor',myColorOrder(1,:));
       elseif strcmp(hFvMF(i).DisplayName,'Partial') == 1
@@ -245,7 +245,33 @@ cd(savepath)
   xlabel('Pulse frequency (Hz)');
   ylabel('Average mass flux (kg/m^2s)');
   saveas(fFREQvMFLUX,fullfile(savepath,'Freq_AvgMFlux.jpg'));
-
+  
+  
+% Pulse frequency vs. mass ratio
+  fFREQvMRATIO = figure;
+  axFvMR = axes('Parent',fMFREQvMRATIO);
+  hold on
+  ylim([0 1])
+  axFvMR.XTick = allFrequencies;
+  axFvMR.XScale = 'log';
+  axFvMR.XLim = [min(allFrequencies) max(allFrequencies)];
+  axFvMR.XTickLabel{1} = 'Steady';
+  hFvMR = gscatter(KPT.Frequency,KPT.AvgMFlux,KPT.PlumeStatus,...
+      myColorOrder,plumeStatSymbols);
+  for i = 1:length(hFvMR)
+      if strcmp(hFvMR(i).DisplayName,'Collapse') == 1
+          set(hFvMR(i),'MarkerFaceColor',myColorOrder(1,:));
+      elseif strcmp(hFvMR(i).DisplayName,'Partial') == 1
+          set(hFvMR(i),'MarkerFaceColor',myColorOrder(2,:));
+      elseif strcmp(hFvMR(i).DisplayName,'Buoyant') == 1
+          set(hFvMR(i),'MarkerFaceColor',myColorOrder(3,:));
+      end
+  end
+  set(hFvMR,'MarkerEdgeColor','none');
+  xlabel('Pulse frequency (Hz)');
+  ylabel('Ratio of collapsed to erupted mass');
+  saveas(fFREQvMRATIO,fullfile(savepath,'Freq_MassRatio.jpg'));
+  
   
 % Average mass flux vs. mass ratio
   fMFLUXvMRATIO = figure;
