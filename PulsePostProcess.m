@@ -1,0 +1,185 @@
+%%% PulsePostProcess analyzes and visualizes the output from simulations of
+%%% volcanic eruptions generated from a modified MFIX code base.
+%
+%   Functions called: userinputparameters; loadmfixparameters;
+%       definespatiotemporalvalues; computeinletflow; errorcheckreplace;
+%       computeparticlestokes; initializeFigures; preallocateVectors;
+%       defineImportSpecifications
+%
+%   Last edit: Taryn Black, 21 July 2016
+
+global RUN_ID
+RUN_ID = 'testdata';
+
+% ======================================================================= %
+
+% ------------------------- DATA PRE-PROCESSING ------------------------- %
+
+%%  Set global variables
+%   Defined in userinputparameters
+    global DATAPATH SAVEPATH POSTPATH
+    global TIME_START TIME_STOP
+    global PLUME_EDGE CHARACTERISTIC_EPG R_GAS MU_G0 g GHOSTCELLS_IJK
+    global IMAGE_SAVE_TYPE VIEW3D_AZIMUTH VIEW3D_ELEVATION ...
+        NUMTICKLABELS_XYZ SCALE_FACTOR_XYZ LABEL_UNIT_XYZ SLICE_LOCATION_XYZ
+    global EPG_ISOSURFACE_EDGE EPG_ISOSURFACE_COLOR EPG_ISOSURFACE_TRANSPARENCY
+    global MASS_FLUX_ALTITUDES
+    global COLORRANGE_ENTRAINMENT COLORRANGE_PARTICLE_CONCENTRATION ...
+        COLORRANGE_BULK_DENSITY COLORRANGE_RELATIVE_DENSITY ...
+        COLORRANGE_GAS_TEMPERATURE COLORRANGE_VELOCITY COLORRANGE_VORTICITY ...
+        COLORRANGE_MASS_FLUX
+    global READ_EPG FILENAME_EPG READ_EPS1 FILENAME_EPS1 ...
+        READ_EPS2 FILENAME_EPS2 READ_EPS3 FILENAME_EPS3 READ_TG ...
+        FILENAME_TG READ_ROG FILENAME_ROG READ_UG FILENAME_UG READ_VG ...
+        FILENAME_VG READ_WG FILENAME_WG READ_VS1 FILENAME_VS1 READ_VS2 ...
+        FILENAME_VS2 READ_VS3 FILENAME_VS3
+%   Defined in loadmfixparameters
+    global IMAX JMAX KMAX
+    global LENGTH HEIGHT WIDTH
+    global RO_S1 RO_S2 RO_S3
+    global NFR_S1 NFR_S2 NFR_S3 
+    global PULSE FREQUENCY
+    global MINIMUM_EPG MAXIMUM_EPG
+    global VENT_R
+    global DT END_T
+    global ATMOS TROPO
+    global BC_EPG BC_PG BC_TG BC_TS1 BC_TS2 BC_TS3
+    global D_S1 D_S2 D_S3
+%   Defined in definespatiotemporalvalues
+    global RESOLUTION_XYZ GRIDPOINTS_X GRIDPOINTS_Y GRIDPOINTS_Z
+    global TICKS_X TICKS_Y TICKS_Z TICKLABELS_X TICKLABELS_Y TICKLABELS_Z
+    global nTIMESTEPS TIME_VECTOR
+%   Defined in errorcheckreplace
+    global SLICE_AZIMUTH SLICE_ELEVATION
+%   Defined in defineImportSpecifications
+    global IMPORTSPEC_EPG IMPORTSPEC_EPS1 IMPORTSPEC_EPS2 IMPORTSPEC_EPS3 ...
+        IMPORTSPEC_UG IMPORTSPEC_VG IMPORTSPEC_WG IMPORTSPEC_TG ...
+        IMPORTSPEC_ROG IMPORTSPEC_VS1 IMPORTSPEC_VS2 IMPORTSPEC_VS3
+%   Defined in errorcheckreplace
+    global RUN_NAME
+
+    
+%%  Set user-defined parameters for post-processing.
+    userinputparameters;
+    
+%%  Load simulation-defined parameters for post-processing.
+    loadmfixparameters;
+    
+%%  Define other spatial and temporal values for simulation processing.
+    definespatiotemporalvalues;
+    
+%%  Compute characteristic flow values at the vent
+    [ AVERAGE_EPG,GAS_MASS_FRACTION,CHARACTERISTIC_VELOCITY,...
+        MASS_FLOW_RATE,MASS_FLUX,SOLID_MASS_FLOW_RATE,SOLID_MASS_FLUX,...
+        JET_HEIGHT ] = computeinletflow;   
+    
+%%  Check for user-generated problems and update select user-defined values
+    errorcheckreplace;      
+    
+%%  Compute Stokes numbers for each particle phase and save to file
+    [ Stokes_S1,Stokes_S2,Stokes_S3 ] = ...
+        computeparticlestokes(CHARACTERISTIC_VELOCITY);    
+    
+%%  Initialize figures
+    [fig_EPG,ax_EPG,...
+        fig_ENTRAINMENT,ax_ENTRAINMENT,cb_ENTRAINMENT,...
+        fig_PARTICLE_CONCENTRATION,ax_PARTICLE_CONCENTRATION,cb_PARTICLE_CONCENTRATION,...
+        fig_GAS_TEMPERATURE,ax_GAS_TEMPERATURE,cb_GAS_TEMPERATURE,...
+        fig_BULK_DENSITY,ax_BULK_DENSITY,cb_BULK_DENSITY,...
+        fig_RELATIVE_DENSITY,ax_RELATIVE_DENSITY,cb_RELATIVE_DENSITY,...
+        fig_VELOCITY,ax_VELOCITY,cb_VELOCITY,...
+        fig_VORTICITY,ax_VORTICITY,cb_VORTICITY] = ...
+        initializeFigures;
+    
+%%  Preallocate vectors for calculations
+    [surf_EPG,...
+        AVG_EEE_COEFF,STD_EEE_COEFF,...
+        AVG_ENTRAINMENT,STD_ENTRAINMENT,...
+        AVG_EXPANSION,STD_EXPANSION,...
+        AVG_EEE_COEFF_JET,STD_EEE_COEFF_JET,...
+        AVG_ENTRAINMENT_JET,STD_ENTRAINMENT_JET,...
+        AVG_EXPANSION_JET,STD_EXPANSION_JET,...
+        PLUME_VOLUME,PLUME_HEIGHT,PLUME_TOP_RADIUS,...
+        MORTON_ENTRAINMENT,...
+        AVG_RELATIVE_DENSITY_JET_HEIGHT] = ...
+        preallocateVectors;
+    
+%%  Define file import specifications
+    [IMPORTSPEC_EPG,IMPORTSPEC_EPS1,IMPORTSPEC_EPS2,IMPORTSPEC_EPS3,...
+        IMPORTSPEC_UG,IMPORTSPEC_VG,IMPORTSPEC_WG,...
+        IMPORTSPEC_TG,IMPORTSPEC_ROG,...
+        IMPORTSPEC_VS1,IMPORTSPEC_VS2,IMPORTSPEC_VS3] = ...
+        defineImportSpecifications;
+
+% ----------------------------------------------------------------------- %
+
+
+% ----------------------- ITERATE OVER TIME STEPS ----------------------- %
+    
+for t = 1:nTIMESTEPS
+   
+    %%  Load data for current timestep
+        [EPG,EPS1,EPS2,EPS3,...
+            U_G,V_G,W_G,...
+            T_G,RO_G,...
+            V_S1,V_S2,V_S3] = ...
+            loadTimestepData(t);
+        
+    %%  Calculations... #TODO
+        T_G = calculateAdjustedTemperature(T_G);
+        
+        [BULK_DENSITY,RELATIVE_DENSITY,AVG_RELATIVE_DENSITY_JETHEIGHT]...
+            = calculateDensities(EPG,EPS1,EPS2,EPS3,RO_G,JET_HEIGHT);
+        
+        [FLOW_VELOCITY,FLOW_VORTICITY_X,FLOW_VORTICITY_Y]...
+            = calculateFlowVelocityVorticity(U_G,V_G,W_G);
+        
+    %%  Plot variables and save figures as image files
+     %  Gas volume fraction: plot and save as image file
+        plotIsosurfaces(fig_EPG,ax_EPG,EPG,EPG_ISOSURFACE_EDGE,...
+            EPG_ISOSURFACE_COLOR,'none',EPG_ISOSURFACE_TRANSPARENCY,...
+            'on','Gas Volume Fraction',t);
+        saveImageFile(fig_EPG,'EPG',t)
+        
+     %  Entrainment: #TODO
+    
+     %  Particle concentration: #TODO
+        % #TODO change variable input to log(EPS1) etc.
+        plotSlices(fig_PARTICLE_CONCENTRATION,ax_PARTICLE_CONCENTRATION,...
+            {EPS1;EPS2;EPS3},'interp','none',...
+            COLORRANGE_PARTICLE_CONCENTRATION,{'Phase 1';'Phase 2';'Phase 3'},t);
+        saveImageFile(fig_PARTICLE_CONCENTRATION,'ParticleConcentration',t);
+    
+     %  Gas temperature: plot and save as image file
+        plotSlices(fig_GAS_TEMPERATURE,ax_GAS_TEMPERATURE,T_G,...
+            'interp','none',COLORRANGE_GAS_TEMPERATURE,'Gas Temperature',t);
+        saveImageFile(fig_GAS_TEMPERATURE,'GasTemperature',t);
+    
+     %  Density: plot and save as image file
+        plotSlices(fig_BULK_DENSITY,ax_BULK_DENSITY,BULK_DENSITY,...
+            'interp','none',COLORRANGE_BULK_DENSITY,'Bulk Density',t);
+        saveImageFile(fig_BULK_DENSITY,'BulkDensity',t);
+    
+     %  Relative density: plot and save as image file
+        plotSlices(fig_RELATIVE_DENSITY,ax_RELATIVE_DENSITY,RELATIVE_DENSITY,...
+            'interp','none',COLORRANGE_RELATIVE_DENSITY,'Relative Density',t);
+        saveImageFile(fig_RELATIVE_DENSITY,'RelativeDensity',t);
+    
+     %  Velocity: #TODO
+        plotSlices(fig_VELOCITY,ax_VELOCITY,FLOW_VELOCITY,...
+            'interp','none',COLORRANGE_VELOCITY,'Flow Velocity',t);
+        saveImageFile(fig_VELOCITY,'FlowVelocity',t);
+    
+     %  Vorticity: #TODO
+        plotSlices(fig_VORTICITY,ax_VORTICITY,{FLOW_VORTICITY_X;FLOW_VORTICITY_Y},...
+            'interp','none',COLORRANGE_VORTICITY,'Flow Vorticity',t);
+        saveImageFile(fig_VORTICITY,'FlowVorticity',t);
+    
+     %  Mass flux: #TODO
+        
+end
+
+% ----------------------------------------------------------------------- %
+
+
+% ======================================================================= %
