@@ -3,7 +3,7 @@ function [ FIGURE,AXES,COLORBAR ] = createHandles( AZIMUTH,ELEVATION,NAME,...
 %createHandles Summary of this function goes here #TODO
 %   Detailed explanation goes here #TODO
 %
-%   Last edit: Taryn Black, 21 July 2016
+%   Last edit: Taryn Black, 25 July 2016
 
 %%  Argument management
     if nargin < 7 || nAXES < 1
@@ -48,31 +48,34 @@ function [ FIGURE,AXES,COLORBAR ] = createHandles( AZIMUTH,ELEVATION,NAME,...
             
             FIGURE = figure('Name',NAME,'OuterPosition',OUTER_POSITION);
             AXES = repmat(axes('Parent',FIGURE),1,nAXES);
+%             COLORBAR = colorbar(AXES(nAXES),'AxisLocation','in','FontSize',12);
             hold on
-            axis(AXES,'equal',[0,IMAX - GHOSTCELLS_IJK(1),...
-                               0,KMAX - GHOSTCELLS_IJK(3),...
-                               0,JMAX - GHOSTCELLS_IJK(2)]);
-            set(AXES,'XTick',TICKS_X(2:end)/RESOLUTION_XYZ(1),...
-                        'XTickLabel',TICKLABELS_X,...
-                     'YTick',TICKS_Z(2:end)/RESOLUTION_XYZ(3),...
-                        'YTickLabel',TICKLABELS_Z,...
-                     'ZTick',TICKS_Y(2:end)/RESOLUTION_XYZ(2),...
-                        'ZTickLabel',TICKLABELS_Y);
             for n = 1:nAXES
                 hold on
                 AXES(n) = subtightplot(1,nAXES,n,[0.01 0.01],0.15,0.15);
+                axis(AXES(n),'equal',[0,IMAX - GHOSTCELLS_IJK(1),...
+                                      0,KMAX - GHOSTCELLS_IJK(3),...
+                                      0,JMAX - GHOSTCELLS_IJK(2)]);
+                set(AXES(n),'XTick',TICKS_X(2:end)/RESOLUTION_XYZ(1),...
+                                'XTickLabel',TICKLABELS_X,...
+                            'YTick',TICKS_Z(2:end)/RESOLUTION_XYZ(3),...
+                                'YTickLabel',TICKLABELS_Z,...
+                            'ZTick',TICKS_Y(2:end)/RESOLUTION_XYZ(2),...
+                                'ZTickLabel',TICKLABELS_Y); 
                 grid(AXES(n),'on');AXES(n).Layer = 'top';
                 view(AXES(n),AZIMUTH,ELEVATION);
                 xlabel(AXES(n),sprintf('\\bf Distance_x (%s)',LABEL_UNIT_XYZ{1}));
                 ylabel(AXES(n),sprintf('\\bf Distance_z (%s)',LABEL_UNIT_XYZ{3}));
                 zlabel(AXES(n),sprintf('\\bf Altitude (%s)',LABEL_UNIT_XYZ{2}));                
                 colormap(AXES(n),COLORMAP);
+                caxis(CAXIS);
+                if n == nAXES
+                   COLORBAR = colorbar(AXES(nAXES),'AxisLocation','in','FontSize',12);
+                end
                 POSITION(n,:) = get(AXES(n),'position');
                 POSITION(n,3:4) = POSITION(1,3:4);
                 set(AXES(n),'position',POSITION(n,:));
             end
-            COLORBAR = colorbar(AXES(nAXES),'AxisLocation','in','FontSize',12);
-            caxis(CAXIS);
             
     end
      

@@ -13,7 +13,8 @@
 %   Global variables that are defined
     global DATAPATH SAVEPATH POSTPATH
     global TIME_START TIME_STOP
-    global PLUME_EDGE CHARACTERISTIC_EPG R_GAS MU_G0 g GHOSTCELLS_IJK
+    global PLUME_EDGE CHARACTERISTIC_EPG R_GAS MU_G0 g GHOSTCELLS_IJK ...
+        MASS_FLUX_ALTITUDES
     global IMAGE_SAVE_TYPE VIEW3D_AZIMUTH VIEW3D_ELEVATION ...
         NUMTICKLABELS_XYZ SCALE_FACTOR_XYZ LABEL_UNIT_XYZ SLICE_LOCATION_XYZ
     global EPG_ISOSURFACE_EDGE EPG_ISOSURFACE_COLOR EPG_ISOSURFACE_TRANSPARENCY
@@ -116,7 +117,7 @@
 %   Altitudes [in meters] at which to calculate the vertical mass flux. To
 %   include the script-calculated jet height, include one NaN in the
 %   vector.
-    MASS_FLUX_ALTITUDES = [0 8000 4000 NaN];
+    MASS_FLUX_ALTITUDES = [0 2000 4000 NaN];
 
 %   COLORRANGE LIMITS
 %   Entrainment (must be between -1 and 1)
@@ -134,8 +135,8 @@
     COLORRANGE_VELOCITY = [0 300];
 %   Vorticity [1/s]
     COLORRANGE_VORTICITY = [-20 20];
-%   Mass flux [kg/m2.s]
-    COLORRANGE_MASS_FLUX = [-1E5 1E5];
+%   Mass flux [kg/m2.s] (log scale, +/- represent up/down movement)
+    COLORRANGE_MASS_FLUX = [-5 5];
 % ----------------------------------------------------------------------- %
 
 
