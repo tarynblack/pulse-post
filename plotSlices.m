@@ -3,13 +3,13 @@ function plotSlices( FIGURE,AXES,VAR,FACE_COLOR,...
 %plotSlices Summary of this function goes here #TODO
 %   Detailed explanation goes here #TODO
 %
-%   Last edit: Taryn Black, 25 July 2016
+%   Last edit: Taryn Black, 2 August 2016
 
 %%  Global variables that are used
     global IMAX JMAX KMAX GHOSTCELLS_IJK
     global PULSE TIME_VECTOR RUN_NAME FREQUENCY
 
-%%  Plot single or multiple #TODO slices in single figure
+%%  Plot single or multiple slices in single figure
     figure(FIGURE)
     
     switch length(AXES)
@@ -17,6 +17,12 @@ function plotSlices( FIGURE,AXES,VAR,FACE_COLOR,...
         case 1
             cla(AXES)
             hold on
+            
+            %   SLICE breaks when all values in VAR are equal. Shift first
+            %   value slightly to give VAR a small range.
+                if range(VAR(:)) == 0
+                    VAR(1) = 1.001*VAR(1);
+                end
             
             if strcmp(SLICE_TYPE,'horizontal')
                 hSLICE = slice(AXES,0.5:(IMAX - GHOSTCELLS_IJK(1) - 0.5),...
@@ -49,6 +55,12 @@ function plotSlices( FIGURE,AXES,VAR,FACE_COLOR,...
             for n = 1:length(AXES)
                 cla(AXES(n))
                 hold on
+                
+                %   SLICE breaks when all values in VAR are equal. Shift
+                %   first value slightly to give VAR a small range.
+                    if range(VAR{n}(:)) == 0
+                        VAR{n}(1) = 1.0001*VAR{n}(1);
+                    end
                 
                 if strcmp(SLICE_TYPE{n},'horizontal')
                     hSLICE = slice(AXES(n),0.5:(IMAX - GHOSTCELLS_IJK(1) - 0.5),...
